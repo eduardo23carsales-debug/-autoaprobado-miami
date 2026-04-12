@@ -1,0 +1,16 @@
+{
+  "name": "autoaprobado-miami",
+  "version": "1.0.0",
+  "description": "Landing page de captura de leads — AutoAprobado Miami",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.22.1",
+    "node-telegram-bot-api": "^0.66.0",
+    "dotenv": "^16.4.0"
+  }
+}
