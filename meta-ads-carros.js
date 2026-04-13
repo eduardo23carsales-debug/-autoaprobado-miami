@@ -139,34 +139,30 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20) {
   // 2. Crear campaña CBO
   const campana = await metaPost(`/${AD_ACCOUNT}/campaigns`, {
     name: `AutoAprobado | ${data.nombre} | ${fecha}`,
-    objective: 'OUTCOME_LEADS',
+    objective: 'OUTCOME_TRAFFIC',
     status: 'ACTIVE',
-    special_ad_categories: ['CREDIT'],   // requerido para anuncios de financiamiento
+    special_ad_categories: ['FINANCIAL_PRODUCTS_SERVICES'],
     daily_budget: presupuestoCentavos,
     bid_strategy: 'LOWEST_COST_WITHOUT_CAP'
   });
   console.log(`✅ Campaña creada: ${campana.id}`);
   await new Promise(r => setTimeout(r, 3000));
 
-  // Targeting — Miami específico, hispanohablantes
+  // Targeting — categorías especiales no permiten Advantage+
+  // Meta exige: edad 18-65, sin género, sin Advantage+
   const targeting = {
-    age_min: 21,
+    age_min: 18,
     age_max: 65,
-    genders: [1, 2],
     geo_locations: {
-      cities: [{ key: '2430536', radius: 40, distance_unit: 'mile' }] // Miami, FL
-    },
-    locales: [6], // Español
-    targeting_automation: { advantage_audience: 1 }
+      regions: [{ key: '3847' }] // Florida
+    }
   };
 
   const adsetBase = {
     campaign_id: campana.id,
     billing_event: 'IMPRESSIONS',
-    optimization_goal: 'LEAD_GENERATION',
+    optimization_goal: 'LANDING_PAGE_VIEWS',
     bid_strategy: 'LOWEST_COST_WITHOUT_CAP',
-    dsa_beneficiary: 'AutoAprobado MiamiDoral',
-    dsa_payor: 'AutoAprobado MiamiDoral',
     targeting,
     status: 'ACTIVE'
   };
