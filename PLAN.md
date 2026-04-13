@@ -1,5 +1,5 @@
 # PLAN — Landing Page AutoAprobado Miami
-> Archivo vivo. Actualizar cada sesión. Última actualización: 2026-04-11
+> Archivo vivo. Actualizar cada sesión. Última actualización: 2026-04-12
 
 ---
 
@@ -76,24 +76,31 @@ POST /api/lead → server.js
 ## ESTADO DE TAREAS
 
 ### ✅ COMPLETADO (Sesión 1 — 2026-04-11)
-- [x] Análisis de requisitos
-- [x] Definición de marca, colores, arquitectura
-- [x] PLAN.md creado
-- [x] package.json creado
-- [x] npm install ejecutado — dependencias listas
-- [x] server.js creado (Express + Telegram + WhatsApp redirect round-robin)
-- [x] public/index.html — Landing completa (HTML + CSS + JS dinámico)
-- [x] .env.example creado
+- [x] Análisis de requisitos y definición de marca
+- [x] server.js — Express + Telegram + WhatsApp round-robin
+- [x] public/index.html — Landing completa con JS dinámico
+- [x] 5 segmentos: mal crédito, sin historial, urgente, upgrade, oferta especial
+- [x] Dropdown oferta especial con precios reales Hyundai 2026 (de pagina doral promo.html)
+- [x] Logo premium CSS dorado — "JE" en fuente Cinzel con efecto metálico
+- [x] Sección vendedores — Eduardo y Jorge con fotos y botones WhatsApp directos
+- [x] Bug fix — botón "Enviando" se reseteaba al cerrar modal
+- [x] Número Eduardo corregido: 17869167339
+- [x] Token Telegram propio: ver Railway dashboard (no escribir aquí)
+- [x] Canal Telegram: "Clientes De Hyundai Doral" (ver Railway dashboard)
+- [x] .env configurado y probado — leads llegan al canal correcto
+- [x] Deploy en Railway — FUNCIONANDO
+- [x] URL producción: https://autoaprobado-miami-production.up.railway.app
+- [x] Repo GitHub: https://github.com/eduardo23carsales-debug/-autoaprobado-miami
 
-### 🔄 SIGUIENTE SESIÓN — PENDIENTE
-- [ ] Configurar .env con tokens reales
-- [ ] Probar server.js en local (node server.js)
-- [ ] Verificar llegada de leads a Telegram
-- [ ] Probar redirect de WhatsApp en móvil
-- [ ] Deploy en Railway (nuevo servicio o mismo proyecto)
-- [ ] Conectar dominio (si aplica)
-- [ ] Configurar pixel de Meta Ads en el HTML
-- [ ] A/B test de headlines (fase 2)
+### 🔄 PENDIENTE — PRÓXIMA SESIÓN
+- [ ] **Dominio** — conectar subdominio de hyundaipromomiami.com (Namecheap)
+  - Eduardo prefiere método más simple que Railway custom domain
+  - Preguntarle cómo corrió landings antes (FTP, cPanel, otro hosting)
+  - Opciones: redireccionamiento, Cloudflare proxy, o subir archivos directo al hosting
+- [ ] Configurar pixel de Meta Ads en el HTML (descomentar bloque ya preparado)
+- [ ] Conectar agente Meta Ads para crear campañas de autos automáticamente
+- [ ] Sistema de videos — subir creativos a la landing para Meta Ads
+- [ ] Inteligencia de competencia — agente analiza hooks virales del mercado de autos Miami
 
 ---
 
