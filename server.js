@@ -7,6 +7,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import TelegramBot from 'node-telegram-bot-api';
+import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -18,17 +19,23 @@ const PORT = process.env.PORT || 3000;
 const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: false });
 const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-// ── WhatsApp — round-robin entre Eduardo y Jorge ─────
+// ── WhatsApp — round-robin por paridad del timestamp ─
 const WHATSAPP = [
-  process.env.WHATSAPP_EDUARDO || '17869137339',
+  process.env.WHATSAPP_EDUARDO || '17869167339',
   process.env.WHATSAPP_JORGE   || '17865809908',
 ];
-let waIndex = 0;
 function nextWhatsApp() {
-  const num = WHATSAPP[waIndex % WHATSAPP.length];
-  waIndex++;
-  return num;
+  return WHATSAPP[Math.floor(Date.now() / 1000) % 2];
 }
+
+// ── Rate limiting — máx 5 leads por IP por minuto ────
+const leadLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { ok: false, error: 'Demasiados intentos. Espera un momento.' },
+});
 
 // ── Middleware ───────────────────────────────────────
 app.use(express.json());
@@ -38,7 +45,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ════════════════════════════════════════════════════
 // POST /api/lead — Recibe lead desde la landing
 // ════════════════════════════════════════════════════
-app.post('/api/lead', async (req, res) => {
+app.post('/api/lead', leadLimiter, async (req, res) => {
   try {
     const {
       nombre,
