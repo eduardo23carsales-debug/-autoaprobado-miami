@@ -8,7 +8,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import TelegramBot from 'node-telegram-bot-api';
 import rateLimit from 'express-rate-limit';
+import cron from 'node-cron';
 import dotenv from 'dotenv';
+import { generarReporte } from './monitor-ads.js';
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -124,7 +126,16 @@ app.post('/api/lead', leadLimiter, async (req, res) => {
 // ── Health check ─────────────────────────────────────
 app.get('/api/ping', (req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
 
+// ── Monitor de campañas — reporte diario 8 AM ET ─────
+// Cron: "0 8 * * *" = todos los días a las 8:00 AM
+// Timezone America/New_York = Miami
+cron.schedule('0 8 * * *', () => {
+  console.log('[Monitor] Ejecutando reporte diario...');
+  generarReporte();
+}, { timezone: 'America/New_York' });
+
 // ── Iniciar servidor ─────────────────────────────────
 app.listen(PORT, () => {
   console.log(`✅ AutoAprobado Miami corriendo en http://localhost:${PORT}`);
+  console.log(`📊 Monitor de campañas activo — reporte diario a las 8 AM ET`);
 });
