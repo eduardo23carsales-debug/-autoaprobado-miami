@@ -89,18 +89,16 @@ POST /api/lead → server.js
 - [x] Canal Telegram: "Clientes De Hyundai Doral" (ver Railway dashboard)
 - [x] .env configurado y probado — leads llegan al canal correcto
 - [x] Deploy en Railway — FUNCIONANDO
-- [x] URL producción: https://autoaprobado-miami-production.up.railway.app
+- [x] URL producción: https://oferta.hyundaipromomiami.com
+- [x] URL Railway (backup): https://autoaprobado-miami-production.up.railway.app
+- [x] Dominio propio conectado: subdominio oferta.hyundaipromomiami.com (Namecheap → Railway CNAME)
 - [x] Repo GitHub: https://github.com/eduardo23carsales-debug/-autoaprobado-miami
 
 ### 🔄 PENDIENTE — PRÓXIMA SESIÓN
-- [ ] **Dominio** — conectar subdominio de hyundaipromomiami.com (Namecheap)
-  - Eduardo prefiere método más simple que Railway custom domain
-  - Preguntarle cómo corrió landings antes (FTP, cPanel, otro hosting)
-  - Opciones: redireccionamiento, Cloudflare proxy, o subir archivos directo al hosting
-- [ ] Configurar pixel de Meta Ads en el HTML (descomentar bloque ya preparado)
 - [ ] Conectar agente Meta Ads para crear campañas de autos automáticamente
 - [ ] Sistema de videos — subir creativos a la landing para Meta Ads
 - [ ] Inteligencia de competencia — agente analiza hooks virales del mercado de autos Miami
+- [ ] Reemplazar testimonios placeholder con clientes reales
 
 ---
 
