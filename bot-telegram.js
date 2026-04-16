@@ -423,6 +423,14 @@ bot.on('polling_error', (err) => {
   console.error('[Bot] Polling error:', err.message);
 });
 
+// Confirmar inicio por Telegram
+setTimeout(() => {
+  bot.sendMessage(CHAT_ID,
+    '🤖 <b>Bot AutoAprobado activo</b> — escuchando comandos.\nEscribe /start para ver los comandos.',
+    { parse_mode: 'HTML' }
+  ).catch(e => console.error('[Bot] No pudo enviar mensaje de inicio:', e.message));
+}, 3000);
+
 console.log('🤖 Bot Telegram con IA activo — esperando mensajes...');
 
 export { bot };
