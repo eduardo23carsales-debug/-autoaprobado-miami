@@ -31,7 +31,7 @@ const SEGMENTOS = {
       `⚠️ El banco te dijo NO. Nosotros decimos SÍ.\n\nEn AutoAprobado Miami especializamos en crédito difícil. No importa tu score, bancarrotas o deudas previas.\n\n🚗 Carros nuevos y usados\n💵 Inicial desde $500\n📱 Proceso 100% en español\n\nVe si calificas GRATIS 👇`,
       `Tu crédito no define tu futuro 🚗\n\nHemos ayudado a cientos de personas en Miami a conseguir su carro aunque el banco los rechazó.\n\nNo necesitas crédito perfecto. Solo necesitas hablar con nosotros.\n\n¿Cuándo fue la última vez que manejaste tranquilo? Empieza hoy. 👇`
     ],
-    imagenPrompt: `Photorealistic Facebook ad image 1:1 for Hispanic market in Miami, Florida. Show a stressed Latino family outside a car dealership, a rejection letter in hand, worried expressions. Contrast with a hopeful look toward a new car. Urgent mood. Dark red and orange palette. Professional advertising quality. NO TEXT, NO WORDS, NO NUMBERS anywhere.`
+    imagenPrompt: `Candid-style photo of a real Hispanic couple in their 30s sitting inside a car dealership in Miami, Florida. Natural lighting, modern dealership interior with cars visible in background. The couple looks relieved and happy, signing paperwork at a desk. Shot with a 50mm lens, shallow depth of field, natural skin tones. No dramatic lighting, no staged poses. Look like a real moment captured, not a stock photo. Square format. NO TEXT, NO LOGOS, NO WORDS anywhere in the image.`
   },
   'sin-credito': {
     nombre:    'Sin Historial — AutoAprobado Miami',
@@ -41,7 +41,7 @@ const SEGMENTOS = {
       `Llegaste a USA con ganas de crecer 💪\n\nSabemos que empezar desde cero es difícil. Por eso en AutoAprobado Miami no pedimos historial.\n\n🚗 Solo necesitas: trabajo estable o negocio propio\n💵 Inicial accesible\n📱 Te guiamos en todo el proceso\n\n¿Cuándo empezamos? 👇`,
       `Sin crédito no significa sin carro 🚗\n\nMuchos de nuestros clientes compraron su primer carro en USA sin un solo punto de crédito.\n\nEl truco: trabajar con el dealer correcto. En AutoAprobado Miami sabemos cómo hacerlo.\n\nVe si calificas en 2 minutos. 👇`
     ],
-    imagenPrompt: `Photorealistic Facebook ad image 1:1 for Hispanic market in Miami, Florida. Show a young Latino immigrant looking hopeful and determined, holding car keys for the first time, smiling confidently. New beginnings theme. Blue and white palette. Professional advertising quality. NO TEXT, NO WORDS, NO NUMBERS anywhere.`
+    imagenPrompt: `Candid-style photo of a young Hispanic man in his late 20s standing next to a new car in a sunny Miami parking lot, holding car keys and smiling naturally. Casual clothes, real Miami neighborhood background, palm trees visible. Shot with natural daylight, 50mm lens. Not staged, not overly polished — looks like a real photo a friend took. Square format. NO TEXT, NO LOGOS, NO WORDS anywhere in the image.`
   },
   'urgente': {
     nombre:    'Urgente — AutoAprobado Miami',
@@ -51,7 +51,7 @@ const SEGMENTOS = {
       `⏰ Cada día sin carro te cuesta dinero.\n\nEn Miami sin carro es casi imposible trabajar, llevar a los niños o manejar tu negocio.\n\nEn AutoAprobado Miami entendemos la urgencia:\n✅ Respuesta en menos de 24 horas\n✅ Carros disponibles para entrega inmediata\n✅ Financiamiento aunque te hayan negado antes\n\nActúa hoy. 👇`,
       `No esperes más 🚗⚡\n\nSi estás leyendo esto es porque necesitas un carro ahora mismo.\n\nLlamamos a decenas de bancos hasta encontrar quien te apruebe. Sin importar tu situación.\n\nMiles de personas en Miami ya manejan gracias a nosotros. Tú eres el siguiente. 👇`
     ],
-    imagenPrompt: `Photorealistic Facebook ad image 1:1 for Hispanic market in Miami, Florida. Show a Latino person looking frustrated waiting for a bus or Uber in the Miami heat, while seeing others drive past comfortably. Strong urgency and contrast. Orange and red palette. Professional advertising quality. NO TEXT, NO WORDS, NO NUMBERS anywhere.`
+    imagenPrompt: `Candid-style photo of a Hispanic woman in her 30s standing at a Miami bus stop on a hot sunny day, looking tired and checking her phone. Real Miami street in background, palm trees, bright daylight. Casual everyday clothes. Shot with natural light, slightly wide angle. Looks like a real street photo, not staged. The scene feels relatable and authentic. Square format. NO TEXT, NO LOGOS, NO WORDS anywhere in the image.`
   },
   'upgrade': {
     nombre:    'Upgrade de Carro — AutoAprobado Miami',
@@ -61,7 +61,7 @@ const SEGMENTOS = {
       `Tu carro actual puede ser tu inicial 🚗➡️🚗\n\nMuchos clientes en Miami hacen el upgrade sin gastar un peso de su bolsillo.\n\nUsamos el valor de tu carro actual como down payment del nuevo.\n\n✅ Modelos 2024-2026 disponibles\n✅ Carros Hyundai desde $310/mes\n✅ Proceso rápido y en español\n\nHablemos hoy. 👇`,
       `¿Cuánto llevas con el mismo carro? 🤔\n\nSi tu carro ya tiene muchos miles encima, muchas reparaciones o simplemente ya no va con tu vida actual — es momento de hablar.\n\nEn AutoAprobado Miami hacemos el proceso de cambio fácil, rápido y sin sorpresas.\n\nVe cuánto vale tu carro en 2 minutos. 👇`
     ],
-    imagenPrompt: `Photorealistic Facebook ad image 1:1 for Hispanic market in Miami, Florida. Show a split scene: on the left a worn-out old car, on the right a shiny new Hyundai 2026 in Miami. A confident Latino person choosing the new car. Aspirational mood. Blue and gold palette. Professional advertising quality. NO TEXT, NO WORDS, NO NUMBERS anywhere.`
+    imagenPrompt: `Candid-style photo of a Hispanic man in his 40s at a car dealership in Miami, talking with a salesperson next to a new Hyundai SUV. Natural dealership lighting, real showroom environment. Man looks interested and confident, casual conversation posture. Shot with 35mm lens, natural colors, no dramatic lighting. Looks like a genuine moment, not posed. Square format. NO TEXT, NO LOGOS, NO WORDS anywhere in the image.`
   },
   'oferta-especial': {
     nombre:    'Oferta Especial Hyundai — AutoAprobado Miami',
@@ -71,7 +71,7 @@ const SEGMENTOS = {
       `¿Sabías que puedes manejar un Hyundai 2026 en Miami por menos de $400/mes? 🚗\n\nEn AutoAprobado Miami tenemos:\n• Venue 2026 — $310/mes\n• Elantra 2026 — $350/mes  \n• Tucson 2026 — $420/mes\n• Santa Fe 2026 — $480/mes\n\nSin importar tu historial crediticio.\n\nEl cupo es limitado. Reserva el tuyo hoy. 👇`,
       `Maneja un carro NUEVO en 2026 sin arruinarte 💪\n\nHyundai Doral tiene los mejores precios de Miami y nosotros tenemos la aprobación más fácil.\n\nJuntos hacemos que sea posible para ti, sin importar tu situación de crédito.\n\n🔥 Precios desde $310/mes\n⚡ Respuesta en 24 horas\n\n¿Para cuál calificas tú? 👇`
     ],
-    imagenPrompt: `Photorealistic Facebook ad image 1:1 for Hispanic market in Miami, Florida. Show a beautiful brand new Hyundai 2026 SUV parked in front of a modern Miami dealership on a sunny day. Premium, aspirational mood. Show the car in detail — clean, shiny, impressive. Miami Blue sky background. NO TEXT, NO WORDS, NO NUMBERS anywhere.`
+    imagenPrompt: `Clean product-style photo of a brand new Hyundai SUV parked outdoors on a bright Miami day. Shot from a 3/4 front angle at eye level, natural sunlight, blue sky with a few clouds, palm trees slightly out of focus in background. No people, just the car. Looks like a real dealership photo taken by a professional photographer. Accurate car proportions, realistic paint reflection, no CGI look. Square format. NO TEXT, NO LOGOS, NO WORDS anywhere in the image.`
   }
 };
 
