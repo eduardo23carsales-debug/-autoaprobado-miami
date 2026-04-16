@@ -76,10 +76,14 @@ Página web bonita y profesional donde Eduardo llena un formulario paso a paso:
 - **Objetivo:** cliente nuevo listo en 15-20 minutos desde el navegador, sin CMD ni conocimiento de Meta
 - **Valor:** esto es lo que vale $2,000-$3,000 por cliente
 
-### Prioridad 3 — VAPI + Agente de seguimiento
-- [ ] VAPI — llamadas de voz para decisiones del Supervisor
-- [ ] Agente calificador — llama al lead en 5 minutos automáticamente
-- [ ] Agente cerrador — agenda cita por voz
+### Prioridad 3 — VAPI + Agente Vendedor por Voz
+- [ ] VAPI llama al lead automáticamente en 5 minutos después de que llena el formulario
+- [ ] Habla en español, sabe el nombre y segmento del lead antes de llamar
+- [ ] Califica al cliente, responde preguntas básicas, agenda cita
+- [ ] Si no contesta, deja mensaje y reintenta en 30 minutos
+- [ ] Costo estimado: $0.15-$0.45 por llamada (ElevenLabs + VAPI)
+- [ ] Este módulo solo se puede vender a dealers y empresas por $15K-$30K
+- [ ] Es el diferenciador que convierte este sistema en producto de agencia premium
 
 ### Prioridad 4 — Stripe + Monetización
 - [ ] Integrar Stripe para cobros automáticos
