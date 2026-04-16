@@ -1,0 +1,47 @@
+====================================================
+  VIDEOS PARA CAMPAÑAS DE META ADS — AutoAprobado Miami
+====================================================
+
+Pon aquí tus videos. El sistema los usará directamente
+SIN modificarlos para crear campañas en Meta Ads.
+
+PRIORIDAD AUTOMÁTICA al crear campaña:
+  1° Video real (esta carpeta)   ← mayor conversión
+  2° Foto real (carpeta photos/)
+  3° Imagen generada con DALL-E  ← respaldo
+
+----------------------------------------------------
+NOMBRES DE ARCHIVO (usa exactamente estos nombres):
+----------------------------------------------------
+
+POR SEGMENTO:
+  mal-credito.mp4      → campaña mal crédito
+  sin-credito.mp4      → sin historial en USA
+  urgente.mp4          → necesitan carro ya
+  upgrade.mp4          → cambiar de carro
+  oferta-especial.mp4  → Hyundai 2026 desde $310/mes
+
+GENERAL (si no hay video específico):
+  general.mp4          → se usa para cualquier segmento
+
+Puedes tener varios videos por segmento numerándolos:
+  mal-credito-1.mp4
+  mal-credito-2.mp4    → el sistema elige uno al azar
+
+----------------------------------------------------
+ESPECIFICACIONES RECOMENDADAS PARA META ADS:
+  Formato   : MP4 o MOV
+  Duración  : 15 a 60 segundos (30 seg es lo ideal)
+  Resolución: mínimo 1080x1080 (cuadrado) o 1080x1920 (vertical)
+  Tamaño    : máximo 4 GB
+  Audio     : con o sin audio (subtítulos recomendados)
+----------------------------------------------------
+
+TIPS PARA GRABAR EL VIDEO:
+  - Habla directo a la cámara los primeros 3 segundos
+  - Menciona "Miami" y "mal crédito" en los primeros 5 seg
+  - Fondo: dealer, carro o fondo neutro limpio
+  - Buena iluminación — natural o ring light
+  - No necesita ser perfecto, lo auténtico convierte mejor
+
+====================================================

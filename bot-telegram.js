@@ -64,15 +64,28 @@ function limpiarNombre(nombre) {
     .trim();
 }
 
-// ── Último video en carpeta videos/ ─────────────────
-function ultimoVideo() {
+// ── Buscar video por segmento en carpeta videos/ ─────
+function buscarVideo(segmento) {
   const dir = path.join(__dirname, 'videos');
   if (!fs.existsSync(dir)) return null;
   const archivos = fs.readdirSync(dir)
-    .filter(f => f.endsWith('.mp4'))
-    .map(f => ({ f, t: fs.statSync(path.join(dir, f)).mtimeMs }))
-    .sort((a, b) => b.t - a.t);
-  return archivos.length ? path.join(dir, archivos[0].f) : null;
+    .filter(f => /\.(mp4|mov)$/i.test(f));
+
+  // Buscar por segmento exacto o numerados
+  const candidatos = archivos.filter(f =>
+    f.toLowerCase().startsWith(segmento.toLowerCase())
+  );
+
+  // Fallback: video general
+  const generales = archivos.filter(f =>
+    f.toLowerCase().startsWith('general')
+  );
+
+  const pool = candidatos.length > 0 ? candidatos : generales;
+  if (!pool.length) return null;
+
+  const elegido = pool[Math.floor(Math.random() * pool.length)];
+  return path.join(dir, elegido);
 }
 
 // ── Subir video a Meta ───────────────────────────────
@@ -178,14 +191,13 @@ async function ejecutar(chatId, accion, params) {
         );
 
         // Video si pidió con_video
-        let videoPath = null;
-        if (params.con_video) {
-          videoPath = ultimoVideo();
-          if (!videoPath) {
-            await bot.sendMessage(chatId, '⚠️ No encontré ningún mp4 en la carpeta videos/. Sube un video primero.');
-            return;
-          }
+        // Buscar video automáticamente — video > foto > DALL-E
+        let videoPath = buscarVideo(params.segmento);
+        if (videoPath) {
           videoMsg = `\n🎬 Video: ${path.basename(videoPath)}`;
+        } else if (params.con_video) {
+          await bot.sendMessage(chatId, `⚠️ No encontré video para "${params.segmento}" en la carpeta videos/.\nPonle el nombre: ${params.segmento}.mp4`);
+          return;
         }
 
         // Importar y ejecutar creador de campañas
