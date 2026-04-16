@@ -407,6 +407,11 @@ async function main() {
 
   // ── Generar todos los archivos ───────────────────────
   try {
+    // Crear carpetas necesarias antes de escribir archivos
+    for (const carpeta of ['public', 'photos', 'videos', 'agentes']) {
+      fs.mkdirSync(path.join(destino, carpeta), { recursive: true });
+    }
+
     // Landing page (Claude Sonnet)
     info('Generando landing page personalizada...');
     const landingHtml = await generarLanding(config);
