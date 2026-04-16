@@ -8,6 +8,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import TelegramBot from 'node-telegram-bot-api';
 import rateLimit from 'express-rate-limit';
+import axios from 'axios';
 import cron from 'node-cron';
 import dotenv from 'dotenv';
 import { generarReporte } from './monitor-ads.js';
