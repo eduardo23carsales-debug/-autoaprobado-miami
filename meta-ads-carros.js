@@ -100,6 +100,19 @@ async function metaPost(endpoint, params) {
   }
 }
 
+// ── Buscar video por segmento en carpeta videos/ ─────
+const VIDEOS_DIR = path.join(__dirname, 'videos');
+function buscarVideo(segmento) {
+  if (!fs.existsSync(VIDEOS_DIR)) return null;
+  const archivos = fs.readdirSync(VIDEOS_DIR)
+    .filter(f => /\.(mp4|mov)$/i.test(f));
+  const candidatos = archivos.filter(f => f.toLowerCase().startsWith(segmento.toLowerCase()));
+  const generales  = archivos.filter(f => f.toLowerCase().startsWith('general'));
+  const pool = candidatos.length > 0 ? candidatos : generales;
+  if (!pool.length) return null;
+  return path.join(VIDEOS_DIR, pool[Math.floor(Math.random() * pool.length)]);
+}
+
 // ── Buscar foto real en carpeta photos/ ──────────────
 function buscarFotoReal(segmento) {
   if (!fs.existsSync(PHOTOS_DIR)) return null;
@@ -158,8 +171,24 @@ async function generarYSubirImagen(prompt, etiqueta) {
   return hash;
 }
 
+// ── Subir video local a Meta ─────────────────────────
+async function subirVideoLocal(videoPath) {
+  const { default: FormData } = await import('form-data');
+  const form = new FormData();
+  form.append('source', fs.createReadStream(videoPath));
+  const { data } = await axios.post(
+    `${API}/${AD_ACCOUNT}/advideos?access_token=${TOKEN}`,
+    form,
+    { headers: form.getHeaders(), timeout: 120000 }
+  );
+  const videoId = data.id;
+  if (!videoId) throw new Error('No se obtuvo ID de video');
+  console.log(`[Video] ${path.basename(videoPath)} subido — id: ${videoId}`);
+  return videoId;
+}
+
 // ── Crear campaña completa para un segmento ──────────
-async function crearCampanaSegmento(segmento, presupuestoDiario = 20) {
+async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathParam = null) {
   const data = SEGMENTOS[segmento];
   if (!data) {
     console.error(`Segmento inválido: ${segmento}`);
@@ -177,25 +206,40 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20) {
   console.log(`💵 Presupuesto: $${presupuestoDiario}/día`);
   console.log(`🌐 Landing: ${LANDING_URL}\n`);
 
-  // 1. Imagen: foto real primero, DALL-E como respaldo
+  // 1. Asset: video > foto real > DALL-E
+  let videoId   = null;
   let imageHash = null;
-  const fotoReal = buscarFotoReal(segmento);
 
-  if (fotoReal) {
+  // Buscar video: primero el que pasó el bot, luego buscar en carpeta
+  const videoPath = videoPathParam || buscarVideo(segmento);
+
+  if (videoPath) {
     try {
-      console.log(`[Foto] Usando foto real: ${path.basename(fotoReal)}`);
-      imageHash = await subirFotoLocal(fotoReal);
+      console.log(`[Video] Usando video real: ${path.basename(videoPath)}`);
+      videoId = await subirVideoLocal(videoPath);
     } catch (e) {
-      console.warn(`[Foto] No se pudo subir foto real — intentando DALL-E: ${e.message}`);
+      console.warn(`[Video] No se pudo subir — intentando foto: ${e.message}`);
     }
   }
 
-  if (!imageHash && OPENAI_KEY) {
+  if (!videoId) {
+    const fotoReal = buscarFotoReal(segmento);
+    if (fotoReal) {
+      try {
+        console.log(`[Foto] Usando foto real: ${path.basename(fotoReal)}`);
+        imageHash = await subirFotoLocal(fotoReal);
+      } catch (e) {
+        console.warn(`[Foto] No se pudo subir — intentando DALL-E: ${e.message}`);
+      }
+    }
+  }
+
+  if (!videoId && !imageHash && OPENAI_KEY) {
     try {
-      console.log(`[Imagen] No hay foto real para "${segmento}" — generando con DALL-E...`);
+      console.log(`[DALL-E] No hay video ni foto para "${segmento}" — generando con IA...`);
       imageHash = await generarYSubirImagen(data.imagenPrompt, segmento);
     } catch (e) {
-      console.warn(`[Imagen] DALL-E falló — se usarán solo copies: ${e.message}`);
+      console.warn(`[DALL-E] Falló — campaña sin imagen: ${e.message}`);
     }
   }
 
@@ -256,18 +300,34 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20) {
 
       await new Promise(r => setTimeout(r, 1000));
 
-      const linkData = {
-        link: LANDING_URL,
-        message: data.copies[i],
-        name: data.hook,
-        description: '✅ Verificación gratis — sin compromiso',
-        call_to_action: { type: 'LEARN_MORE', value: { link: LANDING_URL } }
-      };
-      if (imageHash) linkData.image_hash = imageHash;
+      // Creative: video_data si hay video, link_data si hay foto/imagen
+      let objectStorySpec;
+      if (videoId) {
+        objectStorySpec = {
+          page_id: PAGE_ID,
+          video_data: {
+            video_id: videoId,
+            message: data.copies[i],
+            title: data.hook,
+            description: '✅ Verificación gratis — sin compromiso',
+            call_to_action: { type: 'LEARN_MORE', value: { link: LANDING_URL } }
+          }
+        };
+      } else {
+        const linkData = {
+          link: LANDING_URL,
+          message: data.copies[i],
+          name: data.hook,
+          description: '✅ Verificación gratis — sin compromiso',
+          call_to_action: { type: 'LEARN_MORE', value: { link: LANDING_URL } }
+        };
+        if (imageHash) linkData.image_hash = imageHash;
+        objectStorySpec = { page_id: PAGE_ID, link_data: linkData };
+      }
 
       const creative = await metaPost(`/${AD_ACCOUNT}/adcreatives`, {
         name: `AutoAprobado | ${segmento} | Creative-${etiquetas[i]}`,
-        object_story_spec: { page_id: PAGE_ID, link_data: linkData }
+        object_story_spec: objectStorySpec
       });
 
       const ad = await metaPost(`/${AD_ACCOUNT}/ads`, {
@@ -298,10 +358,14 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20) {
     }
   }
 
+  const tipoAsset = videoId   ? `🎬 Video real (${path.basename(videoPath || '')})` :
+                    imageHash ? (buscarFotoReal(segmento) ? `📷 Foto real` : `🤖 DALL-E 3`) :
+                                '⚠️  Sin imagen';
+
   console.log(`\n🎉 Campaña lista!`);
   console.log(`   Campaña ID : ${campana.id}`);
   console.log(`   Ads creados: ${adsCreados.length}/3`);
-  console.log(`   Imagen     : ${imageHash ? 'Generada con DALL-E 3' : 'Sin imagen (DALL-E falló)'}`);
+  console.log(`   Asset      : ${tipoAsset}`);
   console.log(`   Landing    : ${LANDING_URL}`);
   console.log(`\nRevisa en Meta Ads Manager → ${AD_ACCOUNT}\n`);
 
