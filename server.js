@@ -128,11 +128,18 @@ app.post('/api/lead', leadLimiter, async (req, res) => {
 app.get('/api/ping', (req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
 
 // ── Telegram webhook ──────────────────────────────────
+const procesados = new Set(); // evita procesar el mismo update dos veces
 app.post('/telegram/webhook', (req, res) => {
+  res.sendStatus(200); // responder inmediato para que Telegram no reintente
   const update = req.body;
+  if (!update?.update_id) return;
+  if (procesados.has(update.update_id)) return; // duplicado, ignorar
+  procesados.add(update.update_id);
+  if (procesados.size > 200) procesados.clear(); // limpiar memoria ocasionalmente
   const msg = update.message || update.channel_post;
-  if (msg) manejarMensaje(msg).catch(e => console.error('[Webhook] Error:', e.message));
-  res.sendStatus(200);
+  if (msg && !msg.from?.is_bot) { // ignorar mensajes del propio bot
+    manejarMensaje(msg).catch(e => console.error('[Webhook] Error:', e.message));
+  }
 });
 
 // ── Monitor de campañas — reporte diario 8 AM ET ─────
