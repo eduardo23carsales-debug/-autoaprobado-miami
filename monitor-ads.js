@@ -15,11 +15,6 @@ const TOKEN      = process.env.META_ACCESS_TOKEN?.trim();
 const AD_ACCOUNT = process.env.META_AD_ACCOUNT_ID?.trim() || 'act_2128062444705705';
 const bot        = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: false });
 const CHAT_ID    = process.env.TELEGRAM_CHAT_ID;
-const _origSendM = bot.sendMessage.bind(bot);
-bot.sendMessage = (chatId, text, opts) => {
-  console.log(`[TG-monitor] sendMessage → "${String(text).slice(0,80)}"`);
-  return _origSendM(chatId, text, opts);
-};
 
 // Estados de cuenta Meta
 const ACCOUNT_STATUS = {

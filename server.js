@@ -23,11 +23,6 @@ const PORT = process.env.PORT || 3000;
 // ── Telegram ─────────────────────────────────────────
 const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: false });
 const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
-const _origSend = bot.sendMessage.bind(bot);
-bot.sendMessage = (chatId, text, opts) => {
-  console.log(`[TG-server] sendMessage → "${String(text).slice(0,80)}"`);
-  return _origSend(chatId, text, opts);
-};
 
 // ── WhatsApp — round-robin por paridad del timestamp ─
 const WHATSAPP = [
@@ -144,13 +139,7 @@ app.post('/telegram/webhook', (req, res) => {
   procesados.add(update.update_id);
   if (procesados.size > 200) procesados.clear(); // limpiar memoria ocasionalmente
 
-  // Log de debug — ayuda a identificar updates inesperados
-  const tipo = Object.keys(update).filter(k => k !== 'update_id').join(',');
   const msg = update.message || update.channel_post;
-  const fromId = msg?.from?.id || 'sin-from';
-  const texto  = msg?.text?.slice(0, 60) || '(sin texto)';
-  console.log(`[Webhook] update_id=${update.update_id} tipo=${tipo} from=${fromId} texto="${texto}"`);
-
   if (msg && !msg.from?.is_bot && !msg.via_bot && msg.text?.startsWith('/')) {
     manejarMensaje(msg).catch(e => console.error('[Webhook] Error:', e.message));
   }

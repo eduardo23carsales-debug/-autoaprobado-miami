@@ -23,11 +23,6 @@ const LANDING    = 'https://oferta.hyundaipromomiami.com';
 
 // Sin polling — Railway usa webhook
 const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: false });
-const _origSendB = bot.sendMessage.bind(bot);
-bot.sendMessage = (chatId, text, opts) => {
-  console.log(`[TG-bot] sendMessage → "${String(text).slice(0,80)}"`);
-  return _origSendB(chatId, text, opts);
-};
 
 const pendientes = new Map();
 

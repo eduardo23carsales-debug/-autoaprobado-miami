@@ -12,13 +12,7 @@ export const TOKEN      = process.env.META_ACCESS_TOKEN?.trim();
 export const AD_ACCOUNT = process.env.META_AD_ACCOUNT_ID?.trim();
 export const CHAT_ID    = process.env.TELEGRAM_CHAT_ID;
 
-const _botRaw = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: false });
-const _origSendU = _botRaw.sendMessage.bind(_botRaw);
-_botRaw.sendMessage = (chatId, text, opts) => {
-  console.log(`[TG-utils] sendMessage → "${String(text).slice(0,80)}"`);
-  return _origSendU(chatId, text, opts);
-};
-export const bot = _botRaw;
+export const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: false });
 
 // ── Meta API helpers ─────────────────────────────────
 export async function metaGet(endpoint, params = {}) {
