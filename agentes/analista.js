@@ -4,16 +4,15 @@
 // Analiza campañas, genera plan y pide aprobación
 // ════════════════════════════════════════════════════
 
-import Anthropic from '@anthropic-ai/sdk';
 import { getCampanas, getMetricas, limpiarNombre, getSegmento,
          notificar, CHAT_ID, bot } from './utils.js';
-
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 const PRESUPUESTO_MAXIMO_DIA = parseFloat(process.env.PRESUPUESTO_MAX_DIA || '30');
 
 // ── Analizar campañas con Claude ─────────────────────
 async function analizarConIA(datos) {
+  const { default: Anthropic } = await import('@anthropic-ai/sdk');
+  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const msg = await anthropic.messages.create({
     model: 'claude-haiku-4-5-20251001',
     max_tokens: 800,
