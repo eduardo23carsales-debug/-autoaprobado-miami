@@ -23,6 +23,11 @@ const PORT = process.env.PORT || 3000;
 // ── Telegram ─────────────────────────────────────────
 const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: false });
 const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+const _origSend = bot.sendMessage.bind(bot);
+bot.sendMessage = (chatId, text, opts) => {
+  console.log(`[TG-server] sendMessage → "${String(text).slice(0,80)}"`);
+  return _origSend(chatId, text, opts);
+};
 
 // ── WhatsApp — round-robin por paridad del timestamp ─
 const WHATSAPP = [
