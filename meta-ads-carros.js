@@ -282,11 +282,10 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
     },
     targeting: {
       ...targeting,
-      // Placements: Facebook Feed + Marketplace + Instagram Feed
+      // Placements: solo Facebook — Feed + Marketplace + Stories
       // Marketplace es clave para carros — la gente busca carros ahí activamente
-      publisher_platforms: ['facebook', 'instagram'],
-      facebook_positions:  ['feed', 'marketplace'],
-      instagram_positions: ['stream']
+      publisher_platforms: ['facebook'],
+      facebook_positions:  ['feed', 'marketplace', 'story']
     },
     status: 'ACTIVE'
   };
