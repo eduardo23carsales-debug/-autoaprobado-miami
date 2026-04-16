@@ -4,8 +4,11 @@
 // Analiza campañas, genera plan y pide aprobación
 // ════════════════════════════════════════════════════
 
+import Anthropic from '@anthropic-ai/sdk';
 import { getCampanas, getMetricas, limpiarNombre, getSegmento,
-         anthropic, notificar, CHAT_ID, bot } from './utils.js';
+         notificar, CHAT_ID, bot } from './utils.js';
+
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 const PRESUPUESTO_MAXIMO_DIA = parseFloat(process.env.PRESUPUESTO_MAX_DIA || '30');
 
