@@ -276,19 +276,28 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
     optimization_goal: 'OFFSITE_CONVERSIONS',
     destination_type: 'WEBSITE',
     bid_strategy: 'LOWEST_COST_WITHOUT_CAP',
+    // Attribution estándar industria: 7 días click, 1 día view
+    attribution_spec: [
+      { event_type: 'CLICK_THROUGH', window_days: 7 },
+      { event_type: 'VIEW_THROUGH',  window_days: 1 }
+    ],
     promoted_object: {
       pixel_id: PIXEL_ID,
-      custom_event_type: 'LEAD'
+      custom_event_type: 'LEAD',
+      // Confirma a Meta dónde ocurre la conversión → mejor optimización
+      conversion_domain: 'oferta.hyundaipromomiami.com'
     },
     targeting: {
       ...targeting,
-      // Placements: solo Facebook — Feed + Marketplace + Stories
-      // Marketplace es clave para carros — la gente busca carros ahí activamente
+      // Feed + Marketplace (sin Stories — requiere formato vertical 9:16)
       publisher_platforms: ['facebook'],
-      facebook_positions:  ['feed', 'marketplace', 'story']
+      facebook_positions:  ['feed', 'marketplace']
     },
     status: 'ACTIVE'
   };
+
+  // CTAs por tipo de copy — más relevantes para financiamiento de carros
+  const CTAS = ['APPLY_NOW', 'GET_QUOTE', 'LEARN_MORE'];
 
   // 3. Crear un adset + ad por cada copy (3 copies = 3 adsets para A/B/C test)
   const etiquetas = ['Emocional', 'Directo', 'Social'];
@@ -306,6 +315,10 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
 
       await new Promise(r => setTimeout(r, 1000));
 
+      // URL con UTM para rastrear cada copy individualmente
+      const landingUTM = `${LANDING_URL}?utm_source=facebook&utm_medium=cpc&utm_campaign=${segmento}&utm_content=${etiquetas[i].toLowerCase()}`;
+      const cta = CTAS[i] || 'APPLY_NOW';
+
       // Creative: video_data si hay video, link_data si hay foto/imagen
       let objectStorySpec;
       if (videoId) {
@@ -316,16 +329,16 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
             message: data.copies[i],
             title: data.hook,
             description: '✅ Verificación gratis — sin compromiso',
-            call_to_action: { type: 'LEARN_MORE', value: { link: LANDING_URL } }
+            call_to_action: { type: cta, value: { link: landingUTM } }
           }
         };
       } else {
         const linkData = {
-          link: LANDING_URL,
+          link: landingUTM,
           message: data.copies[i],
           name: data.hook,
           description: '✅ Verificación gratis — sin compromiso',
-          call_to_action: { type: 'LEARN_MORE', value: { link: LANDING_URL } }
+          call_to_action: { type: cta, value: { link: landingUTM } }
         };
         if (imageHash) linkData.image_hash = imageHash;
         objectStorySpec = { page_id: PAGE_ID, link_data: linkData };
@@ -333,7 +346,13 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
 
       const creative = await metaPost(`/${AD_ACCOUNT}/adcreatives`, {
         name: `AutoAprobado | ${segmento} | Creative-${etiquetas[i]}`,
-        object_story_spec: objectStorySpec
+        object_story_spec: objectStorySpec,
+        // Advantage+ Creative — Meta optimiza automáticamente el formato y presentación
+        degrees_of_freedom_spec: {
+          creative_features_spec: {
+            standard_enhancements: { enroll_status: 'OPT_IN' }
+          }
+        }
       });
 
       const ad = await metaPost(`/${AD_ACCOUNT}/ads`, {
