@@ -88,7 +88,9 @@ async function metaPost(endpoint, params) {
     const error = err.response?.data?.error;
     const msg   = error?.message || err.message;
     const code  = error?.code || err.response?.status;
-    throw new Error(`Meta API error ${code}: ${msg}`);
+    const sub   = error?.error_subcode ? ` (subcode ${error.error_subcode})` : '';
+    const detail = error?.error_user_msg ? ` — ${error.error_user_msg}` : '';
+    throw new Error(`Meta API error ${code}${sub}: ${msg}${detail}`);
   }
 }
 
@@ -142,7 +144,7 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20) {
   // 2. Crear campaña CBO — objetivo conversiones (leads reales)
   const campana = await metaPost(`/${AD_ACCOUNT}/campaigns`, {
     name: `AutoAprobado | ${data.nombre} | ${fecha}`,
-    objective: 'OUTCOME_CONVERSIONS',
+    objective: 'OUTCOME_LEADS',
     status: 'ACTIVE',
     special_ad_categories: ['FINANCIAL_PRODUCTS_SERVICES'],
     daily_budget: presupuestoCentavos,
@@ -170,6 +172,7 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20) {
     campaign_id: campana.id,
     billing_event: 'IMPRESSIONS',
     optimization_goal: 'OFFSITE_CONVERSIONS',
+    destination_type: 'WEBSITE',
     bid_strategy: 'LOWEST_COST_WITHOUT_CAP',
     promoted_object: {
       pixel_id: PIXEL_ID,
