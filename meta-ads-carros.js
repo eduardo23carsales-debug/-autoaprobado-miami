@@ -153,6 +153,47 @@ async function subirFotoLocal(filePath) {
   return hash;
 }
 
+// ── Preguntas de calificación por segmento ───────────
+const FORM_PREGUNTAS = {
+  'mal-credito':     { label: '¿Te han negado financiamiento antes?',        opciones: ['Sí, me han negado', 'No, es mi primera vez'] },
+  'sin-credito':     { label: '¿Tienes trabajo o negocio propio?',           opciones: ['Sí, tengo trabajo estable', 'Tengo negocio propio', 'Estoy buscando trabajo'] },
+  'urgente':         { label: '¿Cuándo necesitas el carro?',                 opciones: ['Esta semana', 'Este mes', 'Solo explorando opciones'] },
+  'upgrade':         { label: '¿Cuánto tiempo llevas con tu carro actual?',  opciones: ['Menos de 2 años', '2 a 5 años', 'Más de 5 años'] },
+  'oferta-especial': { label: '¿Cuánto tienes disponible de inicial?',       opciones: ['$0 - $500', '$500 - $2,000', 'Más de $2,000'] }
+};
+
+// ── Crear formulario nativo de Facebook Lead Ads ─────
+async function crearFormulario(segmento, nombreCampana) {
+  const pq = FORM_PREGUNTAS[segmento];
+  const form = await metaPost(`/${PAGE_ID}/leadgen_forms`, {
+    name: `AutoAprobado Miami — ${segmento} — ${new Date().toISOString().slice(0,10)}`,
+    locale: 'es_ES',
+    questions: [
+      { type: 'FULL_NAME',     key: 'full_name'    },
+      { type: 'PHONE',         key: 'phone_number' },
+      {
+        type: 'CUSTOM',
+        key:  'pregunta_calificacion',
+        label: pq.label,
+        options: pq.opciones.map(v => ({ value: v }))
+      }
+    ],
+    privacy_policy: { url: `${LANDING_URL}/#privacidad` },
+    thank_you_page: {
+      title: '¡Gracias! Te llamamos pronto 🚗',
+      body:  'Un asesor de AutoAprobado Miami te contactará en menos de 24 horas. ¡Prepárate para manejar!'
+    },
+    // Disclaimer TCPA — requerido para contacto por teléfono en USA
+    legal_content_id: null,
+    context_card: {
+      title:   '¿Calificas para un carro?',
+      content: ['Sin importar tu crédito', 'Proceso en español', 'Respuesta en 24 horas']
+    }
+  });
+  console.log(`[Form] Formulario creado: ${form.id}`);
+  return form.id;
+}
+
 // ── Generar imagen con DALL-E y subirla a Meta ───────
 async function generarYSubirImagen(prompt, etiqueta) {
   console.log(`[Imagen] Generando ${etiqueta} con DALL-E 3...`);
@@ -204,7 +245,15 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
 
   console.log(`\n🚗 AutoAprobado Miami — Campaña: ${data.nombre}`);
   console.log(`💵 Presupuesto: $${presupuestoDiario}/día`);
-  console.log(`🌐 Landing: ${LANDING_URL}\n`);
+  console.log(`📋 Tipo: Lead Ads nativo (formulario dentro de Facebook)\n`);
+
+  // 0. Crear formulario nativo de Lead Ads
+  let formId = null;
+  try {
+    formId = await crearFormulario(segmento, data.nombre);
+  } catch (e) {
+    console.warn(`[Form] No se pudo crear formulario — usando landing: ${e.message}`);
+  }
 
   // 1. Asset: video > foto real > DALL-E
   let videoId   = null;
@@ -270,34 +319,34 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
     }
   };
 
+  // Si hay formulario → Lead Ads nativo. Si no → website con pixel
+  const esLeadAd = !!formId;
+
   const adsetBase = {
     campaign_id: campana.id,
     billing_event: 'IMPRESSIONS',
-    optimization_goal: 'OFFSITE_CONVERSIONS',
-    destination_type: 'WEBSITE',
+    optimization_goal: esLeadAd ? 'LEAD_GENERATION' : 'OFFSITE_CONVERSIONS',
+    destination_type:  esLeadAd ? 'ON_AD'           : 'WEBSITE',
     bid_strategy: 'LOWEST_COST_WITHOUT_CAP',
-    // Attribution estándar industria: 7 días click, 1 día view
     attribution_spec: [
       { event_type: 'CLICK_THROUGH', window_days: 7 },
       { event_type: 'VIEW_THROUGH',  window_days: 1 }
     ],
-    promoted_object: {
-      pixel_id: PIXEL_ID,
-      custom_event_type: 'LEAD',
-      // Confirma a Meta dónde ocurre la conversión → mejor optimización
-      conversion_domain: 'oferta.hyundaipromomiami.com'
-    },
+    promoted_object: esLeadAd
+      ? { page_id: PAGE_ID }
+      : { pixel_id: PIXEL_ID, custom_event_type: 'LEAD', conversion_domain: 'oferta.hyundaipromomiami.com' },
     targeting: {
       ...targeting,
-      // Feed + Marketplace (sin Stories — requiere formato vertical 9:16)
       publisher_platforms: ['facebook'],
       facebook_positions:  ['feed', 'marketplace']
     },
     status: 'ACTIVE'
   };
 
-  // CTAs por tipo de copy — más relevantes para financiamiento de carros
-  const CTAS = ['APPLY_NOW', 'GET_QUOTE', 'LEARN_MORE'];
+  // CTAs por tipo de copy
+  const CTAS = esLeadAd
+    ? ['SIGN_UP', 'SIGN_UP', 'SIGN_UP']       // Lead Ads siempre SIGN_UP
+    : ['APPLY_NOW', 'GET_QUOTE', 'LEARN_MORE']; // Website: CTAs variados
 
   // 3. Crear un adset + ad por cada copy (3 copies = 3 adsets para A/B/C test)
   const etiquetas = ['Emocional', 'Directo', 'Social'];
@@ -315,11 +364,15 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
 
       await new Promise(r => setTimeout(r, 1000));
 
-      // URL con UTM para rastrear cada copy individualmente
       const landingUTM = `${LANDING_URL}?utm_source=facebook&utm_medium=cpc&utm_campaign=${segmento}&utm_content=${etiquetas[i].toLowerCase()}`;
-      const cta = CTAS[i] || 'APPLY_NOW';
+      const cta = CTAS[i] || 'SIGN_UP';
 
-      // Creative: video_data si hay video, link_data si hay foto/imagen
+      // Valor del CTA: formulario nativo o URL de landing
+      const ctaValue = esLeadAd
+        ? { lead_gen_form_id: formId }
+        : { link: landingUTM };
+
+      // Creative: video o imagen
       let objectStorySpec;
       if (videoId) {
         objectStorySpec = {
@@ -329,18 +382,18 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
             message: data.copies[i],
             title: data.hook,
             description: '✅ Verificación gratis — sin compromiso',
-            call_to_action: { type: cta, value: { link: landingUTM } }
+            call_to_action: { type: cta, value: ctaValue }
           }
         };
       } else {
         const linkData = {
-          link: landingUTM,
           message: data.copies[i],
           name: data.hook,
           description: '✅ Verificación gratis — sin compromiso',
-          call_to_action: { type: cta, value: { link: landingUTM } }
+          call_to_action: { type: cta, value: ctaValue }
         };
-        if (imageHash) linkData.image_hash = imageHash;
+        if (!esLeadAd) linkData.link = landingUTM;
+        if (imageHash)  linkData.image_hash = imageHash;
         objectStorySpec = { page_id: PAGE_ID, link_data: linkData };
       }
 

@@ -129,6 +129,71 @@ app.post('/api/lead', leadLimiter, async (req, res) => {
 // ── Health check ─────────────────────────────────────
 app.get('/api/ping', (req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
 
+// ════════════════════════════════════════════════════
+// Webhook de Meta Lead Ads — recibe leads en tiempo real
+// ════════════════════════════════════════════════════
+
+// Verificación del webhook (Meta llama a esto al configurarlo)
+app.get('/api/meta/webhook', (req, res) => {
+  const mode      = req.query['hub.mode'];
+  const token     = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+  if (mode === 'subscribe' && token === process.env.META_WEBHOOK_TOKEN) {
+    console.log('[Meta Webhook] Verificado ✅');
+    res.send(challenge);
+  } else {
+    res.sendStatus(403);
+  }
+});
+
+// Recepción de leads (Meta llama a esto cuando alguien llena el formulario)
+app.post('/api/meta/webhook', async (req, res) => {
+  res.sendStatus(200); // responder inmediato
+  try {
+    const entries = req.body?.entry || [];
+    for (const entry of entries) {
+      for (const change of entry.changes || []) {
+        if (change.field !== 'leadgen') continue;
+        const { leadgen_id, ad_id, form_id } = change.value;
+        if (!leadgen_id) continue;
+
+        // Obtener datos del lead desde Meta API
+        const { data: lead } = await axios.get(
+          `https://graph.facebook.com/v25.0/${leadgen_id}`,
+          { params: { fields: 'field_data,created_time,ad_name,campaign_name', access_token: process.env.META_ACCESS_TOKEN?.trim() }, timeout: 10000 }
+        );
+
+        // Extraer campos del formulario
+        const campos = {};
+        for (const f of lead.field_data || []) campos[f.name] = f.values?.[0] || '';
+
+        const nombre   = campos.full_name    || '—';
+        const telefono = campos.phone_number || '—';
+        const califica = campos.pregunta_calificacion || '';
+        const ts       = new Date(lead.created_time).toLocaleString('es-US', { timeZone: 'America/New_York' });
+        const campana  = lead.campaign_name || '—';
+        const adNombre = lead.ad_name || '—';
+
+        const msg =
+          `🚗 <b>NUEVO LEAD — Facebook Lead Ads</b>\n` +
+          `━━━━━━━━━━━━━━━━━━━━━━\n` +
+          `👤 <b>Nombre:</b> ${nombre}\n` +
+          `📱 <b>Teléfono:</b> ${telefono}\n` +
+          (califica ? `💬 <b>Calificación:</b> ${califica}\n` : '') +
+          `━━━━━━━━━━━━━━━━━━━━━━\n` +
+          `📢 <b>Campaña:</b> ${campana}\n` +
+          `🎯 <b>Anuncio:</b> ${adNombre}\n` +
+          `🕐 ${ts}`;
+
+        await bot.sendMessage(CHAT_ID, msg, { parse_mode: 'HTML' });
+        console.log(`[Lead Ads] Lead recibido: ${nombre} — ${telefono}`);
+      }
+    }
+  } catch (err) {
+    console.error('[Lead Ads] Error procesando lead:', err.message);
+  }
+});
+
 // ── Telegram webhook ──────────────────────────────────
 const procesados = new Set(); // evita procesar el mismo update dos veces
 app.post('/telegram/webhook', (req, res) => {
