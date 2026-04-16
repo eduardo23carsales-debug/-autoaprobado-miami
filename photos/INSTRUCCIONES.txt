@@ -1,0 +1,46 @@
+====================================================
+  FOTOS PARA CAMPAÑAS DE META ADS — AutoAprobado Miami
+====================================================
+
+Pon aquí las fotos reales de los carros y de clientes.
+El sistema las usará directamente SIN modificarlas.
+
+----------------------------------------------------
+NOMBRES DE ARCHIVO (usa exactamente estos nombres):
+----------------------------------------------------
+
+POR SEGMENTO DE CAMPAÑA:
+  mal-credito.jpg      → campaña de mal crédito
+  sin-credito.jpg      → campaña sin historial
+  urgente.jpg          → campaña urgente
+  upgrade.jpg          → campaña upgrade de carro
+  oferta-especial.jpg  → campaña oferta Hyundai
+
+POR MODELO DE CARRO (alternativas para oferta-especial):
+  tucson.jpg
+  elantra.jpg
+  venue.jpg
+  kona.jpg
+  sonata.jpg
+  santa-fe.jpg
+  palisade.jpg
+
+FOTOS GENERALES (se usan si no hay foto específica):
+  dealer.jpg           → foto del dealer / showroom
+  cliente.jpg          → foto de cliente real (con permiso)
+
+----------------------------------------------------
+FORMATOS ACEPTADOS: .jpg  .jpeg  .png
+TAMAÑO RECOMENDADO: mínimo 1080x1080 px (cuadrada)
+PESO MÁXIMO: 30 MB por foto
+----------------------------------------------------
+
+IMPORTANTE:
+- Las fotos se suben TAL CUAL a Meta Ads, sin edición
+- Si no hay foto para un segmento, el sistema genera
+  una imagen con IA automáticamente como respaldo
+- Puedes tener varias fotos por segmento numerándolas:
+  mal-credito-1.jpg, mal-credito-2.jpg, etc.
+  El sistema elige una al azar
+
+====================================================

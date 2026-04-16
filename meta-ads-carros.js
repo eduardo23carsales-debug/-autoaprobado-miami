@@ -9,7 +9,13 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
+import fs    from 'fs';
+import path  from 'path';
+import { fileURLToPath } from 'url';
 dotenv.config();
+
+const __dirname  = path.dirname(fileURLToPath(import.meta.url));
+const PHOTOS_DIR = path.join(__dirname, 'photos');
 
 const API          = 'https://graph.facebook.com/v25.0';
 const TOKEN        = process.env.META_ACCESS_TOKEN?.trim();
@@ -94,6 +100,46 @@ async function metaPost(endpoint, params) {
   }
 }
 
+// ── Buscar foto real en carpeta photos/ ──────────────
+function buscarFotoReal(segmento) {
+  if (!fs.existsSync(PHOTOS_DIR)) return null;
+  const archivos = fs.readdirSync(PHOTOS_DIR)
+    .filter(f => /\.(jpg|jpeg|png)$/i.test(f));
+
+  // Buscar por segmento exacto o numeradas (mal-credito-1.jpg, mal-credito-2.jpg)
+  const candidatos = archivos.filter(f =>
+    f.toLowerCase().startsWith(segmento.toLowerCase())
+  );
+
+  // Fallback: foto genérica dealer o cliente
+  const genericas = archivos.filter(f =>
+    f.toLowerCase().startsWith('dealer') || f.toLowerCase().startsWith('cliente')
+  );
+
+  const pool = candidatos.length > 0 ? candidatos : genericas;
+  if (!pool.length) return null;
+
+  // Elegir al azar si hay varias
+  const elegida = pool[Math.floor(Math.random() * pool.length)];
+  return path.join(PHOTOS_DIR, elegida);
+}
+
+// ── Subir foto local a Meta (sin modificarla) ────────
+async function subirFotoLocal(filePath) {
+  const { default: FormData } = await import('form-data');
+  const form = new FormData();
+  form.append('filename', fs.createReadStream(filePath));
+  const url = `${API}/${AD_ACCOUNT}/adimages?access_token=${TOKEN}`;
+  const { data } = await axios.post(url, form, {
+    headers: form.getHeaders(),
+    timeout: 30000
+  });
+  const hash = Object.values(data.images || {})[0]?.hash;
+  if (!hash) throw new Error('No se obtuvo hash de imagen');
+  console.log(`[Foto] ${path.basename(filePath)} subida — hash: ${hash}`);
+  return hash;
+}
+
 // ── Generar imagen con DALL-E y subirla a Meta ───────
 async function generarYSubirImagen(prompt, etiqueta) {
   console.log(`[Imagen] Generando ${etiqueta} con DALL-E 3...`);
@@ -131,13 +177,25 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20) {
   console.log(`💵 Presupuesto: $${presupuestoDiario}/día`);
   console.log(`🌐 Landing: ${LANDING_URL}\n`);
 
-  // 1. Generar imagen
+  // 1. Imagen: foto real primero, DALL-E como respaldo
   let imageHash = null;
-  if (OPENAI_KEY) {
+  const fotoReal = buscarFotoReal(segmento);
+
+  if (fotoReal) {
     try {
+      console.log(`[Foto] Usando foto real: ${path.basename(fotoReal)}`);
+      imageHash = await subirFotoLocal(fotoReal);
+    } catch (e) {
+      console.warn(`[Foto] No se pudo subir foto real — intentando DALL-E: ${e.message}`);
+    }
+  }
+
+  if (!imageHash && OPENAI_KEY) {
+    try {
+      console.log(`[Imagen] No hay foto real para "${segmento}" — generando con DALL-E...`);
       imageHash = await generarYSubirImagen(data.imagenPrompt, segmento);
     } catch (e) {
-      console.warn(`[Imagen] Falló — se usarán solo copies: ${e.message}`);
+      console.warn(`[Imagen] DALL-E falló — se usarán solo copies: ${e.message}`);
     }
   }
 
