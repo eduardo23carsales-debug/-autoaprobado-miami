@@ -11,7 +11,9 @@ import rateLimit from 'express-rate-limit';
 import cron from 'node-cron';
 import dotenv from 'dotenv';
 import { generarReporte } from './monitor-ads.js';
-import { bot as tgBot, manejarMensaje } from './bot-telegram.js';
+import { bot as tgBot, manejarMensaje, manejarCallback } from './bot-telegram.js';
+import { ejecutarAnalista } from './agentes/analista.js';
+import { ejecutarSupervisor } from './agentes/supervisor.js';
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -140,14 +142,22 @@ app.post('/telegram/webhook', (req, res) => {
   if (msg && !msg.from?.is_bot && !msg.via_bot && msg.text?.startsWith('/')) {
     manejarMensaje(msg).catch(e => console.error('[Webhook] Error:', e.message));
   }
+  // Botones inline de los agentes
+  if (update.callback_query) {
+    manejarCallback(update.callback_query).catch(e => console.error('[Webhook] Error callback:', e.message));
+  }
 });
 
-// ── Monitor de campañas — reporte diario 8 AM ET ─────
-// Cron: "0 8 * * *" = todos los días a las 8:00 AM
-// Timezone America/New_York = Miami
+// ── Agente Analista — 8 AM ET diario ─────────────────
 cron.schedule('0 8 * * *', () => {
-  console.log('[Monitor] Ejecutando reporte diario...');
-  generarReporte();
+  console.log('[Cron] Ejecutando Analista...');
+  ejecutarAnalista().catch(e => console.error('[Cron] Analista error:', e.message));
+}, { timezone: 'America/New_York' });
+
+// ── Agente Supervisor — cada 4 horas ─────────────────
+cron.schedule('0 */4 * * *', () => {
+  console.log('[Cron] Ejecutando Supervisor...');
+  ejecutarSupervisor().catch(e => console.error('[Cron] Supervisor error:', e.message));
 }, { timezone: 'America/New_York' });
 
 // ── Iniciar servidor ─────────────────────────────────

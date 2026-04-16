@@ -291,6 +291,8 @@ const AYUDA =
 
 /reporte — métricas de hoy
 /mejor — qué campaña va mejor
+/analista — análisis IA + plan de acción
+/supervisor — revisión inmediata de campañas
 
 /nueva mal-credito 5 — crear campaña ($5/día)
 /nueva sin-credito 5
@@ -335,6 +337,22 @@ async function manejarMensaje(msg) {
     if (cmd === '/reporte' || cmd === 'reporte') {
       await bot.sendMessage(chatId, '⏳ Generando reporte...');
       await generarReporte();
+      return;
+    }
+
+    // /analista — lanzar análisis IA manualmente
+    if (cmd === '/analista' || cmd === 'analista') {
+      await bot.sendMessage(chatId, '🧠 Iniciando análisis con IA...');
+      const { ejecutarAnalista } = await import('./agentes/analista.js');
+      ejecutarAnalista().catch(e => bot.sendMessage(chatId, `❌ Error analista: <code>${e.message}</code>`, { parse_mode: 'HTML' }));
+      return;
+    }
+
+    // /supervisor — lanzar supervisor manualmente
+    if (cmd === '/supervisor' || cmd === 'supervisor') {
+      await bot.sendMessage(chatId, '👁 Revisando campañas ahora...');
+      const { ejecutarSupervisor } = await import('./agentes/supervisor.js');
+      ejecutarSupervisor().catch(e => bot.sendMessage(chatId, `❌ Error supervisor: <code>${e.message}</code>`, { parse_mode: 'HTML' }));
       return;
     }
 
@@ -393,6 +411,71 @@ async function manejarMensaje(msg) {
   }
 }
 
-export { bot, manejarMensaje };
+// ── Manejador de botones inline (callback_query) ─────
+async function manejarCallback(query) {
+  const chatId   = String(query.message?.chat?.id);
+  const data     = query.data;
+  const queryId  = query.id;
+
+  // Verificar chat autorizado
+  const idNormalizado = CHAT_ID.replace('-100', '');
+  if (chatId !== CHAT_ID && chatId !== idNormalizado && `-100${chatId}` !== CHAT_ID) return;
+
+  try {
+    // ── Aprobar plan del Analista ────────────────────
+    if (data === 'aprobar_plan') {
+      await bot.answerCallbackQuery(queryId, { text: '✅ Ejecutando plan...' });
+      const plan = global._planPendiente;
+      if (!plan) {
+        await bot.sendMessage(chatId, '⚠️ No hay plan pendiente (el bot se reinició). Ejecuta /analista para generar uno nuevo.');
+        return;
+      }
+      await bot.sendMessage(chatId, '⚡ Ejecutando plan aprobado...');
+      const { ejecutarPlan } = await import('./agentes/ejecutor.js');
+      await ejecutarPlan(plan);
+      global._planPendiente = null;
+      return;
+    }
+
+    // ── Ignorar plan del Analista ────────────────────
+    if (data === 'ignorar_plan') {
+      await bot.answerCallbackQuery(queryId, { text: '❌ Plan ignorado' });
+      global._planPendiente = null;
+      return;
+    }
+
+    // ── Escalar campaña específica (del Supervisor) ──
+    if (data.startsWith('escalar:')) {
+      const [, campanaId, presupuestoNuevo] = data.split(':');
+      await bot.answerCallbackQuery(queryId, { text: '✅ Escalando...' });
+      try {
+        await metaPost(`/${campanaId}`, { daily_budget: Math.round(parseFloat(presupuestoNuevo) * 100) });
+        await bot.sendMessage(chatId,
+          `📈 <b>Campaña escalada</b> — presupuesto actualizado a $${parseFloat(presupuestoNuevo).toFixed(2)}/día`,
+          { parse_mode: 'HTML' }
+        );
+      } catch (e) {
+        await bot.sendMessage(chatId, `❌ Error al escalar: <code>${e.message}</code>`, { parse_mode: 'HTML' });
+      }
+      global._consultaPendiente = null;
+      return;
+    }
+
+    // ── Ignorar escalar (del Supervisor) ────────────
+    if (data === 'ignorar_escalar') {
+      await bot.answerCallbackQuery(queryId, { text: 'Ok, sin cambios' });
+      global._consultaPendiente = null;
+      return;
+    }
+
+    await bot.answerCallbackQuery(queryId);
+
+  } catch (err) {
+    console.error('[Bot] Error callback:', err.message);
+    try { await bot.answerCallbackQuery(queryId, { text: 'Error' }); } catch {}
+  }
+}
+
+export { bot, manejarMensaje, manejarCallback };
 
 console.log('🤖 Bot AutoAprobado cargado — modo webhook');
