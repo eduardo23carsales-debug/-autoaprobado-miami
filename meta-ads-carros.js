@@ -180,11 +180,10 @@ async function crearFormulario(segmento, nombreCampana) {
     ],
     privacy_policy: { url: `${LANDING_URL}/#privacidad` },
     thank_you_page: {
-      title: '¡Gracias! Te llamamos pronto 🚗',
-      body:  'Un asesor de AutoAprobado Miami te contactará en menos de 24 horas. ¡Prepárate para manejar!'
+      title:       '¡Gracias! Te llamamos pronto 🚗',
+      body:        'Un asesor de AutoAprobado Miami te contactará en menos de 24 horas. ¡Prepárate para manejar!',
+      button_type: 'NO_BUTTON'
     },
-    // Disclaimer TCPA — requerido para contacto por teléfono en USA
-    legal_content_id: null,
     context_card: {
       title:   '¿Calificas para un carro?',
       content: ['Sin importar tu crédito', 'Proceso en español', 'Respuesta en 24 horas']
@@ -334,7 +333,7 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
     ],
     promoted_object: esLeadAd
       ? { page_id: PAGE_ID }
-      : { pixel_id: PIXEL_ID, custom_event_type: 'LEAD', conversion_domain: 'oferta.hyundaipromomiami.com' },
+      : { pixel_id: PIXEL_ID, custom_event_type: 'LEAD' },
     targeting: {
       ...targeting,
       publisher_platforms: ['facebook'],
