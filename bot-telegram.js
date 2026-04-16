@@ -5,7 +5,6 @@
 // ════════════════════════════════════════════════════
 
 import TelegramBot from 'node-telegram-bot-api';
-import Anthropic    from '@anthropic-ai/sdk';
 import axios        from 'axios';
 import fs           from 'fs';
 import path         from 'path';
@@ -22,9 +21,8 @@ const PAGE_ID    = process.env.META_PAGE_ID?.trim();
 const CHAT_ID    = String(process.env.TELEGRAM_CHAT_ID);
 const LANDING    = 'https://oferta.hyundaipromomiami.com';
 
-const anthropic  = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-// Sin polling — Railway usa webhook (más confiable en servidores hosteados)
-const bot        = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: false });
+// Sin polling — Railway usa webhook
+const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: false });
 
 const pendientes = new Map();
 
@@ -90,46 +88,6 @@ async function subirVideo(videoPath) {
   return data.id;
 }
 
-// ── Sistema prompt Claude ────────────────────────────
-const SYSTEM_PROMPT = `Eres el agente de marketing de AutoAprobado Miami. Interpretas mensajes de Eduardo (el dueño) y los conviertes en acciones concretas de Meta Ads.
-
-Responde SIEMPRE con JSON válido con esta estructura exacta:
-{
-  "accion": string,
-  "params": object,
-  "resumen": string
-}
-
-Acciones disponibles:
-- "reporte": ver métricas del día. params: {}
-- "pausa": pausar campaña(s). params: { "segmento": "mal-credito"|"sin-credito"|"urgente"|"upgrade"|"oferta-especial"|"todas" }
-- "activa": activar campaña(s). params: { "segmento": "..." }
-- "presupuesto": cambiar presupuesto diario. params: { "segmento": "...", "monto": número }
-- "crear_campana": crear nueva campaña. params: { "segmento": "...", "presupuesto": número, "con_video": boolean }
-- "mejor_campana": comparar campañas y ver cuál va mejor. params: {}
-- "desconocido": no entendí la solicitud. params: {}
-
-Segmentos válidos: mal-credito, sin-credito, urgente, upgrade, oferta-especial
-
-El campo "resumen" debe ser una frase clara en español explicando exactamente lo que vas a hacer.
-
-Responde SOLO con el JSON, sin texto adicional ni bloques de código.`;
-
-// ── Claude interpreta el mensaje ─────────────────────
-async function interpretar(texto) {
-  try {
-    const msg = await anthropic.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 300,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: texto }]
-    });
-    const raw = msg.content[0].text.trim().replace(/```json|```/g, '');
-    return JSON.parse(raw);
-  } catch {
-    return { accion: 'desconocido', params: {}, resumen: 'No entendí la solicitud.' };
-  }
-}
 
 // ── Ejecutar acción confirmada ───────────────────────
 async function ejecutar(chatId, accion, params) {
