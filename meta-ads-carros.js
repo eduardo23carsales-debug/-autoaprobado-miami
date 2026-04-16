@@ -280,7 +280,14 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
       pixel_id: PIXEL_ID,
       custom_event_type: 'LEAD'
     },
-    targeting,
+    targeting: {
+      ...targeting,
+      // Placements: Facebook Feed + Marketplace + Instagram Feed
+      // Marketplace es clave para carros — la gente busca carros ahí activamente
+      publisher_platforms: ['facebook', 'instagram'],
+      facebook_positions:  ['feed', 'marketplace'],
+      instagram_positions: ['stream']
+    },
     status: 'ACTIVE'
   };
 
