@@ -120,7 +120,10 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20) {
   }
 
   const presupuestoCentavos = presupuestoDiario * 100;
-  const fecha = new Date().toISOString().slice(0, 10);
+  const ahora = new Date();
+  const fecha = ahora.toISOString().slice(0, 10) + 'T' +
+    String(ahora.getUTCHours()).padStart(2, '0') + 'h' +
+    String(ahora.getUTCMinutes()).padStart(2, '0');
 
   console.log(`\n🚗 AutoAprobado Miami — Campaña: ${data.nombre}`);
   console.log(`💵 Presupuesto: $${presupuestoDiario}/día`);
@@ -136,10 +139,10 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20) {
     }
   }
 
-  // 2. Crear campaña CBO
+  // 2. Crear campaña CBO — objetivo conversiones (leads reales)
   const campana = await metaPost(`/${AD_ACCOUNT}/campaigns`, {
     name: `AutoAprobado | ${data.nombre} | ${fecha}`,
-    objective: 'OUTCOME_TRAFFIC',
+    objective: 'OUTCOME_CONVERSIONS',
     status: 'ACTIVE',
     special_ad_categories: ['FINANCIAL_PRODUCTS_SERVICES'],
     daily_budget: presupuestoCentavos,
@@ -148,21 +151,30 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20) {
   console.log(`✅ Campaña creada: ${campana.id}`);
   await new Promise(r => setTimeout(r, 3000));
 
-  // Targeting — categorías especiales no permiten Advantage+
-  // Meta exige: edad 18-65, sin género, sin Advantage+
+  // Targeting — solo Miami (40 millas cubre Miami-Dade + Broward + Palm Beach)
+  // Categorías especiales: sin restricción por edad/género, solo geo permitido
   const targeting = {
     age_min: 18,
     age_max: 65,
     geo_locations: {
-      regions: [{ key: '3847' }] // Florida
+      custom_locations: [{
+        latitude: 25.7617,
+        longitude: -80.1918,
+        radius: 40,
+        distance_unit: 'mile'
+      }]
     }
   };
 
   const adsetBase = {
     campaign_id: campana.id,
     billing_event: 'IMPRESSIONS',
-    optimization_goal: 'LANDING_PAGE_VIEWS',
+    optimization_goal: 'OFFSITE_CONVERSIONS',
     bid_strategy: 'LOWEST_COST_WITHOUT_CAP',
+    promoted_object: {
+      pixel_id: PIXEL_ID,
+      custom_event_type: 'LEAD'
+    },
     targeting,
     status: 'ACTIVE'
   };
@@ -246,11 +258,17 @@ async function preflight() {
   }
 }
 
-// ── Punto de entrada ─────────────────────────────────
-const [,, segmento, presupuesto] = process.argv;
+// ── Exportar para uso desde bot-telegram.js ──────────
+export { crearCampanaSegmento };
 
-if (!segmento) {
-  console.log(`
+// ── Punto de entrada CLI ─────────────────────────────
+const esDirecto = process.argv[1]?.replace(/\\/g, '/').endsWith('meta-ads-carros.js');
+
+if (esDirecto) {
+  const [,, segmento, presupuesto] = process.argv;
+
+  if (!segmento) {
+    console.log(`
 AutoAprobado Miami — Crear campaña Meta Ads
 
 Uso: node meta-ads-carros.js <segmento> [presupuesto]
@@ -267,9 +285,10 @@ Presupuesto: en dólares por día (default: 20)
 Ejemplos:
   node meta-ads-carros.js mal-credito 20
   node meta-ads-carros.js oferta-especial 30
-  `);
-  process.exit(0);
-}
+    `);
+    process.exit(0);
+  }
 
-await preflight();
-await crearCampanaSegmento(segmento, parseInt(presupuesto) || 20);
+  await preflight();
+  await crearCampanaSegmento(segmento, parseInt(presupuesto) || 20);
+}
