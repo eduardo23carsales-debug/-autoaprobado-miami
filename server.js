@@ -138,7 +138,14 @@ app.post('/telegram/webhook', (req, res) => {
   if (procesados.has(update.update_id)) return; // duplicado, ignorar
   procesados.add(update.update_id);
   if (procesados.size > 200) procesados.clear(); // limpiar memoria ocasionalmente
+
+  // Log de debug — ayuda a identificar updates inesperados
+  const tipo = Object.keys(update).filter(k => k !== 'update_id').join(',');
   const msg = update.message || update.channel_post;
+  const fromId = msg?.from?.id || 'sin-from';
+  const texto  = msg?.text?.slice(0, 60) || '(sin texto)';
+  console.log(`[Webhook] update_id=${update.update_id} tipo=${tipo} from=${fromId} texto="${texto}"`);
+
   // msg.from debe existir — filtra mensajes del propio bot en el canal (no tienen from)
   if (msg && msg.from && !msg.from.is_bot && !msg.via_bot && msg.text?.startsWith('/')) {
     manejarMensaje(msg).catch(e => console.error('[Webhook] Error:', e.message));
