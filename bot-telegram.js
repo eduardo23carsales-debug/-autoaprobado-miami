@@ -418,5 +418,3 @@ async function manejarMensaje(msg) {
 export { bot, manejarMensaje };
 
 console.log('🤖 Bot AutoAprobado cargado — modo webhook');
-
-export { bot };
