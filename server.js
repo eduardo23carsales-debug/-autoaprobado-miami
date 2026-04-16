@@ -137,7 +137,7 @@ app.post('/telegram/webhook', (req, res) => {
   procesados.add(update.update_id);
   if (procesados.size > 200) procesados.clear(); // limpiar memoria ocasionalmente
   const msg = update.message || update.channel_post;
-  if (msg && !msg.from?.is_bot) { // ignorar mensajes del propio bot
+  if (msg && !msg.from?.is_bot && !msg.via_bot && msg.text?.startsWith('/')) {
     manejarMensaje(msg).catch(e => console.error('[Webhook] Error:', e.message));
   }
 });
@@ -162,10 +162,6 @@ app.listen(PORT, async () => {
     try {
       await tgBot.setWebHook(webhookUrl);
       console.log(`🤖 Telegram webhook activo: ${webhookUrl}`);
-      await tgBot.sendMessage(process.env.TELEGRAM_CHAT_ID,
-        '🤖 <b>Bot AutoAprobado activo</b> — escuchando comandos.\nEscribe /start para ver los comandos.',
-        { parse_mode: 'HTML' }
-      );
     } catch (e) {
       console.error('[Webhook] Error al registrar:', e.message);
     }
