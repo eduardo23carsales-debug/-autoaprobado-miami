@@ -219,7 +219,20 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20) {
         status: 'ACTIVE'
       });
 
-      adsCreados.push({ copy: etiquetas[i], adset_id: adset.id, ad_id: ad.id });
+      // Obtener URL de preview del ad
+      let previewUrl = null;
+      try {
+        await new Promise(r => setTimeout(r, 2000));
+        const prev = await axios.get(`${API}/${ad.id}/previews`, {
+          params: { ad_format: 'MOBILE_FEED_STANDARD', access_token: TOKEN },
+          timeout: 10000
+        });
+        const iframe = prev.data?.data?.[0]?.body || '';
+        const match  = iframe.match(/src="([^"]+)"/);
+        if (match) previewUrl = match[1].replace(/&amp;/g, '&');
+      } catch { /* preview opcional, no bloquea */ }
+
+      adsCreados.push({ copy: etiquetas[i], adset_id: adset.id, ad_id: ad.id, previewUrl });
       console.log(`✅ Ad ${etiquetas[i]}: ${ad.id}`);
 
     } catch (e) {

@@ -200,6 +200,16 @@ async function ejecutar(chatId, accion, params) {
           videoMsg,
           { parse_mode: 'HTML' }
         );
+
+        // Mandar preview de cada ad
+        for (const ad of result.ads) {
+          if (ad.previewUrl) {
+            await bot.sendMessage(chatId,
+              `👁 <b>Preview — Copy ${ad.copy}:</b>\n${ad.previewUrl}`,
+              { parse_mode: 'HTML', disable_web_page_preview: false }
+            );
+          }
+        }
         break;
       }
 
