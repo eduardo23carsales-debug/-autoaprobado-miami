@@ -286,28 +286,81 @@ async function ejecutar(chatId, accion, params) {
   }
 }
 
-const AYUDA =
-`📋 <b>Comandos disponibles:</b>
+// ── Teclados reutilizables ────────────────────────────
+const KB_SEGMENTOS = {
+  inline_keyboard: [
+    [
+      { text: '⚠️ Mal crédito',    callback_data: 'seg:mal-credito' },
+      { text: '🆕 Sin crédito',    callback_data: 'seg:sin-credito' },
+    ],
+    [
+      { text: '🚨 Urgente',        callback_data: 'seg:urgente' },
+      { text: '🔄 Upgrade',        callback_data: 'seg:upgrade' },
+    ],
+    [
+      { text: '🔥 Oferta especial', callback_data: 'seg:oferta-especial' },
+    ]
+  ]
+};
 
-/reporte — métricas de hoy
-/mejor — qué campaña va mejor
-/analista — análisis IA + plan de acción
-/supervisor — revisión inmediata de campañas
+function kbPresupuesto(segmento, accion) {
+  return {
+    inline_keyboard: [
+      [
+        { text: '$5/día',  callback_data: `${accion}:${segmento}:5` },
+        { text: '$10/día', callback_data: `${accion}:${segmento}:10` },
+        { text: '$20/día', callback_data: `${accion}:${segmento}:20` },
+      ],
+      [
+        { text: '$30/día', callback_data: `${accion}:${segmento}:30` },
+        { text: '$50/día', callback_data: `${accion}:${segmento}:50` },
+        { text: '$100/día', callback_data: `${accion}:${segmento}:100` },
+      ]
+    ]
+  };
+}
 
-/nueva mal-credito 5 — crear campaña ($5/día)
-/nueva sin-credito 5
-/nueva urgente 5
-/nueva upgrade 5
-/nueva oferta-especial 5
+function kbSegmentosAccion(accion) {
+  return {
+    inline_keyboard: [
+      [
+        { text: '⚠️ Mal crédito',    callback_data: `${accion}:mal-credito` },
+        { text: '🆕 Sin crédito',    callback_data: `${accion}:sin-credito` },
+      ],
+      [
+        { text: '🚨 Urgente',        callback_data: `${accion}:urgente` },
+        { text: '🔄 Upgrade',        callback_data: `${accion}:upgrade` },
+      ],
+      [
+        { text: '🔥 Oferta especial', callback_data: `${accion}:oferta-especial` },
+        { text: '⏹ Todas',           callback_data: `${accion}:todas` },
+      ]
+    ]
+  };
+}
 
-/pausa mal-credito — pausar campaña
-/pausa todas — pausar todas
-/activa mal-credito — activar campaña
-/activa todas — activar todas
+const MENU_PRINCIPAL = {
+  inline_keyboard: [
+    [
+      { text: '🚀 Nueva campaña',   callback_data: 'menu:nueva' },
+      { text: '📊 Reporte',         callback_data: 'menu:reporte' },
+    ],
+    [
+      { text: '⏸ Pausar',          callback_data: 'menu:pausa' },
+      { text: '▶️ Activar',         callback_data: 'menu:activa' },
+    ],
+    [
+      { text: '💵 Cambiar presupuesto', callback_data: 'menu:presupuesto' },
+      { text: '🏆 Mejor campaña',   callback_data: 'menu:mejor' },
+    ],
+    [
+      { text: '🧠 Analista',        callback_data: 'menu:analista' },
+      { text: '👁 Supervisor',      callback_data: 'menu:supervisor' },
+    ]
+  ]
+};
 
-/presupuesto mal-credito 10 — cambiar presupuesto
-
-Segmentos: mal-credito | sin-credito | urgente | upgrade | oferta-especial`;
+const AYUDA = `📋 <b>Menú AutoAprobado Miami</b>\n\nEscribe /menu para ver los botones, o usa los comandos directos abajo.\n\n/nueva — crear campaña\n/pausa — pausar campaña\n/activa — activar campaña\n/presupuesto — cambiar presupuesto\n/reporte — métricas de hoy\n/mejor — mejor campaña\n/analista — análisis IA\n/supervisor — revisar campañas`;
 
 // ── Manejador principal de mensajes ──────────────────
 async function manejarMensaje(msg) {
@@ -327,9 +380,11 @@ async function manejarMensaje(msg) {
   const cmd    = partes[0];
 
   try {
-    // /start o /ayuda
-    if (cmd === '/start' || cmd === '/ayuda' || cmd === '/help') {
-      await bot.sendMessage(chatId, AYUDA, { parse_mode: 'HTML' });
+    // /start o /ayuda o /menu
+    if (cmd === '/start' || cmd === '/ayuda' || cmd === '/help' || cmd === '/menu') {
+      await bot.sendMessage(chatId, '🤖 <b>AutoAprobado Miami</b> — ¿Qué hacemos?', {
+        parse_mode: 'HTML', reply_markup: MENU_PRINCIPAL
+      });
       return;
     }
 
@@ -362,48 +417,80 @@ async function manejarMensaje(msg) {
       return;
     }
 
-    // /nueva <segmento> <presupuesto>
+    // /nueva — con o sin parámetros
     if (cmd === '/nueva' || cmd === 'nueva') {
-      const segmento   = partes[1];
-      const presupuesto = parseFloat(partes[2]) || 5;
-      const validos = ['mal-credito','sin-credito','urgente','upgrade','oferta-especial'];
-      if (!validos.includes(segmento)) {
+      const segmento    = partes[1];
+      const presupuesto = parseFloat(partes[2]);
+      const validos     = ['mal-credito','sin-credito','urgente','upgrade','oferta-especial'];
+      if (segmento && validos.includes(segmento) && presupuesto) {
+        // Comando completo — ejecutar directo
+        await ejecutar(chatId, 'crear_campana', { segmento, presupuesto });
+      } else if (segmento && validos.includes(segmento)) {
+        // Tiene segmento pero falta presupuesto — mostrar montos
         await bot.sendMessage(chatId,
-          `⚠️ Segmento inválido. Usa uno de:\n${validos.join(' | ')}`, { parse_mode: 'HTML' });
-        return;
+          `🚀 <b>${segmento}</b> — ¿Cuánto presupuesto por día?`,
+          { parse_mode: 'HTML', reply_markup: kbPresupuesto(segmento, 'nueva') }
+        );
+      } else {
+        // Sin parámetros — mostrar segmentos
+        await bot.sendMessage(chatId,
+          '🚀 <b>Nueva campaña</b> — ¿Qué segmento?',
+          { parse_mode: 'HTML', reply_markup: kbSegmentosAccion('nueva_seg') }
+        );
       }
-      await ejecutar(chatId, 'crear_campana', { segmento, presupuesto, con_video: false });
       return;
     }
 
-    // /pausa <segmento|todas>
+    // /pausa — con o sin parámetros
     if (cmd === '/pausa' || cmd === 'pausa') {
-      const segmento = partes[1] || 'todas';
-      await ejecutar(chatId, 'pausa', { segmento });
+      if (partes[1]) {
+        await ejecutar(chatId, 'pausa', { segmento: partes[1] });
+      } else {
+        await bot.sendMessage(chatId,
+          '⏸ <b>Pausar campaña</b> — ¿Cuál?',
+          { parse_mode: 'HTML', reply_markup: kbSegmentosAccion('pausa') }
+        );
+      }
       return;
     }
 
-    // /activa <segmento|todas>
+    // /activa — con o sin parámetros
     if (cmd === '/activa' || cmd === 'activa') {
-      const segmento = partes[1] || 'todas';
-      await ejecutar(chatId, 'activa', { segmento });
+      if (partes[1]) {
+        await ejecutar(chatId, 'activa', { segmento: partes[1] });
+      } else {
+        await bot.sendMessage(chatId,
+          '▶️ <b>Activar campaña</b> — ¿Cuál?',
+          { parse_mode: 'HTML', reply_markup: kbSegmentosAccion('activa') }
+        );
+      }
       return;
     }
 
-    // /presupuesto <segmento> <monto>
+    // /presupuesto — con o sin parámetros
     if (cmd === '/presupuesto' || cmd === 'presupuesto') {
       const segmento = partes[1];
       const monto    = parseFloat(partes[2]);
-      if (!segmento || !monto) {
-        await bot.sendMessage(chatId, '⚠️ Uso: /presupuesto mal-credito 10');
-        return;
+      if (segmento && monto) {
+        await ejecutar(chatId, 'presupuesto', { segmento, monto });
+      } else if (segmento) {
+        await bot.sendMessage(chatId,
+          `💵 <b>${segmento}</b> — ¿Nuevo presupuesto por día?`,
+          { parse_mode: 'HTML', reply_markup: kbPresupuesto(segmento, 'presu') }
+        );
+      } else {
+        await bot.sendMessage(chatId,
+          '💵 <b>Cambiar presupuesto</b> — ¿Qué campaña?',
+          { parse_mode: 'HTML', reply_markup: kbSegmentosAccion('presu_seg') }
+        );
       }
-      await ejecutar(chatId, 'presupuesto', { segmento, monto });
       return;
     }
 
-    // No reconocido
-    await bot.sendMessage(chatId, AYUDA, { parse_mode: 'HTML' });
+    // No reconocido — mostrar menú
+    await bot.sendMessage(chatId, '🤖 <b>AutoAprobado Miami</b> — ¿Qué hacemos?', {
+      parse_mode: 'HTML', reply_markup: MENU_PRINCIPAL
+    });
 
   } catch (err) {
     console.error('[Bot] Error:', err.message);
@@ -422,6 +509,78 @@ async function manejarCallback(query) {
   if (chatId !== CHAT_ID && chatId !== idNormalizado && `-100${chatId}` !== CHAT_ID) return;
 
   try {
+    // ── Menú principal ───────────────────────────────
+    if (data.startsWith('menu:')) {
+      const accion = data.split(':')[1];
+      await bot.answerCallbackQuery(queryId);
+      const acciones = {
+        nueva:       () => bot.sendMessage(chatId, '🚀 <b>Nueva campaña</b> — ¿Qué segmento?', { parse_mode: 'HTML', reply_markup: kbSegmentosAccion('nueva_seg') }),
+        pausa:       () => bot.sendMessage(chatId, '⏸ <b>Pausar campaña</b> — ¿Cuál?',        { parse_mode: 'HTML', reply_markup: kbSegmentosAccion('pausa') }),
+        activa:      () => bot.sendMessage(chatId, '▶️ <b>Activar campaña</b> — ¿Cuál?',      { parse_mode: 'HTML', reply_markup: kbSegmentosAccion('activa') }),
+        presupuesto: () => bot.sendMessage(chatId, '💵 <b>Cambiar presupuesto</b> — ¿Qué campaña?', { parse_mode: 'HTML', reply_markup: kbSegmentosAccion('presu_seg') }),
+        reporte:     () => { bot.sendMessage(chatId, '⏳ Generando reporte...'); generarReporte(); },
+        mejor:       () => ejecutar(chatId, 'mejor_campana', {}),
+        analista:    () => { bot.sendMessage(chatId, '🧠 Iniciando análisis con IA...'); import('./agentes/analista.js').then(m => m.ejecutarAnalista()); },
+        supervisor:  () => { bot.sendMessage(chatId, '👁 Revisando campañas ahora...'); import('./agentes/supervisor.js').then(m => m.ejecutarSupervisor()); },
+      };
+      if (acciones[accion]) await acciones[accion]();
+      return;
+    }
+
+    // ── Nueva campaña: elegir segmento ───────────────
+    if (data.startsWith('nueva_seg:')) {
+      const segmento = data.split(':')[1];
+      await bot.answerCallbackQuery(queryId);
+      await bot.sendMessage(chatId,
+        `🚀 <b>${segmento}</b> — ¿Cuánto presupuesto por día?`,
+        { parse_mode: 'HTML', reply_markup: kbPresupuesto(segmento, 'nueva') }
+      );
+      return;
+    }
+
+    // ── Nueva campaña: elegir presupuesto ────────────
+    if (data.startsWith('nueva:')) {
+      const [, segmento, monto] = data.split(':');
+      await bot.answerCallbackQuery(queryId, { text: `Creando ${segmento} $${monto}/día...` });
+      await ejecutar(chatId, 'crear_campana', { segmento, presupuesto: parseFloat(monto) });
+      return;
+    }
+
+    // ── Pausar campaña ───────────────────────────────
+    if (data.startsWith('pausa:')) {
+      const segmento = data.split(':')[1];
+      await bot.answerCallbackQuery(queryId, { text: `Pausando ${segmento}...` });
+      await ejecutar(chatId, 'pausa', { segmento });
+      return;
+    }
+
+    // ── Activar campaña ──────────────────────────────
+    if (data.startsWith('activa:')) {
+      const segmento = data.split(':')[1];
+      await bot.answerCallbackQuery(queryId, { text: `Activando ${segmento}...` });
+      await ejecutar(chatId, 'activa', { segmento });
+      return;
+    }
+
+    // ── Presupuesto: elegir segmento ─────────────────
+    if (data.startsWith('presu_seg:')) {
+      const segmento = data.split(':')[1];
+      await bot.answerCallbackQuery(queryId);
+      await bot.sendMessage(chatId,
+        `💵 <b>${segmento}</b> — ¿Nuevo presupuesto por día?`,
+        { parse_mode: 'HTML', reply_markup: kbPresupuesto(segmento, 'presu') }
+      );
+      return;
+    }
+
+    // ── Presupuesto: elegir monto ────────────────────
+    if (data.startsWith('presu:')) {
+      const [, segmento, monto] = data.split(':');
+      await bot.answerCallbackQuery(queryId, { text: `Actualizando presupuesto...` });
+      await ejecutar(chatId, 'presupuesto', { segmento, monto: parseFloat(monto) });
+      return;
+    }
+
     // ── Aprobar plan del Analista ────────────────────
     if (data === 'aprobar_plan') {
       await bot.answerCallbackQuery(queryId, { text: '✅ Ejecutando plan...' });
