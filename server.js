@@ -146,8 +146,7 @@ app.post('/telegram/webhook', (req, res) => {
   const texto  = msg?.text?.slice(0, 60) || '(sin texto)';
   console.log(`[Webhook] update_id=${update.update_id} tipo=${tipo} from=${fromId} texto="${texto}"`);
 
-  // msg.from debe existir — filtra mensajes del propio bot en el canal (no tienen from)
-  if (msg && msg.from && !msg.from.is_bot && !msg.via_bot && msg.text?.startsWith('/')) {
+  if (msg && !msg.from?.is_bot && !msg.via_bot && msg.text?.startsWith('/')) {
     manejarMensaje(msg).catch(e => console.error('[Webhook] Error:', e.message));
   }
   // Botones inline de los agentes
