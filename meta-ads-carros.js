@@ -124,9 +124,9 @@ function buscarFotoReal(segmento) {
     f.toLowerCase().startsWith(segmento.toLowerCase())
   );
 
-  // Fallback: foto genérica dealer o cliente
+  // Fallback: foto genérica (general-, dealer- o cliente-)
   const genericas = archivos.filter(f =>
-    f.toLowerCase().startsWith('dealer') || f.toLowerCase().startsWith('cliente')
+    f.toLowerCase().startsWith('general') || f.toLowerCase().startsWith('dealer') || f.toLowerCase().startsWith('cliente')
   );
 
   const pool = candidatos.length > 0 ? candidatos : genericas;
