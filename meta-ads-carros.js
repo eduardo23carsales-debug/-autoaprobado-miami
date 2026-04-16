@@ -31,7 +31,7 @@ const SEGMENTOS = {
       `⚠️ El banco te dijo NO. Nosotros decimos SÍ.\n\nEn AutoAprobado Miami especializamos en crédito difícil. No importa tu score, bancarrotas o deudas previas.\n\n🚗 Carros nuevos y usados\n💵 Inicial desde $500\n📱 Proceso 100% en español\n\nVe si calificas GRATIS 👇`,
       `Tu crédito no define tu futuro 🚗\n\nHemos ayudado a cientos de personas en Miami a conseguir su carro aunque el banco los rechazó.\n\nNo necesitas crédito perfecto. Solo necesitas hablar con nosotros.\n\n¿Cuándo fue la última vez que manejaste tranquilo? Empieza hoy. 👇`
     ],
-    imagenPrompt: `Candid-style photo of a real Hispanic couple in their 30s sitting inside a car dealership in Miami, Florida. Natural lighting, modern dealership interior with cars visible in background. The couple looks relieved and happy, signing paperwork at a desk. Shot with a 50mm lens, shallow depth of field, natural skin tones. No dramatic lighting, no staged poses. Look like a real moment captured, not a stock photo. Square format. NO TEXT, NO LOGOS, NO WORDS anywhere in the image.`
+    imagenPrompt: `Documentary photograph, Canon 5D, 50mm lens, f/2.0. A single Hispanic man in his late 30s sitting at a desk inside a bright modern car dealership showroom in Miami. He is signing a document, looking down at the paper, slight smile. One salesperson's hand visible across the desk handing a pen. Real dealership background: glass walls, one or two cars on the showroom floor out of focus. Natural daylight from windows, no flash. Realistic skin tones, no dramatic shadows. Square 1:1 crop. NO TEXT, NO WORDS, NO LOGOS in the image.`
   },
   'sin-credito': {
     nombre:    'Sin Historial — AutoAprobado Miami',
@@ -41,7 +41,7 @@ const SEGMENTOS = {
       `Llegaste a USA con ganas de crecer 💪\n\nSabemos que empezar desde cero es difícil. Por eso en AutoAprobado Miami no pedimos historial.\n\n🚗 Solo necesitas: trabajo estable o negocio propio\n💵 Inicial accesible\n📱 Te guiamos en todo el proceso\n\n¿Cuándo empezamos? 👇`,
       `Sin crédito no significa sin carro 🚗\n\nMuchos de nuestros clientes compraron su primer carro en USA sin un solo punto de crédito.\n\nEl truco: trabajar con el dealer correcto. En AutoAprobado Miami sabemos cómo hacerlo.\n\nVe si calificas en 2 minutos. 👇`
     ],
-    imagenPrompt: `Candid-style photo of a young Hispanic man in his late 20s standing next to a new car in a sunny Miami parking lot, holding car keys and smiling naturally. Casual clothes, real Miami neighborhood background, palm trees visible. Shot with natural daylight, 50mm lens. Not staged, not overly polished — looks like a real photo a friend took. Square format. NO TEXT, NO LOGOS, NO WORDS anywhere in the image.`
+    imagenPrompt: `Documentary photograph, Canon 5D, 35mm lens. A single young Hispanic man, early 20s, standing beside a white compact sedan in a sunny parking lot in Miami, Florida. He holds car keys in one hand, looking at them with a natural expression. Wearing casual everyday clothes — jeans and a t-shirt. Background: real Miami parking lot, palm trees, blue sky, other cars parked. Harsh midday sunlight, natural shadows. No posing, looks like a candid moment. Realistic colors. Square 1:1 crop. NO TEXT, NO WORDS, NO LOGOS.`
   },
   'urgente': {
     nombre:    'Urgente — AutoAprobado Miami',
@@ -51,7 +51,7 @@ const SEGMENTOS = {
       `⏰ Cada día sin carro te cuesta dinero.\n\nEn Miami sin carro es casi imposible trabajar, llevar a los niños o manejar tu negocio.\n\nEn AutoAprobado Miami entendemos la urgencia:\n✅ Respuesta en menos de 24 horas\n✅ Carros disponibles para entrega inmediata\n✅ Financiamiento aunque te hayan negado antes\n\nActúa hoy. 👇`,
       `No esperes más 🚗⚡\n\nSi estás leyendo esto es porque necesitas un carro ahora mismo.\n\nLlamamos a decenas de bancos hasta encontrar quien te apruebe. Sin importar tu situación.\n\nMiles de personas en Miami ya manejan gracias a nosotros. Tú eres el siguiente. 👇`
     ],
-    imagenPrompt: `Candid-style photo of a Hispanic woman in her 30s standing at a Miami bus stop on a hot sunny day, looking tired and checking her phone. Real Miami street in background, palm trees, bright daylight. Casual everyday clothes. Shot with natural light, slightly wide angle. Looks like a real street photo, not staged. The scene feels relatable and authentic. Square format. NO TEXT, NO LOGOS, NO WORDS anywhere in the image.`
+    imagenPrompt: `Documentary photograph, Canon 5D, 35mm lens, f/2.8. A single Hispanic woman in her 30s sitting in the driver's seat of a car, hands on the steering wheel, looking forward through the windshield with a calm confident expression. Shot from outside the car through the driver's window, slightly low angle. Miami street visible through the windshield — palm trees, buildings. Natural daylight. Realistic interior: car dashboard, steering wheel, seatbelt on. No exaggerated expression, real moment. Square 1:1. NO TEXT, NO WORDS, NO LOGOS.`
   },
   'upgrade': {
     nombre:    'Upgrade de Carro — AutoAprobado Miami',
@@ -61,7 +61,7 @@ const SEGMENTOS = {
       `Tu carro actual puede ser tu inicial 🚗➡️🚗\n\nMuchos clientes en Miami hacen el upgrade sin gastar un peso de su bolsillo.\n\nUsamos el valor de tu carro actual como down payment del nuevo.\n\n✅ Modelos 2024-2026 disponibles\n✅ Carros Hyundai desde $310/mes\n✅ Proceso rápido y en español\n\nHablemos hoy. 👇`,
       `¿Cuánto llevas con el mismo carro? 🤔\n\nSi tu carro ya tiene muchos miles encima, muchas reparaciones o simplemente ya no va con tu vida actual — es momento de hablar.\n\nEn AutoAprobado Miami hacemos el proceso de cambio fácil, rápido y sin sorpresas.\n\nVe cuánto vale tu carro en 2 minutos. 👇`
     ],
-    imagenPrompt: `Candid-style photo of a Hispanic man in his 40s at a car dealership in Miami, talking with a salesperson next to a new Hyundai SUV. Natural dealership lighting, real showroom environment. Man looks interested and confident, casual conversation posture. Shot with 35mm lens, natural colors, no dramatic lighting. Looks like a genuine moment, not posed. Square format. NO TEXT, NO LOGOS, NO WORDS anywhere in the image.`
+    imagenPrompt: `Documentary photograph, Canon 5D, 50mm lens. Close-up of a single Hispanic man's hands, early 40s, holding two car keys — one old worn key on the left, one shiny new car key on the right. Real hands, real keys. Shallow depth of field, background slightly blurred showing a car dealership interior. Natural light. No people's faces visible, just the hands and keys. Realistic colors, no filters. Square 1:1. NO TEXT, NO WORDS, NO LOGOS.`
   },
   'oferta-especial': {
     nombre:    'Oferta Especial Hyundai — AutoAprobado Miami',
@@ -71,7 +71,7 @@ const SEGMENTOS = {
       `¿Sabías que puedes manejar un Hyundai 2026 en Miami por menos de $400/mes? 🚗\n\nEn AutoAprobado Miami tenemos:\n• Venue 2026 — $310/mes\n• Elantra 2026 — $350/mes  \n• Tucson 2026 — $420/mes\n• Santa Fe 2026 — $480/mes\n\nSin importar tu historial crediticio.\n\nEl cupo es limitado. Reserva el tuyo hoy. 👇`,
       `Maneja un carro NUEVO en 2026 sin arruinarte 💪\n\nHyundai Doral tiene los mejores precios de Miami y nosotros tenemos la aprobación más fácil.\n\nJuntos hacemos que sea posible para ti, sin importar tu situación de crédito.\n\n🔥 Precios desde $310/mes\n⚡ Respuesta en 24 horas\n\n¿Para cuál calificas tú? 👇`
     ],
-    imagenPrompt: `Clean product-style photo of a brand new Hyundai SUV parked outdoors on a bright Miami day. Shot from a 3/4 front angle at eye level, natural sunlight, blue sky with a few clouds, palm trees slightly out of focus in background. No people, just the car. Looks like a real dealership photo taken by a professional photographer. Accurate car proportions, realistic paint reflection, no CGI look. Square format. NO TEXT, NO LOGOS, NO WORDS anywhere in the image.`
+    imagenPrompt: `Professional automotive photograph, Canon 5D, 35mm lens, f/8. A brand new white Hyundai Tucson SUV parked on clean asphalt outside a dealership in Miami on a sunny day. 3/4 front angle, eye level. Natural sunlight creating soft reflections on the hood and doors. Background: clear blue sky, one or two palm trees slightly blurred. No people. Realistic car proportions, accurate reflections, no CGI. Photo quality matching a real car dealership listing. Square 1:1. NO TEXT, NO WORDS, NO LOGOS, NO LICENSE PLATES.`
   }
 };
 
