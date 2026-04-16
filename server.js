@@ -11,6 +11,7 @@ import rateLimit from 'express-rate-limit';
 import cron from 'node-cron';
 import dotenv from 'dotenv';
 import { generarReporte } from './monitor-ads.js';
+import { bot as tgBot, manejarMensaje } from './bot-telegram.js';
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -126,6 +127,14 @@ app.post('/api/lead', leadLimiter, async (req, res) => {
 // ── Health check ─────────────────────────────────────
 app.get('/api/ping', (req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
 
+// ── Telegram webhook ──────────────────────────────────
+app.post('/telegram/webhook', (req, res) => {
+  const update = req.body;
+  const msg = update.message || update.channel_post;
+  if (msg) manejarMensaje(msg).catch(e => console.error('[Webhook] Error:', e.message));
+  res.sendStatus(200);
+});
+
 // ── Monitor de campañas — reporte diario 8 AM ET ─────
 // Cron: "0 8 * * *" = todos los días a las 8:00 AM
 // Timezone America/New_York = Miami
@@ -135,7 +144,25 @@ cron.schedule('0 8 * * *', () => {
 }, { timezone: 'America/New_York' });
 
 // ── Iniciar servidor ─────────────────────────────────
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`✅ AutoAprobado Miami corriendo en http://localhost:${PORT}`);
   console.log(`📊 Monitor de campañas activo — reporte diario a las 8 AM ET`);
+
+  // Registrar webhook de Telegram
+  const domain = process.env.RAILWAY_PUBLIC_DOMAIN;
+  if (domain) {
+    const webhookUrl = `https://${domain}/telegram/webhook`;
+    try {
+      await tgBot.setWebHook(webhookUrl);
+      console.log(`🤖 Telegram webhook activo: ${webhookUrl}`);
+      await tgBot.sendMessage(process.env.TELEGRAM_CHAT_ID,
+        '🤖 <b>Bot AutoAprobado activo</b> — escuchando comandos.\nEscribe /start para ver los comandos.',
+        { parse_mode: 'HTML' }
+      );
+    } catch (e) {
+      console.error('[Webhook] Error al registrar:', e.message);
+    }
+  } else {
+    console.log('⚠️  RAILWAY_PUBLIC_DOMAIN no definido — webhook no registrado');
+  }
 });

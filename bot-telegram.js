@@ -23,9 +23,9 @@ const CHAT_ID    = String(process.env.TELEGRAM_CHAT_ID);
 const LANDING    = 'https://oferta.hyundaipromomiami.com';
 
 const anthropic  = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const bot        = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true });
+// Sin polling — Railway usa webhook (más confiable en servidores hosteados)
+const bot        = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: false });
 
-// Acciones pendientes de confirmación: chatId → { accion, params, resumen }
 const pendientes = new Map();
 
 // ── Helpers Meta API ─────────────────────────────────
@@ -415,22 +415,8 @@ async function manejarMensaje(msg) {
   }
 }
 
-// Escuchar mensajes normales (grupos, privado) Y posts de canales
-bot.on('message',      manejarMensaje);
-bot.on('channel_post', manejarMensaje);
+export { bot, manejarMensaje };
 
-bot.on('polling_error', (err) => {
-  console.error('[Bot] Polling error:', err.message);
-});
-
-// Confirmar inicio por Telegram
-setTimeout(() => {
-  bot.sendMessage(CHAT_ID,
-    '🤖 <b>Bot AutoAprobado activo</b> — escuchando comandos.\nEscribe /start para ver los comandos.',
-    { parse_mode: 'HTML' }
-  ).catch(e => console.error('[Bot] No pudo enviar mensaje de inicio:', e.message));
-}, 3000);
-
-console.log('🤖 Bot Telegram con IA activo — esperando mensajes...');
+console.log('🤖 Bot AutoAprobado cargado — modo webhook');
 
 export { bot };
