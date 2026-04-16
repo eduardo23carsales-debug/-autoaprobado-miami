@@ -182,7 +182,7 @@ async function crearFormulario(segmento, nombreCampana) {
     thank_you_page: {
       title:       '¡Gracias! Te llamamos pronto 🚗',
       body:        'Un asesor de AutoAprobado Miami te contactará en menos de 24 horas. ¡Prepárate para manejar!',
-      button_type: 'NO_BUTTON'
+      button_type: 'NONE'
     },
     context_card: {
       title:   '¿Calificas para un carro?',
@@ -399,12 +399,6 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
       const creative = await metaPost(`/${AD_ACCOUNT}/adcreatives`, {
         name: `AutoAprobado | ${segmento} | Creative-${etiquetas[i]}`,
         object_story_spec: objectStorySpec,
-        // Advantage+ Creative — Meta optimiza automáticamente el formato y presentación
-        degrees_of_freedom_spec: {
-          creative_features_spec: {
-            standard_enhancements: { enroll_status: 'OPT_IN' }
-          }
-        }
       });
 
       const ad = await metaPost(`/${AD_ACCOUNT}/ads`, {
