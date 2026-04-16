@@ -313,8 +313,6 @@ async function manejarMensaje(msg) {
   const cmd    = partes[0];
 
   try {
-    await bot.sendChatAction(chatId, 'typing');
-
     // /start o /ayuda
     if (cmd === '/start' || cmd === '/ayuda' || cmd === '/help') {
       await bot.sendMessage(chatId, AYUDA, { parse_mode: 'HTML' });

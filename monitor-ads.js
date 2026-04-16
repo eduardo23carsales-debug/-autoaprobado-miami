@@ -123,7 +123,8 @@ export async function generarReporte() {
     const cuenta = await verificarCuenta();
 
     // 2. Campañas
-    const campanas = await obtenerCampanas();
+    const todasCampanas = await obtenerCampanas();
+    const campanas = todasCampanas.filter(c => c.effective_status === 'ACTIVE');
 
     // 3. Si no hay saldo → pausar todo y notificar
     if (cuenta.sinSaldo && campanas.length > 0) {
@@ -158,7 +159,12 @@ export async function generarReporte() {
 
       const estado  = c.effective_status === 'ACTIVE' ? '🟢' : '⏸';
       const cpl     = m.leads > 0 ? `$${(m.spend / m.leads).toFixed(2)}/lead` : m.spend > 0 ? '⚠️ 0 leads' : '—';
-      const nombre  = c.name.replace('AutoAprobado | ', '').replace(/ \| \d{4}-\d{2}-\d{2}$/, '');
+      const nombre  = c.name
+        .replace(/^AutoAprobado \| /, '')
+        .replace(/ \| \d{4}-\d{2}-\d{2}(T\d{2}h\d{2})?$/, '')
+        .replace(/ — AutoAprobado Miami$/, '')
+        .trim()
+        + ` [${c.id.slice(-6)}]`;
 
       lineas.push(`${estado} <b>${nombre}</b>\n   💵 $${m.spend.toFixed(2)} | 👆 ${m.clicks} clicks | 🎯 ${m.leads} leads | ${cpl}`);
     }
@@ -167,13 +173,28 @@ export async function generarReporte() {
       lineas.push('📭 No hay campañas activas todavía.');
     }
 
-    // 5. Alertas automáticas
+    // 5. Alertas automáticas + preguntas de acción
     const alertas = [];
     for (const c of campanas) {
       const m = await obtenerMetricas(c.id);
       const presupuesto = parseFloat(c.daily_budget || 0) / 100;
       if (m.spend >= presupuesto * 0.8 && m.leads === 0 && c.effective_status === 'ACTIVE') {
-        alertas.push(`⚠️ <b>${c.name.replace('AutoAprobado | ', '').replace(/ \| \d{4}-\d{2}-\d{2}$/, '')}</b> — gastó $${m.spend.toFixed(2)} sin ningún lead. Considera pausarla.`);
+        const alertaNombre = c.name
+          .replace(/^AutoAprobado \| /, '')
+          .replace(/ \| \d{4}-\d{2}-\d{2}(T\d{2}h\d{2})?$/, '')
+          .replace(/ — AutoAprobado Miami$/, '')
+          .trim();
+
+        // Detectar segmento de la campaña
+        const segmento = ['mal-credito','sin-credito','urgente','upgrade','oferta-especial']
+          .find(s => c.name.toLowerCase().includes(s)) || 'mal-credito';
+
+        alertas.push(
+          `🚨 <b>${alertaNombre}</b> gastó $${m.spend.toFixed(2)} sin ningún lead hoy.\n` +
+          `¿Qué hacemos?\n` +
+          `👉 /pausa ${segmento} — pausar esta campaña\n` +
+          `👉 /nueva ${segmento} 5 — crear nueva versión`
+        );
       }
     }
 
