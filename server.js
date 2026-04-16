@@ -139,7 +139,8 @@ app.post('/telegram/webhook', (req, res) => {
   procesados.add(update.update_id);
   if (procesados.size > 200) procesados.clear(); // limpiar memoria ocasionalmente
   const msg = update.message || update.channel_post;
-  if (msg && !msg.from?.is_bot && !msg.via_bot && msg.text?.startsWith('/')) {
+  // msg.from debe existir — filtra mensajes del propio bot en el canal (no tienen from)
+  if (msg && msg.from && !msg.from.is_bot && !msg.via_bot && msg.text?.startsWith('/')) {
     manejarMensaje(msg).catch(e => console.error('[Webhook] Error:', e.message));
   }
   // Botones inline de los agentes
