@@ -184,10 +184,6 @@ async function crearFormulario(segmento, nombreCampana) {
       body:        'Un asesor de AutoAprobado Miami te contactará en menos de 24 horas. ¡Prepárate para manejar!',
       button_type: 'NONE'
     },
-    context_card: {
-      title:   '¿Calificas para un carro?',
-      content: ['Sin importar tu crédito', 'Proceso en español', 'Respuesta en 24 horas']
-    }
   });
   console.log(`[Form] Formulario creado: ${form.id}`);
   return form.id;
