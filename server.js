@@ -15,6 +15,7 @@ import { generarReporte } from './monitor-ads.js';
 import { bot as tgBot, manejarMensaje, manejarCallback } from './bot-telegram.js';
 import { ejecutarAnalista } from './agentes/analista.js';
 import { ejecutarSupervisor } from './agentes/supervisor.js';
+import { programarLlamada, procesarResultadoLlamada } from './agentes/llamador.js';
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -115,6 +116,11 @@ app.post('/api/lead', leadLimiter, async (req, res) => {
 
     await bot.sendMessage(CHAT_ID, msg, { parse_mode: 'HTML' });
 
+    // Programar llamada VAPI en 5 minutos
+    if (process.env.VAPI_API_KEY && process.env.VAPI_PHONE_NUMBER_ID) {
+      programarLlamada({ nombre, telefono, segmento });
+    }
+
     // WhatsApp redirect URL
     const waNum = nextWhatsApp();
     const waMsg = encodeURIComponent(
@@ -195,6 +201,32 @@ app.post('/api/meta/webhook', async (req, res) => {
     }
   } catch (err) {
     console.error('[Lead Ads] Error procesando lead:', err.message);
+  }
+});
+
+// ════════════════════════════════════════════════════
+// Webhook de VAPI — recibe resultados de llamadas
+// ════════════════════════════════════════════════════
+app.post('/api/vapi/webhook', async (req, res) => {
+  res.sendStatus(200);
+  try {
+    const { message } = req.body;
+    if (!message) return;
+
+    // Solo procesar cuando la llamada termina
+    if (message.type === 'end-of-call-report') {
+      await procesarResultadoLlamada({
+        id:          message.call?.id,
+        status:      message.call?.status,
+        endedReason: message.endedReason,
+        duration:    message.durationSeconds,
+        transcript:  message.transcript,
+        summary:     message.summary,
+        customer:    message.call?.customer
+      });
+    }
+  } catch (err) {
+    console.error('[VAPI Webhook] Error:', err.message);
   }
 });
 
