@@ -90,8 +90,13 @@ Página web bonita y profesional donde Eduardo llena un formulario paso a paso:
   - Success Evaluation Pass/Fail (boolean)
   - Success Evaluation Numeric Scale (1-10)
 - [x] Scorecard configurado: Cita agendada 50pts + Pass/Fail 30pts + Escala 20pts
-- [x] Webhook VAPI activo — resultados llegan a Telegram con resumen y botones
-- [ ] Pendiente: cuando llega VAPI_ASSISTANT_ID en logs de Railway, guardarlo como variable de entorno
+- [x] Webhook VAPI activo — resultados llegan a Telegram con resumen, cita y score
+- [x] VAPI_ASSISTANT_ID=c3fef418-2ae3-456e-b0e6-c943701929fc — agregar en Railway
+- [x] Asistente renombrado a David (era Carlos)
+- [x] Cierre menciona a Eduardo Ferrer y Jorge Martínez por nombre
+- ⚠️ **VAPI desactivado temporalmente** — leads solo a Telegram mientras se afina la voz
+- Para reactivar: descomentar bloque `programarLlamada` en server.js línea 120
+- [ ] Pendiente: probar voz David en llamada real y reactivar
 - [ ] Pendiente: si no contesta, reintentar en 30 minutos (no implementado aún)
 
 ### Prioridad 4 — Reactivación de Base de Datos (después de VAPI)
