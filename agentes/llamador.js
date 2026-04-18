@@ -68,9 +68,8 @@ Cuando confirmen cita:
         }]
       },
       voice: {
-        provider: 'openai',
-        voiceId:  'onyx', // Voz masculina profunda y natural — funciona bien en español
-        speed:    1.0,
+        provider: 'cartesia',
+        voiceId:  '57dcab65-68ac-45a6-8480-6c4c52ec1cd1', // Ariana — Cartesia español
       },
       transcriber: {
         provider: 'deepgram',
