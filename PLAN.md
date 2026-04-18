@@ -85,7 +85,16 @@ Página web bonita y profesional donde Eduardo llena un formulario paso a paso:
 - [ ] Este módulo solo se puede vender a dealers y empresas por $15K-$30K
 - [ ] Es el diferenciador que convierte este sistema en producto de agencia premium
 
-### Prioridad 4 — Stripe + Monetización
+### Prioridad 4 — Reactivación de Base de Datos (después de VAPI)
+- [ ] Estructura CSV de clientes: nombre, teléfono, correo, carro actual, año, pago mensual, descuento disponible, último contacto
+- [ ] Agente Clasificador — analiza la base y prioriza quién llamar primero (upgrade listo, pagos al día, 3+ años con el carro)
+- [ ] Agente que llama con VAPI — personalizado con nombre y carro específico del cliente
+- [ ] Script de llamada: "Hola [nombre], tienes el [carro] [año]. Hoy podemos bajarte $50/mes con el [modelo nuevo]"
+- [ ] Agente Agendador — propone horario, confirma cita, la registra
+- [ ] Reporte a Telegram: "Cita agendada: [nombre], [día] [hora], interesado en [carro]"
+- [ ] Base de datos vacía lista con estructura correcta para cuando Eduardo la tenga
+
+### Prioridad 5 — Stripe + Monetización
 - [ ] Integrar Stripe para cobros automáticos
 - [ ] Landing del Bot de Opciones (vender señales/acceso)
 - [ ] Agente Contador — reporte diario de ingresos y gastos
