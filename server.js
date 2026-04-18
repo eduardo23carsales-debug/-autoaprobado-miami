@@ -116,10 +116,10 @@ app.post('/api/lead', leadLimiter, async (req, res) => {
 
     await bot.sendMessage(CHAT_ID, msg, { parse_mode: 'HTML' });
 
-    // Programar llamada VAPI en 5 minutos
-    if (process.env.VAPI_API_KEY && process.env.VAPI_PHONE_NUMBER_ID) {
-      programarLlamada({ nombre, telefono, segmento });
-    }
+    // VAPI desactivado temporalmente — leads solo a Telegram
+    // if (process.env.VAPI_API_KEY && process.env.VAPI_PHONE_NUMBER_ID) {
+    //   programarLlamada({ nombre, telefono, segmento });
+    // }
 
     // WhatsApp redirect URL
     const waNum = nextWhatsApp();
