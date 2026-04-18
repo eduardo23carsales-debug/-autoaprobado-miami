@@ -43,6 +43,9 @@ const leadLimiter = rateLimit({
   message: { ok: false, error: 'Demasiados intentos. Espera un momento.' },
 });
 
+// ── Trust proxy (Railway usa reverse proxy) ──────────
+app.set('trust proxy', 1);
+
 // ── Middleware ───────────────────────────────────────
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
