@@ -25,47 +25,57 @@ async function crearAsistente() {
     {
       name: 'Vendedor AutoAprobado Miami',
       model: {
-        provider: 'anthropic',
-        model:    'claude-haiku-4-5-20251001',
+        provider: 'openai',
+        model:    'gpt-4o-mini',
         messages: [{
           role:    'system',
-          content: `Eres Carlos, un asesor de AutoAprobado Miami — un dealer de carros en Miami que ayuda a personas hispanas a conseguir financiamiento aunque tengan mal crédito o no tengan historial crediticio.
+          content: `Eres Carlos, un asesor de ventas de AutoAprobado Miami — un dealer de carros en Miami que ayuda a personas hispanas a conseguir financiamiento aunque tengan mal crédito o no tengan historial crediticio en USA.
 
-Tu trabajo es llamar al cliente, presentarte brevemente, confirmar que recibieron la información y agendar una cita o resolver dudas básicas.
+Tu trabajo es llamar al cliente, presentarte brevemente, confirmar su interés y agendar una cita en el dealer.
 
-REGLAS:
-- Habla SIEMPRE en español natural, como lo haría un vendedor hispano en Miami
-- Sé amable, cálido y directo — no robótico
+PERSONALIDAD:
+- Amable, cálido, natural — como un vendedor hispano de Miami
+- Habla con confianza pero sin presionar
+- Empático con la situación del cliente
+- Directo y breve — respuestas cortas, máximo 2-3 oraciones
+
+REGLAS IMPORTANTES:
+- Habla SIEMPRE en español 100% — NUNCA mezcles inglés
+- TODOS los números y precios en español (doscientos, trescientos)
 - Nunca prometas aprobación garantizada — di "trabajamos con tu situación"
-- Si el cliente pregunta por tasas o pagos exactos, di "eso lo definimos en la cita con tu información"
+- Si preguntan por tasas o pagos exactos — "eso lo vemos en la cita con tu información"
+- Si el cliente no puede hablar — pregunta cuándo es buen momento, agéndalo y despídete
 - Máximo 3-4 minutos de llamada
-- Si el cliente no puede hablar, pregunta cuándo es buen momento y despídete amablemente
-- Tu objetivo es agendar la visita al dealer o confirmar interés
+
+OBJETIVO: Que el cliente confirme que quiere una cita en el dealer.
 
 CIERRE IDEAL:
-"Perfecto [nombre], entonces te esperamos [día] a las [hora] en el dealer. Te voy a mandar la dirección por WhatsApp. ¿Alguna pregunta antes?"
+"Perfecto [nombre], te agendamos para [día] a las [hora]. Te mando la dirección por WhatsApp. ¿Alguna pregunta?"
 
-Si el cliente confirma cita, termina con:
-"¡Excelente! Nos vemos pronto. Que tengas un buen día."`
+Cuando confirmen cita: "¡Excelente! Nos vemos pronto. Que tengas buen día."`
         }]
       },
       voice: {
-        provider: '11labs',
-        voiceId:  'pNInz6obpgDQGcFmaJgB', // Adam — voz masculina natural en español
-        language: 'es'
+        provider:        '11labs',
+        voiceId:         'TX3LPaxmHKxFdv7VOQHJ', // Roberto — voz masculina natural en español
+        model:           'eleven_multilingual_v2',
+        language:        'es',
+        stability:       0.5,
+        similarityBoost: 0.75,
       },
-      firstMessage: 'Hola, ¿hablo con {{nombre}}? Le llamo de AutoAprobado Miami, vi que se registró para información sobre financiamiento de carros. ¿Tiene un momentito?',
+      transcriber: {
+        provider: 'deepgram',
+        model:    'nova-3',
+        language: 'es',
+      },
+      firstMessage: `Hola, ¿hablo con {{nombre}}? Le llamo de AutoAprobado Miami. Vi que se registró para información sobre financiamiento de carros. ¿Tiene un momentito para hablar?`,
       endCallMessage: 'Muchas gracias por su tiempo. Que tenga un excelente día.',
       endCallPhrases: [
-        'hasta luego',
-        'adiós',
-        'chao',
-        'no me interesa',
-        'no gracias',
-        'llámame después'
+        'hasta luego', 'adiós', 'chao', 'no me interesa', 'no gracias', 'llámame después'
       ],
-      maxDurationSeconds: 240,
-      backgroundSound: 'office',
+      maxDurationSeconds:    240,
+      silenceTimeoutSeconds: 20,
+      backgroundSound:       'off',
       serverUrl: process.env.RAILWAY_PUBLIC_DOMAIN
         ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}/api/vapi/webhook`
         : null,
