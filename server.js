@@ -216,13 +216,15 @@ app.post('/api/vapi/webhook', async (req, res) => {
     // Solo procesar cuando la llamada termina
     if (message.type === 'end-of-call-report') {
       await procesarResultadoLlamada({
-        id:          message.call?.id,
-        status:      message.call?.status,
-        endedReason: message.endedReason,
-        duration:    message.durationSeconds,
-        transcript:  message.transcript,
-        summary:     message.summary,
-        customer:    message.call?.customer
+        id:               message.call?.id,
+        status:           message.call?.status,
+        endedReason:      message.endedReason,
+        duration:         message.durationSeconds,
+        transcript:       message.transcript,
+        summary:          message.analysis?.summary || message.summary,
+        appointmentBooked: message.analysis?.appointmentBooked,
+        successEval:      message.analysis?.successEvaluationNumericScale,
+        customer:         message.call?.customer
       });
     }
   } catch (err) {

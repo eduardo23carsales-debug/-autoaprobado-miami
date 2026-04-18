@@ -199,28 +199,32 @@ export function programarLlamada(lead) {
 // ── Procesar resultado de llamada (desde webhook) ─────
 export async function procesarResultadoLlamada(callData) {
   try {
-    const { id, status, endedReason, duration, transcript, summary, customer } = callData;
+    const { id, status, endedReason, duration, transcript, summary, appointmentBooked, successEval, customer } = callData;
 
     const nombre   = customer?.name || 'Lead';
     const telefono = customer?.number || '—';
     const duracion = duration ? `${Math.round(duration)}s` : '—';
 
     const iconos = {
-      'ended':           '✅',
-      'no-answer':       '📵',
-      'busy':            '📵',
-      'failed':          '❌',
-      'voicemail':       '📬',
+      'ended':     '✅',
+      'no-answer': '📵',
+      'busy':      '📵',
+      'failed':    '❌',
+      'voicemail': '📬',
     };
 
     const icono = iconos[endedReason] || iconos[status] || '📞';
+    const citaIcono = appointmentBooked === true ? '🗓 <b>CITA AGENDADA</b>' : appointmentBooked === false ? '❌ Sin cita' : '';
+    const scoreTexto = successEval != null ? `⭐ Score: ${successEval}/10` : '';
 
     let msg =
       `${icono} <b>Resultado llamada — ${nombre}</b>\n` +
       `━━━━━━━━━━━━━━━━━━━━━━\n` +
       `📱 ${telefono}\n` +
       `⏱ Duración: ${duracion}\n` +
-      `📋 Estado: ${endedReason || status}\n`;
+      `📋 Estado: ${endedReason || status}\n` +
+      (citaIcono ? `${citaIcono}\n` : '') +
+      (scoreTexto ? `${scoreTexto}\n` : '');
 
     if (summary) msg += `\n💬 <b>Resumen:</b>\n${summary}`;
 
