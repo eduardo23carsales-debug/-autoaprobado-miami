@@ -68,9 +68,9 @@ Cuando confirmen cita:
         }]
       },
       voice: {
-        provider: 'google',
-        voiceId:  'es-US-Journey-D', // Voz masculina Journey — la más natural de Google en español
-        language: 'es-US',
+        provider: 'openai',
+        voiceId:  'onyx', // Voz masculina profunda y natural — funciona bien en español
+        speed:    1.0,
       },
       transcriber: {
         provider: 'deepgram',
