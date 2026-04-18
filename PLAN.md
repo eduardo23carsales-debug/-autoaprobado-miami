@@ -1,5 +1,5 @@
 # PLAN — AutoAprobado Miami + Infraestructura Agencia
-> Archivo vivo. Actualizar cada sesión. Última actualización: 2026-04-16
+> Archivo vivo. Actualizar cada sesión. Última actualización: 2026-04-18
 
 ---
 
@@ -76,14 +76,23 @@ Página web bonita y profesional donde Eduardo llena un formulario paso a paso:
 - **Objetivo:** cliente nuevo listo en 15-20 minutos desde el navegador, sin CMD ni conocimiento de Meta
 - **Valor:** esto es lo que vale $2,000-$3,000 por cliente
 
-### Prioridad 3 — VAPI + Agente Vendedor por Voz
-- [ ] VAPI llama al lead automáticamente en 5 minutos después de que llena el formulario
-- [ ] Habla en español, sabe el nombre y segmento del lead antes de llamar
-- [ ] Califica al cliente, responde preguntas básicas, agenda cita
-- [ ] Si no contesta, deja mensaje y reintenta en 30 minutos
-- [ ] Costo estimado: $0.15-$0.45 por llamada (ElevenLabs + VAPI)
-- [ ] Este módulo solo se puede vender a dealers y empresas por $15K-$30K
-- [ ] Es el diferenciador que convierte este sistema en producto de agencia premium
+### ✅ Prioridad 3 — VAPI + Agente Vendedor por Voz (completado 2026-04-18)
+- [x] VAPI llama al lead automáticamente en 5 minutos después de que llena el formulario
+- [x] Habla en español, sabe el nombre y segmento del lead antes de llamar
+- [x] Califica al cliente, responde preguntas básicas, agenda cita
+- [x] Agente Carlos — prompt enriquecido con manejo de objeciones y equipo de ventas
+- [x] Equipo de ventas: Eduardo Ferrer y Jorge Martínez mencionados por nombre
+- [x] Voz: ElevenLabs David con modelo Turbo v2.5 — natural en español
+- [x] Transcriber: Deepgram en español
+- [x] Structured Outputs configurados en VAPI:
+  - Call Summary (resumen en español)
+  - Appointment Booked (boolean)
+  - Success Evaluation Pass/Fail (boolean)
+  - Success Evaluation Numeric Scale (1-10)
+- [x] Scorecard configurado: Cita agendada 50pts + Pass/Fail 30pts + Escala 20pts
+- [x] Webhook VAPI activo — resultados llegan a Telegram con resumen y botones
+- [ ] Pendiente: cuando llega VAPI_ASSISTANT_ID en logs de Railway, guardarlo como variable de entorno
+- [ ] Pendiente: si no contesta, reintentar en 30 minutos (no implementado aún)
 
 ### Prioridad 4 — Reactivación de Base de Datos (después de VAPI)
 - [ ] Estructura CSV de clientes: nombre, teléfono, correo, carro actual, año, pago mensual, descuento disponible, último contacto
