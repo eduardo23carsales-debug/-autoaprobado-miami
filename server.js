@@ -18,7 +18,7 @@ import { ejecutarAnalista } from './agentes/analista.js';
 import { ejecutarSupervisor } from './agentes/supervisor.js';
 import { programarLlamada, procesarResultadoLlamada } from './agentes/llamador.js';
 import { cargarPlan, marcarEjecutado } from './agentes/plan-store.js';
-import { ejecutarEjecutor } from './agentes/ejecutor.js';
+import { ejecutarPlan } from './agentes/ejecutor.js';
 import { registrarLead } from './agentes/leads-store.js';
 dotenv.config();
 
@@ -356,7 +356,7 @@ app.post('/api/vapi/webhook', async (req, res) => {
               { parse_mode: 'HTML' }
             );
             marcarEjecutado();
-            ejecutarEjecutor(plan).catch(e =>
+            ejecutarPlan(plan).catch(e =>
               tgBot.sendMessage(CHAT_ID, `❌ Error ejecutando plan: <code>${e.message}</code>`, { parse_mode: 'HTML' })
             );
           }
