@@ -97,6 +97,36 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ════════════════════════════════════════════════════
 // POST /api/lead — Recibe lead desde la landing
+// ── Lead Scoring — califica el lead según sus respuestas ─
+function scoreLead({ segmento, negado, ingreso, cuando, inicial }) {
+  let puntos = 0;
+  const razones = [];
+
+  if (segmento === 'mal-credito') {
+    if (ingreso?.includes('trabajo') || ingreso?.includes('negocio')) { puntos += 2; razones.push('tiene ingreso'); }
+    if (negado?.includes('No'))  { puntos += 1; razones.push('nunca negado'); }
+  }
+  if (segmento === 'sin-credito') {
+    if (ingreso?.includes('trabajo') || ingreso?.includes('negocio')) { puntos += 2; razones.push('tiene ingreso'); }
+  }
+  if (segmento === 'urgente') {
+    if (cuando?.includes('semana')) { puntos += 3; razones.push('necesita esta semana'); }
+    else if (cuando?.includes('mes')) { puntos += 2; razones.push('necesita este mes'); }
+  }
+  if (segmento === 'upgrade') {
+    puntos += 2; razones.push('tiene carro para trade-in');
+  }
+  if (segmento === 'oferta-especial') {
+    if (inicial?.includes('2,000') || inicial?.includes('Más'))  { puntos += 3; razones.push('inicial > $2,000'); }
+    else if (inicial?.includes('500'))                           { puntos += 2; razones.push('inicial $500-$2,000'); }
+    else                                                          { puntos += 1; razones.push('inicial < $500'); }
+  }
+
+  if (puntos >= 3) return { emoji: '🔥', label: 'CALIENTE', puntos, razones };
+  if (puntos >= 1) return { emoji: '🟡', label: 'TIBIO',    puntos, razones };
+  return             { emoji: '🔵', label: 'FRÍO',     puntos, razones };
+}
+
 // ════════════════════════════════════════════════════
 app.post('/api/lead', leadLimiter, async (req, res) => {
   try {
@@ -146,6 +176,9 @@ app.post('/api/lead', leadLimiter, async (req, res) => {
       extras += inicial      ? `\n💵 Inicial disponible: ${inicial}`       : '';
     }
 
+    // Score del lead
+    const score = scoreLead({ segmento, negado, ingreso, cuando, inicial });
+
     // Mensaje Telegram
     const msg =
       `🚗 <b>NUEVO LEAD — AutoAprobado Miami</b>\n` +
@@ -155,6 +188,7 @@ app.post('/api/lead', leadLimiter, async (req, res) => {
       `🎯 <b>Situación:</b> ${segmentoLabel}` +
       extras + '\n' +
       `━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `${score.emoji} <b>Score: ${score.label}</b>${score.razones.length ? ` — ${score.razones.join(', ')}` : ''}\n` +
       `🕐 ${ts}`;
 
     await bot.sendMessage(CHAT_ID, msg, { parse_mode: 'HTML' });
