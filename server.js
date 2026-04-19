@@ -123,9 +123,9 @@ function scoreLead({ segmento, negado, ingreso, cuando, inicial }) {
     puntos += 2; razones.push('tiene carro para trade-in');
   }
   if (segmento === 'oferta-especial') {
-    if (inicial?.includes('2,000') || inicial?.includes('Más'))  { puntos += 3; razones.push('inicial > $2,000'); }
+    if (inicial?.includes('2,000') || inicial?.includes('Más'))  { puntos += 3; razones.push('inicial más de $2,000'); }
     else if (inicial?.includes('500'))                           { puntos += 2; razones.push('inicial $500-$2,000'); }
-    else                                                          { puntos += 1; razones.push('inicial < $500'); }
+    else                                                          { puntos += 1; razones.push('inicial menos de $500'); }
   }
 
   if (puntos >= 3) return { emoji: '🔥', label: 'CALIENTE', puntos, razones };
