@@ -216,15 +216,26 @@ app.post('/api/lead', leadLimiter, async (req, res) => {
       userAgent: req.headers['user-agent'] || ''
     });
 
-    // VAPI — llamar solo de 9 AM a 8 PM ET
+    // VAPI — llamar de 9 AM a 8 PM ET, cualquier día incluido domingos
+    // Si VAPI falla o no está configurado, el lead ya llegó a Telegram arriba
     if (process.env.VAPI_API_KEY && process.env.VAPI_PHONE_NUMBER_ID) {
       const horaET = new Date().toLocaleString('en-US', { timeZone: 'America/New_York', hour: 'numeric', hour12: false });
       const hora   = parseInt(horaET);
       if (hora >= 9 && hora < 20) {
-        programarLlamada({ nombre, telefono, segmento });
+        try {
+          programarLlamada({ nombre, telefono, segmento });
+        } catch (vapiErr) {
+          console.error('[VAPI] Error al programar llamada:', vapiErr.message);
+          await bot.sendMessage(CHAT_ID,
+            `⚠️ <b>VAPI no disponible</b> — llama manualmente a ${nombre}\n📱 <a href="https://wa.me/${telefono.replace(/\D/g,'')}">WhatsApp: ${telefono}</a>`,
+            { parse_mode: 'HTML' }
+          );
+        }
       } else {
-        console.log(`[VAPI] Fuera de horario (${hora}h ET) — solo Telegram`);
+        console.log(`[VAPI] Fuera de horario (${hora}h ET) — lead en Telegram`);
       }
+    } else {
+      console.log('[VAPI] No configurado — lead notificado solo por Telegram');
     }
 
     // WhatsApp redirect URL
