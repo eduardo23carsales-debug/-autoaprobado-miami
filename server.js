@@ -336,7 +336,7 @@ app.get('/inventario.csv', (req, res) => {
     { id: 'palisade-2026',  title: 'Hyundai Palisade 2026',  mensual: 555, foto: 'general-palisade.png',  body: 'SUV',       color: 'Blanco Perlado', model: 'Palisade'  },
   ];
 
-  const header = 'vehicle_id,make,model,year,vin,mileage.value,mileage.unit,body_style,title,description,price,image[0].url,url,availability,fuel_type,transmission,exterior_color,state_of_vehicle,address.city,address.region,address.country,address.postal_code';
+  const header = 'vehicle_id,make,model,year,vin,mileage.value,mileage.unit,body_style,title,description,price,image[0].url,url,availability,fuel_type,transmission,exterior_color,state_of_vehicle,address.street,address.city,address.region,address.country,address.postal_code';
 
   const rows = vehiculos.map(v => {
     const vin = `KMH${v.id.toUpperCase().replace(/-/g,'').slice(0,8)}26`.padEnd(17,'0').slice(0,17);
@@ -345,7 +345,7 @@ app.get('/inventario.csv', (req, res) => {
     const url   = `${LANDING}?utm_source=catalog&utm_medium=dynamic&utm_campaign=${v.id}`;
     const img   = `${BASE}/photos/${v.foto}`;
     const price = `${v.mensual}.00 USD`;
-    const fields = [v.id,'Hyundai',v.model,'2026',vin,'0','MI',v.body,title,desc,price,img,url,'available','gasoline','automatic',v.color,'new','Miami','FL','US','33122'];
+    const fields = [v.id,'Hyundai',v.model,'2026',vin,'0','MI',v.body,title,desc,price,img,url,'available','gasoline','automatic',v.color,'new','3250 NW 79th Ave','Miami','FL','US','33122'];
     return fields.map(f => `"${String(f).replace(/"/g,'""')}"`).join(',');
   });
 
