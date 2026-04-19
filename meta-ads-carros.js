@@ -36,9 +36,9 @@ const SEGMENTOS = {
     nombre:    'Mal Crédito — AutoAprobado Miami',
     hook:      '¿Te negaron el préstamo por mal crédito?',
     copies: [
-      `😔 ¿Te han negado financiamiento por mal crédito?\n\nEn AutoAprobado Miami trabajamos CON tu situación, no contra ella.\n\n✅ Sin mínimo de score requerido\n✅ Aprobación en 24 horas\n✅ Carros 2024-2026 disponibles\n\nMiles de familias hispanas en Miami ya tienen su carro. Tú puedes ser el próximo. 👇`,
-      `⚠️ ¿Otros dealers te dijeron que no? Nosotros encontramos opciones.\n\nEn AutoAprobado Miami nos especializamos en situaciones de crédito difícil. No importa tu score, bancarrotas o deudas previas.\n\n🚗 Carros nuevos y usados\n💵 Inicial desde $500\n📱 Proceso 100% en español\n\nVe si calificas GRATIS 👇`,
-      `Tu crédito no define tu futuro 🚗\n\nHemos ayudado a cientos de personas en Miami a conseguir su carro aunque el banco los rechazó.\n\nNo necesitas crédito perfecto. Solo necesitas hablar con nosotros.\n\n¿Cuándo fue la última vez que manejaste tranquilo? Empieza hoy. 👇`
+      `😔 ¿Te negaron financiamiento por mal crédito?\n\nEn AutoAprobado Miami trabajamos CON tu situación, no contra ella.\n\n✅ Sin mínimo de score requerido\n✅ Respuesta en menos de 24 horas\n✅ Carros 2024-2026 disponibles\n\nMiles de familias hispanas en Miami ya manejan su carro nuevo. Tú puedes ser el próximo.\n\n👉 Llena el formulario en 30 segundos y te llamamos hoy.`,
+      `⚠️ ¿Otros dealers te dijeron que NO?\n\nNosotros decimos: cuéntanos tu situación.\n\nEn AutoAprobado Miami nos especializamos en crédito difícil. No importa tu score, bancarrotas anteriores o deudas.\n\n🚗 Carros nuevos y usados\n💵 Inicial desde $500\n📱 Proceso 100% en español\n\n👉 Verifica si calificas GRATIS — sin afectar tu crédito. Tarda 30 segundos.`,
+      `Tu crédito no define tu futuro 🚗\n\nHemos ayudado a cientos de familias en Miami a conseguir su carro aunque el banco los rechazó.\n\nNo necesitas crédito perfecto. Solo necesitas al dealer correcto.\n\n¿Cuándo fue la última vez que manejaste sin preocupaciones?\n\n👉 Empieza ahora — es gratis verificar y no te compromete a nada.`
     ],
     imagenPrompt: `Documentary photograph, Canon 5D, 50mm lens, f/2.0. A single Hispanic man in his late 30s sitting at a desk inside a bright modern car dealership showroom in Miami. He is signing a document, looking down at the paper, slight smile. One salesperson's hand visible across the desk handing a pen. Real dealership background: glass walls, one or two cars on the showroom floor out of focus. Natural daylight from windows, no flash. Realistic skin tones, no dramatic shadows. Square 1:1 crop. NO TEXT, NO WORDS, NO LOGOS in the image.`
   },
@@ -46,9 +46,9 @@ const SEGMENTOS = {
     nombre:    'Sin Historial — AutoAprobado Miami',
     hook:      '¿No tienes historial crediticio en USA?',
     copies: [
-      `🆕 ¿Recién llegaste a USA o nunca tuviste crédito?\n\nNo necesitas historial crediticio para tener tu carro en Miami.\n\n✅ Aprobamos con ITIN o SSN\n✅ Si tienes trabajo o negocio, calificas\n✅ Proceso 100% en español\n\nEmpieza a construir tu crédito HOY con tu propio carro. 👇`,
-      `Llegaste a USA con ganas de crecer 💪\n\nSabemos que empezar desde cero es difícil. Por eso en AutoAprobado Miami no pedimos historial.\n\n🚗 Solo necesitas: trabajo estable o negocio propio\n💵 Inicial accesible\n📱 Te guiamos en todo el proceso\n\n¿Cuándo empezamos? 👇`,
-      `Sin crédito no significa sin carro 🚗\n\nMuchos de nuestros clientes compraron su primer carro en USA sin un solo punto de crédito.\n\nEl truco: trabajar con el dealer correcto. En AutoAprobado Miami sabemos cómo hacerlo.\n\nVe si calificas en 2 minutos. 👇`
+      `🆕 ¿Recién llegaste a USA o nunca tuviste crédito?\n\nNo necesitas historial crediticio para tener tu carro en Miami.\n\n✅ Aprobamos con ITIN o SSN\n✅ Si tienes trabajo o negocio propio, calificas\n✅ Proceso 100% en español\n\nTu carro propio es también tu primer paso para construir crédito en USA.\n\n👉 Verifica si calificas en 30 segundos — completamente gratis.`,
+      `Llegaste a USA con ganas de crecer 💪\n\nEmpezar desde cero es difícil. Por eso en AutoAprobado Miami no te pedimos historial crediticio.\n\nSolo necesitas:\n🚗 Trabajo estable o negocio propio\n💵 Inicial accesible\n📱 Ganas de manejar tu propio carro\n\nYa ayudamos a cientos de inmigrantes hispanos en Miami a conseguir su primer carro.\n\n👉 ¿Cuándo empezamos? Llena el formulario ahora — es gratis.`,
+      `Sin crédito en USA no significa sin carro 🚗\n\nCientos de nuestros clientes compraron su primer carro sin un solo punto de historial crediticio.\n\nEl secreto: encontrar el dealer que sabe cómo trabajar con tu situación.\n\nEn AutoAprobado Miami lo hacemos todos los días.\n\n👉 Tarda 2 minutos verificar si calificas. Sin costo, sin compromiso.`
     ],
     imagenPrompt: `Documentary photograph, Canon 5D, 35mm lens. A single young Hispanic man, early 20s, standing beside a white compact sedan in a sunny parking lot in Miami, Florida. He holds car keys in one hand, looking at them with a natural expression. Wearing casual everyday clothes — jeans and a t-shirt. Background: real Miami parking lot, palm trees, blue sky, other cars parked. Harsh midday sunlight, natural shadows. No posing, looks like a candid moment. Realistic colors. Square 1:1 crop. NO TEXT, NO WORDS, NO LOGOS.`
   },
@@ -56,9 +56,9 @@ const SEGMENTOS = {
     nombre:    'Urgente — AutoAprobado Miami',
     hook:      '¿Necesitas un carro YA en Miami?',
     copies: [
-      `🚨 ¿Perdiste tu carro o necesitas uno URGENTE?\n\nEn AutoAprobado Miami podemos tenerte manejando en 24-48 horas.\n\n⚡ Aprobación express\n🚗 Inventario disponible hoy\n📱 Proceso sin vueltas, 100% en español\n\nNo pierdas más trabajo ni oportunidades por falta de transporte. 👇`,
-      `⏰ Cada día sin carro te cuesta dinero.\n\nEn Miami sin carro es casi imposible trabajar, llevar a los niños o manejar tu negocio.\n\nEn AutoAprobado Miami entendemos la urgencia:\n✅ Respuesta en menos de 24 horas\n✅ Carros disponibles para entrega inmediata\n✅ Financiamiento aunque te hayan negado antes\n\nActúa hoy. 👇`,
-      `No esperes más 🚗⚡\n\nSi estás leyendo esto es porque necesitas un carro ahora mismo.\n\nLlamamos a decenas de bancos hasta encontrar quien te apruebe. Sin importar tu situación.\n\nMiles de personas en Miami ya manejan gracias a nosotros. Tú eres el siguiente. 👇`
+      `🚨 ¿Perdiste tu carro o necesitas uno URGENTE?\n\nEn AutoAprobado Miami podemos tenerte manejando en 24-48 horas.\n\n⚡ Aprobación express el mismo día\n🚗 Inventario disponible para entrega inmediata\n📱 Proceso sin vueltas, 100% en español\n\nNo pierdas más trabajo ni oportunidades por falta de transporte. Cada día cuenta.\n\n👉 Llena el formulario ahora — te llamamos en menos de 1 hora.`,
+      `⏰ Cada día sin carro en Miami te cuesta dinero real.\n\nSin carro es casi imposible trabajar, llevar a los niños al colegio o manejar tu negocio en esta ciudad.\n\nEn AutoAprobado Miami entendemos la urgencia:\n✅ Respuesta en menos de 24 horas\n✅ Entrega inmediata del vehículo\n✅ Aprobamos aunque te hayan negado antes\n\n👉 Actúa ahora — llena el formulario en 30 segundos.`,
+      `Si estás leyendo esto, necesitas un carro HOY 🚗⚡\n\nNo te vamos a hacer esperar semanas. Llamamos a nuestros bancos y encontramos quien te apruebe — sin importar tu situación de crédito.\n\nMiles de personas en Miami ya manejan gracias a nosotros.\n\nTú eres el siguiente. Pero hay que actuar rápido — el inventario es limitado.\n\n👉 Reserva tu lugar ahora. Es gratis y tarda 30 segundos.`
     ],
     imagenPrompt: `Documentary photograph, Canon 5D, 35mm lens, f/2.8. A single Hispanic woman in her 30s sitting in the driver's seat of a car, hands on the steering wheel, looking forward through the windshield with a calm confident expression. Shot from outside the car through the driver's window, slightly low angle. Miami street visible through the windshield — palm trees, buildings. Natural daylight. Realistic interior: car dashboard, steering wheel, seatbelt on. No exaggerated expression, real moment. Square 1:1. NO TEXT, NO WORDS, NO LOGOS.`
   },
@@ -66,9 +66,9 @@ const SEGMENTOS = {
     nombre:    'Upgrade de Carro — AutoAprobado Miami',
     hook:      '¿Listo para cambiar tu carro en Miami?',
     copies: [
-      `🔄 ¿Tu carro ya no te da lo que necesitas?\n\nEn AutoAprobado Miami te ayudamos a hacer el cambio correcto.\n\n✅ Usamos tu carro actual como inicial\n✅ Más comodidad, más tecnología, menos problemas\n✅ Pagos que se adaptan a tu presupuesto\n\n¿Cuánto vale tu carro hoy? Descúbrelo gratis. 👇`,
-      `Tu carro actual puede ser tu inicial 🚗➡️🚗\n\nMuchos clientes en Miami hacen el upgrade sin gastar un peso de su bolsillo.\n\nUsamos el valor de tu carro actual como down payment del nuevo.\n\n✅ Modelos 2024-2026 disponibles\n✅ Pagos desde $299/mes*\n✅ Proceso rápido y en español\n\nHablemos hoy. 👇\n\n${DISCLAIMER}`,
-      `¿Cuánto llevas con el mismo carro? 🤔\n\nSi tu carro ya tiene muchos miles encima, muchas reparaciones o simplemente ya no va con tu vida actual — es momento de hablar.\n\nEn AutoAprobado Miami hacemos el proceso de cambio fácil, rápido y sin sorpresas.\n\nVe cuánto vale tu carro en 2 minutos. 👇`
+      `🔄 ¿Tu carro ya no te da lo que necesitas?\n\nEn AutoAprobado Miami hacemos el cambio fácil — usamos tu carro actual como parte del pago inicial del nuevo.\n\n✅ Sin gastar tu dinero de bolsillo\n✅ Más comodidad, más tecnología, menos reparaciones\n✅ Pagos que se adaptan a tu presupuesto actual\n\nNo esperes a que se dañe del todo.\n\n👉 Descubre cuánto vale tu carro hoy — es gratis y tarda 2 minutos.`,
+      `Tu carro actual puede pagar el nuevo 🚗➡️🚗\n\nMuchos clientes en Miami hacen el upgrade sin poner ni un dólar de su bolsillo.\n\nUsamos el valor de tu carro como down payment del nuevo.\n\n✅ Modelos 2024-2026 disponibles\n✅ Pagos desde $299/mes*\n✅ Proceso rápido en español\n\n👉 Habla con nosotros hoy — cuéntanos qué tienes y te decimos exactamente qué opciones tienes.\n\n${DISCLAIMER}`,
+      `¿Cuánto llevas con el mismo carro? 🤔\n\nSi ya tiene muchos miles, muchas reparaciones, o simplemente ya no va con tu vida actual — es señal.\n\nEn AutoAprobado Miami hacemos el cambio sin complicaciones y sin sorpresas.\n\nNuestros clientes salen con carro nuevo el mismo día que vienen.\n\n👉 Averigua cuánto vale tu carro en 2 minutos. Gratis, sin compromiso.`
     ],
     imagenPrompt: `Documentary photograph, Canon 5D, 50mm lens. Close-up of a single Hispanic man's hands, early 40s, holding two car keys — one old worn key on the left, one shiny new car key on the right. Real hands, real keys. Shallow depth of field, background slightly blurred showing a car dealership interior. Natural light. No people's faces visible, just the hands and keys. Realistic colors, no filters. Square 1:1. NO TEXT, NO WORDS, NO LOGOS.`
   },
@@ -76,9 +76,9 @@ const SEGMENTOS = {
     nombre:    'Oferta Especial Hyundai — AutoAprobado Miami',
     hook:      '🔥 Hyundai 2026 — pagos desde $299/mes* en Miami',
     copies: [
-      `🔥 OFERTA ESPECIAL — Hyundai 2026 con pagos desde $299/mes*\n\nDisponibles ahora en Miami:\n🚗 Hyundai Venue 2026\n🚗 Hyundai Elantra 2026\n🚗 Hyundai Tucson 2026\n\n✅ Aprobamos aunque te hayan negado antes\n✅ Inicial accesible\n✅ Proceso 100% en español\n\nOferta por tiempo limitado. 👇\n\n${DISCLAIMER}`,
-      `¿Sabías que puedes manejar un Hyundai 2026 en Miami con pagos accesibles desde $299/mes*? 🚗\n\nEn AutoAprobado Miami tenemos Venue, Elantra, Tucson y Santa Fe 2026.\n\nSin importar tu historial crediticio.\n\nEl cupo es limitado. Reserva el tuyo hoy. 👇\n\n${DISCLAIMER}`,
-      `Maneja un carro NUEVO en 2026 sin arruinarte 💪\n\nHyundai Doral tiene los mejores precios de Miami y nosotros tenemos la aprobación más fácil.\n\nJuntos hacemos que sea posible para ti, sin importar tu situación de crédito.\n\n🔥 Pagos desde $299/mes*\n⚡ Respuesta en 24 horas\n\n¿Para cuál calificas tú? 👇\n\n${DISCLAIMER}`
+      `🔥 OFERTA ESPECIAL — Hyundai 2026 con pagos desde $299/mes*\n\nDisponibles AHORA en Miami:\n🚗 Hyundai Venue 2026\n🚗 Hyundai Elantra 2026\n🚗 Hyundai Tucson 2026\n\n✅ Aprobamos aunque te hayan negado antes\n✅ Inicial accesible desde $500\n✅ Proceso 100% en español\n\nOferta por tiempo limitado — los carros se van rápido.\n\n👉 Llena el formulario en 30 segundos y reserva el tuyo hoy.\n\n${DISCLAIMER}`,
+      `¿Sabías que puedes manejar un Hyundai 2026 NUEVO en Miami desde $299/mes*? 🚗\n\nTenemos Venue, Elantra, Tucson y Santa Fe 2026 — y aprobamos sin importar tu historial crediticio.\n\nYa ayudamos a cientos de familias hispanas en Miami a manejar carro nuevo.\n\n⚠️ El inventario es limitado y esta oferta no dura para siempre.\n\n👉 Reserva el tuyo ahora — verifica si calificas en 2 minutos, gratis.\n\n${DISCLAIMER}`,
+      `Maneja un Hyundai NUEVO en 2026 sin arruinar tu presupuesto 💪\n\nLos mejores precios de Miami + la aprobación más fácil de la ciudad = tu carro nuevo esta semana.\n\nNo importa tu crédito. No importa si te negaron antes.\n\n🔥 Pagos desde $299/mes*\n⚡ Respuesta en menos de 24 horas\n🚗 Inventario disponible para entrega inmediata\n\n¿Para cuál Hyundai calificas tú?\n\n👉 Descúbrelo gratis en 2 minutos.\n\n${DISCLAIMER}`
     ],
     imagenPrompt: `Professional automotive photograph, Canon 5D, 35mm lens, f/8. A brand new white Hyundai Tucson SUV parked on clean asphalt outside a dealership in Miami on a sunny day. 3/4 front angle, eye level. Natural sunlight creating soft reflections on the hood and doors. Background: clear blue sky, one or two palm trees slightly blurred. No people. Realistic car proportions, accurate reflections, no CGI. Photo quality matching a real car dealership listing. Square 1:1. NO TEXT, NO WORDS, NO LOGOS, NO LICENSE PLATES.`
   }
@@ -302,8 +302,9 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
   console.log(`✅ Campaña creada: ${campana.id}`);
   await new Promise(r => setTimeout(r, 3000));
 
-  // Targeting — solo Miami (40 millas cubre Miami-Dade + Broward + Palm Beach)
-  // Categorías especiales: sin restricción por edad/género, solo geo permitido
+  // Targeting — Miami + hispanohablantes + móvil
+  // locales 27 = Spanish — filtra solo personas con idioma español en su cuenta
+  // device_platforms mobile — audiencia hispana Miami es 90%+ móvil, mejor CPL
   const targeting = {
     age_min: 18,
     age_max: 65,
@@ -314,7 +315,9 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
         radius: 40,
         distance_unit: 'mile'
       }]
-    }
+    },
+    locales:          [27],
+    device_platforms: ['mobile'],
   };
 
   // Si hay formulario → Lead Ads nativo. Si no → website con pixel
@@ -335,8 +338,9 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
       : { pixel_id: PIXEL_ID, custom_event_type: 'LEAD' },
     targeting: {
       ...targeting,
-      publisher_platforms: ['facebook'],
-      facebook_positions:  ['feed', 'marketplace']
+      publisher_platforms: ['facebook', 'instagram'],
+      facebook_positions:  ['feed', 'marketplace'],
+      instagram_positions: ['stream'],
     },
     status: 'ACTIVE'
   };
@@ -464,6 +468,135 @@ async function preflight() {
     console.error('❌ META_ACCESS_TOKEN inválido o expirado');
     process.exit(1);
   }
+}
+
+// ── Campaña de retargeting — visitantes que no llenaron el formulario ──
+export async function crearCampanaRetargeting(presupuestoDiario = 10) {
+  if (!PIXEL_ID) {
+    console.warn('[Retargeting] META_PIXEL_ID no configurado — saltando');
+    return;
+  }
+
+  const ahora = new Date();
+  const fecha = ahora.toISOString().slice(0, 10);
+
+  console.log(`\n🎯 Creando campaña de retargeting — $${presupuestoDiario}/día`);
+
+  // 1. Crear audiencia personalizada: visitantes del sitio últimos 30 días
+  let audienciaId = null;
+  try {
+    const audiencia = await metaPost(`/${AD_ACCOUNT}/customaudiences`, {
+      name: `AutoAprobado — Visitantes Web 30 días — ${fecha}`,
+      subtype: 'WEBSITE',
+      retention_days: 30,
+      rule: JSON.stringify({
+        inclusions: {
+          operator: 'or',
+          rules: [{
+            event_sources: [{ id: PIXEL_ID, type: 'pixel' }],
+            retention_seconds: 2592000, // 30 días
+            filter: {
+              operator: 'and',
+              filters: [{
+                field: 'event',
+                operator: 'eq',
+                value: 'PageView'
+              }]
+            }
+          }]
+        }
+      })
+    });
+    audienciaId = audiencia.id;
+    console.log(`✅ Audiencia retargeting creada: ${audienciaId}`);
+    await new Promise(r => setTimeout(r, 3000));
+  } catch (e) {
+    console.warn(`[Retargeting] No se pudo crear audiencia: ${e.message}`);
+    return;
+  }
+
+  // 2. Campaña
+  const campana = await metaPost(`/${AD_ACCOUNT}/campaigns`, {
+    name: `AutoAprobado | Retargeting Visitantes | ${fecha}`,
+    objective: 'OUTCOME_LEADS',
+    status: 'ACTIVE',
+    special_ad_categories: ['FINANCIAL_PRODUCTS_SERVICES'],
+    daily_budget: presupuestoDiario * 100,
+    bid_strategy: 'LOWEST_COST_WITHOUT_CAP'
+  });
+  console.log(`✅ Campaña retargeting: ${campana.id}`);
+  await new Promise(r => setTimeout(r, 3000));
+
+  // 3. Adset con audiencia personalizada
+  const adset = await metaPost(`/${AD_ACCOUNT}/adsets`, {
+    campaign_id: campana.id,
+    name: 'AutoAprobado | Retargeting | Visitantes 30d',
+    billing_event: 'IMPRESSIONS',
+    optimization_goal: 'OFFSITE_CONVERSIONS',
+    destination_type: 'WEBSITE',
+    bid_strategy: 'LOWEST_COST_WITHOUT_CAP',
+    promoted_object: { pixel_id: PIXEL_ID, custom_event_type: 'LEAD' },
+    targeting: {
+      age_min: 18,
+      age_max: 65,
+      geo_locations: {
+        custom_locations: [{ latitude: 25.7617, longitude: -80.1918, radius: 40, distance_unit: 'mile' }]
+      },
+      locales: [27],
+      device_platforms: ['mobile'],
+      publisher_platforms: ['facebook', 'instagram'],
+      facebook_positions: ['feed', 'marketplace'],
+      instagram_positions: ['stream'],
+      custom_audiences: [{ id: audienciaId }]
+    },
+    status: 'ACTIVE'
+  });
+  console.log(`✅ Adset retargeting: ${adset.id}`);
+  await new Promise(r => setTimeout(r, 2000));
+
+  // 4. Copy específico para retargeting — ya te conocen, más directo
+  const copies = [
+    `👋 ¿Estuviste viendo opciones de financiamiento?\n\nSabemos que tomar esta decisión no es fácil.\n\nPero hay algo que queremos que sepas: en AutoAprobado Miami no te vamos a juzgar por tu crédito. Solo queremos ayudarte a manejar.\n\n✅ Proceso sin presión\n✅ Respuesta en menos de 24 horas\n✅ 100% en español\n\n👉 ¿Le damos una oportunidad? Llena el formulario — tarda 30 segundos.`,
+    `⏰ Todavía estás a tiempo 🚗\n\nViste nuestras opciones pero no diste el paso. Entendemos — es una decisión grande.\n\nPero cada día sin carro en Miami es dinero que pierdes.\n\nHoy mismo podemos revisar tu situación y darte una respuesta honesta. Sin costo, sin compromiso.\n\n👉 Un solo formulario. 30 segundos. Te llamamos hoy.`
+  ];
+
+  const fotoReal = buscarFotoReal('general') || buscarFotoReal('mal-credito');
+  let imageHash = null;
+  if (fotoReal) {
+    try { imageHash = await subirFotoLocal(fotoReal); } catch {}
+  }
+
+  for (let i = 0; i < copies.length; i++) {
+    try {
+      await new Promise(r => setTimeout(r, 1500));
+      const landingUTM = `${LANDING_URL}?utm_source=facebook&utm_medium=cpc&utm_campaign=retargeting&utm_content=copy${i+1}`;
+      const linkData = {
+        message: copies[i],
+        name: '¿Todavía buscas financiamiento para tu carro?',
+        description: '✅ Aprobamos aunque te hayan negado antes — 100% en español',
+        link: landingUTM,
+        call_to_action: { type: 'APPLY_NOW', value: { link: landingUTM } }
+      };
+      if (imageHash) linkData.image_hash = imageHash;
+
+      const creative = await metaPost(`/${AD_ACCOUNT}/adcreatives`, {
+        name: `AutoAprobado | Retargeting | Creative-${i+1}`,
+        object_story_spec: { page_id: PAGE_ID, link_data: linkData }
+      });
+      const ad = await metaPost(`/${AD_ACCOUNT}/ads`, {
+        name: `AutoAprobado | Retargeting | Ad-${i+1}`,
+        adset_id: adset.id,
+        creative: { creative_id: creative.id },
+        status: 'ACTIVE'
+      });
+      console.log(`✅ Ad retargeting ${i+1}: ${ad.id}`);
+    } catch (e) {
+      console.warn(`[Retargeting] Ad ${i+1} falló: ${e.message}`);
+    }
+  }
+
+  console.log(`\n🎯 Campaña retargeting lista — ID: ${campana.id}`);
+  return { campaign_id: campana.id };
 }
 
 // ── Exportar para uso desde bot-telegram.js ──────────

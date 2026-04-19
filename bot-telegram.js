@@ -361,7 +361,7 @@ const MENU_PRINCIPAL = {
   ]
 };
 
-const AYUDA = `📋 <b>Menú AutoAprobado Miami</b>\n\nEscribe /menu para ver los botones, o usa los comandos directos abajo.\n\n/nueva — crear campaña\n/pausa — pausar campaña\n/activa — activar campaña\n/presupuesto — cambiar presupuesto\n/reporte — métricas de hoy\n/mejor — mejor campaña\n/analista — análisis IA\n/supervisor — revisar campañas`;
+const AYUDA = `📋 <b>Menú AutoAprobado Miami</b>\n\nEscribe /menu para ver los botones, o usa los comandos directos abajo.\n\n/nueva — crear campaña\n/retargeting [presupuesto] — campaña para visitantes que no convirtieron\n/pausa — pausar campaña\n/activa — activar campaña\n/presupuesto — cambiar presupuesto\n/reporte — métricas de hoy\n/mejor — mejor campaña\n/ventas — tasa de cierre y leads\n/analista — análisis IA\n/supervisor — revisar campañas`;
 
 // ── Manejador principal de mensajes ──────────────────
 async function manejarMensaje(msg) {
@@ -430,6 +430,28 @@ async function manejarMensaje(msg) {
         `📈 Tasa de cierre: <b>${r.tasa}%</b>`,
         { parse_mode: 'HTML' }
       );
+      return;
+    }
+
+    // /retargeting — crear campaña para visitantes que no convirtieron
+    if (cmd === '/retargeting') {
+      const presupuesto = parseInt(args[0]) || 10;
+      await bot.sendMessage(chatId, `🎯 Creando campaña de retargeting — $${presupuesto}/día...`);
+      try {
+        const { crearCampanaRetargeting } = await import('./meta-ads-carros.js');
+        const result = await crearCampanaRetargeting(presupuesto);
+        await bot.sendMessage(chatId,
+          `✅ <b>Retargeting listo!</b>\n` +
+          `🎯 Audiencia: visitantes web últimos 30 días\n` +
+          `💵 Presupuesto: $${presupuesto}/día\n` +
+          `📱 Placements: Facebook Feed + Instagram Feed\n` +
+          `🌐 Idioma: Español\n\n` +
+          `Campaña ID: <code>${result.campaign_id}</code>`,
+          { parse_mode: 'HTML' }
+        );
+      } catch (e) {
+        await bot.sendMessage(chatId, `❌ Error retargeting: <code>${e.message}</code>`, { parse_mode: 'HTML' });
+      }
       return;
     }
 
