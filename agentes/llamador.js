@@ -80,7 +80,7 @@ CUÁNDO COLGAR — MUY IMPORTANTE:
         }]
       },
       voice: {
-        provider:  'elevenlabs',
+        provider:  '11labs',
         voiceId:   'onwK4e9ZLuTAKqWW03F9', // David — neutral latino
         model:     'eleven_turbo_v2_5',
         stability: 0.3,
