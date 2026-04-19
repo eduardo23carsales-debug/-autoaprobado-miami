@@ -12,9 +12,10 @@ const VAPI_API_KEY       = process.env.VAPI_API_KEY;
 const VAPI_PHONE_ID      = process.env.VAPI_PHONE_NUMBER_ID;
 const WHATSAPP_PRINCIPAL = process.env.WHATSAPP_PRINCIPAL || process.env.WHATSAPP_EDUARDO || '17869167339';
 
-// ID del asistente VAPI — se crea una vez y se reutiliza
-// Se guarda en variable de entorno VAPI_ASSISTANT_ID después de la primera creación
-let _assistantId = process.env.VAPI_ASSISTANT_ID || null;
+// ID del asistente Sofía (leads) — se crea una vez y se reutiliza
+let _assistantId    = process.env.VAPI_ASSISTANT_ID     || null;
+// ID del asistente Ana (briefing matutino) — se guarda en VAPI_ANA_ASSISTANT_ID
+let _anaAssistantId = process.env.VAPI_ANA_ASSISTANT_ID || null;
 
 // ── Crear asistente VAPI (solo la primera vez) ────────
 async function crearAsistente() {
@@ -198,6 +199,169 @@ export async function llamarLead(lead) {
     const msg = err.response?.data?.message || err.message;
     console.error(`[VAPI] Error al llamar: ${msg}`);
     await notificar(`⚠️ <b>VAPI Error:</b> No se pudo llamar a ${nombre}\n<code>${msg}</code>`);
+  }
+}
+
+// ════════════════════════════════════════════════════
+// ANA — Asistente Personal de Eduardo
+// Llama cada mañana con el briefing del negocio
+// Tono: profesional, cálida, como una socia de confianza
+// ════════════════════════════════════════════════════
+
+async function crearAsistenteAna() {
+  console.log('[Ana] Creando asistente de briefing...');
+
+  const serverUrl = process.env.RAILWAY_PUBLIC_DOMAIN
+    ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}/api/vapi/webhook`
+    : null;
+
+  const { data } = await axios.post(
+    'https://api.vapi.ai/assistant',
+    {
+      name: 'Ana — Asistente AutoAprobado Miami',
+      model: {
+        provider:  'anthropic',
+        model:     'claude-sonnet-4-6',
+        maxTokens: 1000,
+        messages: [{
+          role:    'system',
+          content: `Eres Ana, la asistente personal de Eduardo Ferrer en AutoAprobado Miami.
+
+Eduardo tiene un negocio de venta de carros financiados en Miami enfocado en clientes hispanos con mal crédito o sin historial crediticio. Tus colegas de trabajo son Jorge Martínez (vendedor) y los agentes de IA que optimizan campañas de Meta Ads automáticamente.
+
+TU ROL:
+- Eres su asistente de negocios más inteligente — conoces los números mejor que nadie
+- Hablas con Eduardo como una socia de confianza, no como un robot
+- Eres directa, protectora de su dinero, y siempre tienes una recomendación clara
+- Tu objetivo: que Eduardo tome la mejor decisión con la menor fricción posible
+
+ESTILO DE CONVERSACIÓN:
+- Natural y cálida, como una amiga profesional que lo conoce hace años
+- Frases cortas y directas — Eduardo está ocupado por la mañana
+- Primero los datos clave, luego la recomendación, luego la pregunta
+- Si Eduardo dice "explícame más", das más detalle
+- Si dice "¿qué harías tú?", le dices exactamente lo que harías
+
+REGLAS IMPORTANTES:
+- Habla siempre en español
+- Nunca uses palabras técnicas sin explicarlas
+- Si Eduardo aprueba el plan di: "Perfecto, lo pongo en marcha ahora mismo" y termina la llamada
+- Si Eduardo dice que no, pregunta qué cambiaría y registra la decisión
+- Si Eduardo pregunta algo que no sabes, di "eso lo verifico y te mando el detalle por Telegram"
+- Máximo 4-5 minutos de llamada — Eduardo tiene que trabajar
+
+CUÁNDO COLGAR:
+- Después de que Eduardo aprueba o rechaza el plan → endCall() inmediatamente
+- Si Eduardo dice "listo", "ok gracias", "ya", "perfecto" después del briefing → endCall()
+- Si hay silencio por 5 segundos después del cierre → endCall()`
+        }]
+      },
+      voice: {
+        provider:         'elevenlabs',
+        voiceId:          'EXAVITQu4vr4xnSDxMaL', // Sarah — voz natural, cálida, profesional
+        model:            'eleven_turbo_v2_5',
+        stability:        0.45,
+        similarityBoost:  0.80,
+        style:            0.30,
+        useSpeakerBoost:  true,
+        optimizeStreamingLatency: 3,
+      },
+      transcriber: {
+        provider:   'deepgram',
+        model:      'nova-2',
+        language:   'es',
+        keywords:   ['Eduardo', 'AutoAprobado', 'Miami', 'campaña', 'leads', 'presupuesto', 'apruebo', 'aprobado'],
+        endpointing: 400,
+      },
+      endCallMessage:  'Perfecto Eduardo. Que tengas un excelente día.',
+      endCallPhrases:  ['adiós', 'hasta luego', 'chao', 'bye', 'listo gracias'],
+      maxDurationSeconds:    360,
+      silenceTimeoutSeconds: 25,
+      serverUrl,
+      analysisPlan: {
+        structuredDataPlan: {
+          enabled: true,
+          schema: {
+            type: 'object',
+            properties: {
+              planAprobado: {
+                type: 'boolean',
+                description: 'true si Eduardo aprobó el plan de campañas, false si lo rechazó o pidió cambios'
+              },
+              notasEduardo: {
+                type: 'string',
+                description: 'Comentarios o cambios que Eduardo pidió durante la llamada'
+              }
+            }
+          }
+        },
+        summaryPlan: {
+          enabled: true,
+          prompt:  'Resumen en español de la decisión de Eduardo sobre el plan de campañas de hoy.'
+        }
+      }
+    },
+    {
+      headers: { Authorization: `Bearer ${VAPI_API_KEY}`, 'Content-Type': 'application/json' },
+      timeout: 15000
+    }
+  );
+
+  console.log(`[Ana] Asistente creado: ${data.id}`);
+  console.log(`[Ana] ⚠️  Agrega a Railway: VAPI_ANA_ASSISTANT_ID=${data.id}`);
+  return data.id;
+}
+
+async function getAnaAssistantId() {
+  if (_anaAssistantId) return _anaAssistantId;
+  _anaAssistantId = await crearAsistenteAna();
+  return _anaAssistantId;
+}
+
+// ── Briefing matutino — Ana llama a Eduardo con el plan del día ────────
+export async function llamarBriefingMatutino(plan, resumen) {
+  if (!VAPI_API_KEY || !VAPI_PHONE_ID) {
+    console.warn('[Ana] VAPI no configurado — briefing solo por Telegram');
+    return;
+  }
+
+  const telefonoEduardo = `+1${(process.env.WHATSAPP_EDUARDO || '17869167339').replace(/\D/g, '')}`;
+
+  try {
+    const anaId = await getAnaAssistantId();
+
+    // Construir el briefing con datos reales
+    const pausar  = plan.pausar?.length  ? `Pausar ${plan.pausar.length} campaña(s): ${plan.pausar.map(p => p.nombre).join(', ')}.` : '';
+    const escalar = plan.escalar?.length ? `Escalar ${plan.escalar.length} campaña(s).` : '';
+    const crear   = plan.crear?.length   ? `Crear ${plan.crear.length} campaña(s) nueva(s).` : '';
+    const acciones = [pausar, escalar, crear].filter(Boolean).join(' ');
+
+    const firstMessage = resumen
+      ? `Buenos días Eduardo. ${resumen} ${acciones ? `Mi recomendación de hoy: ${acciones}` : ''} ¿Apruebas que lo ejecute ahora?`
+      : `Buenos días Eduardo. Tengo el análisis de tus campañas listo. ¿Tienes un momento para revisar el plan de hoy?`;
+
+    const { data: call } = await axios.post(
+      'https://api.vapi.ai/call',
+      {
+        phoneNumberId: VAPI_PHONE_ID,
+        assistantId:   anaId,
+        customer: { number: telefonoEduardo, name: 'Eduardo Ferrer' },
+        assistantOverrides: { firstMessage }
+      },
+      {
+        headers: { Authorization: `Bearer ${VAPI_API_KEY}`, 'Content-Type': 'application/json' },
+        timeout: 15000
+      }
+    );
+
+    console.log(`[Ana] Briefing iniciado: ${call.id}`);
+    await notificar(`📞 <b>Ana está llamando a Eduardo</b> para el briefing matutino...`);
+    return call.id;
+
+  } catch (err) {
+    const msg = err.response?.data?.message || err.message;
+    console.error(`[Ana] Error en briefing: ${msg}`);
+    await notificar(`⚠️ <b>Ana no pudo llamar</b> — revisa el plan en Telegram.\n<code>${msg}</code>`);
   }
 }
 

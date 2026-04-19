@@ -8,6 +8,7 @@ import { getCampanas, getMetricas, limpiarNombre, getSegmento,
          notificar, CHAT_ID, bot } from './utils.js';
 import { guardarPlan } from './plan-store.js';
 import { obtenerResumen } from './leads-store.js';
+import { llamarBriefingMatutino } from './llamador.js';
 
 const PRESUPUESTO_MAXIMO_DIA = parseFloat(process.env.PRESUPUESTO_MAX_DIA || '30');
 
@@ -137,6 +138,13 @@ export async function ejecutarAnalista() {
 
     await notificar(lineas.join('\n'), { reply_markup: keyboardSimple });
     console.log('[Analista] Plan enviado a Telegram');
+
+    // Ana llama a Eduardo en 2 minutos para el briefing de voz
+    setTimeout(() => {
+      llamarBriefingMatutino(plan, plan.resumen_voz).catch(e =>
+        console.error('[Analista] Error llamando briefing:', e.message)
+      );
+    }, 2 * 60 * 1000);
 
   } catch (err) {
     console.error('[Analista] Error:', err.message);

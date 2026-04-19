@@ -17,6 +17,8 @@ import { bot as tgBot, manejarMensaje, manejarCallback } from './bot-telegram.js
 import { ejecutarAnalista } from './agentes/analista.js';
 import { ejecutarSupervisor } from './agentes/supervisor.js';
 import { programarLlamada, procesarResultadoLlamada } from './agentes/llamador.js';
+import { cargarPlan, marcarEjecutado } from './agentes/plan-store.js';
+import { ejecutarEjecutor } from './agentes/ejecutor.js';
 import { registrarLead } from './agentes/leads-store.js';
 dotenv.config();
 
@@ -332,16 +334,64 @@ app.post('/api/vapi/webhook', async (req, res) => {
 
     // Solo procesar cuando la llamada termina
     if (message.type === 'end-of-call-report') {
+      const assistantId = message.call?.assistantId;
+      const anaId       = process.env.VAPI_ANA_ASSISTANT_ID;
+
+      // ── Briefing de Ana → detectar aprobación de Eduardo ──
+      if (anaId && assistantId === anaId) {
+        const planAprobado  = message.analysis?.structuredData?.planAprobado;
+        const notas         = message.analysis?.structuredData?.notasEduardo || '';
+        const resumen       = message.analysis?.summary || '';
+        const duracion      = message.durationSeconds ? `${Math.round(message.durationSeconds)}s` : '—';
+
+        if (planAprobado === true) {
+          // Eduardo aprobó — ejecutar plan automáticamente
+          const plan = cargarPlan();
+          if (plan) {
+            await tgBot.sendMessage(CHAT_ID,
+              `✅ <b>Eduardo aprobó el plan por voz</b>\n` +
+              `⏱ Duración briefing: ${duracion}\n` +
+              (notas ? `📝 Notas: ${notas}\n` : '') +
+              `\n🚀 Ejecutando plan ahora...`,
+              { parse_mode: 'HTML' }
+            );
+            marcarEjecutado();
+            ejecutarEjecutor(plan).catch(e =>
+              tgBot.sendMessage(CHAT_ID, `❌ Error ejecutando plan: <code>${e.message}</code>`, { parse_mode: 'HTML' })
+            );
+          }
+        } else if (planAprobado === false) {
+          await tgBot.sendMessage(CHAT_ID,
+            `❌ <b>Eduardo rechazó el plan</b>\n` +
+            `⏱ Duración briefing: ${duracion}\n` +
+            (notas ? `📝 Sus notas: ${notas}\n` : '') +
+            (resumen ? `\n💬 Resumen: ${resumen}` : ''),
+            { parse_mode: 'HTML' }
+          );
+        } else {
+          // No se capturó decisión — mandar resumen y dejar botones de Telegram
+          await tgBot.sendMessage(CHAT_ID,
+            `📞 <b>Briefing con Ana completado</b>\n` +
+            `⏱ Duración: ${duracion}\n` +
+            (resumen ? `\n💬 ${resumen}\n` : '') +
+            `\nAprueba el plan en Telegram con los botones de arriba.`,
+            { parse_mode: 'HTML' }
+          );
+        }
+        return;
+      }
+
+      // ── Llamada a lead (Sofía) → procesar normalmente ──
       await procesarResultadoLlamada({
-        id:               message.call?.id,
-        status:           message.call?.status,
-        endedReason:      message.endedReason,
-        duration:         message.durationSeconds,
-        transcript:       message.transcript,
-        summary:          message.analysis?.summary || message.summary,
-        appointmentBooked: message.analysis?.appointmentBooked,
-        successEval:      message.analysis?.successEvaluationNumericScale,
-        customer:         message.call?.customer
+        id:                message.call?.id,
+        status:            message.call?.status,
+        endedReason:       message.endedReason,
+        duration:          message.durationSeconds,
+        transcript:        message.transcript,
+        summary:           message.analysis?.summary || message.summary,
+        appointmentBooked: message.analysis?.structuredData?.appointmentBooked ?? message.analysis?.appointmentBooked,
+        successEval:       message.analysis?.structuredData?.successEvaluationNumericScale ?? message.analysis?.successEvaluationNumericScale,
+        customer:          message.call?.customer
       });
     }
   } catch (err) {
