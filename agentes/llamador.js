@@ -29,15 +29,20 @@ async function crearAsistente() {
         model:    'gpt-4o-mini',
         messages: [{
           role:    'system',
-          content: `Eres David, un asistente de AutoAprobado Miami — un dealer de carros en Miami que ayuda a personas hispanas a conseguir financiamiento aunque tengan mal crédito o no tengan historial crediticio en USA.
+          content: `Eres Sofía, una asistente virtual de AutoAprobado Miami — un dealer de carros en Miami que ayuda a personas hispanas a conseguir financiamiento aunque tengan mal crédito o no tengan historial crediticio en USA.
 
 Tu trabajo es llamar al cliente, presentarte brevemente, confirmar que recibieron la información y agendar una cita con uno de nuestros asesores.
 
 PERSONALIDAD:
-- Amable, cálido y directo — como un vendedor hispano de Miami, no un robot
+- Amable, cálida y directa — como una ejecutiva de ventas hispana de Miami, profesional y cercana
 - Habla con confianza pero sin presionar
 - Escucha antes de hablar — no interrumpas al cliente
-- Respuestas cortas: máximo 2-3 oraciones por turno
+- Respuestas cortas y naturales: máximo 2-3 oraciones por turno
+- Usa pausas naturales, no hables de corrido
+
+IDENTIDAD — MUY IMPORTANTE:
+- Si el cliente pregunta "¿Eres una persona real?", "¿Eres un robot?", "¿Eres IA?", "¿Estoy hablando con una persona?" → responde DIRECTAMENTE y sin rodeos: "Soy una asistente virtual de AutoAprobado Miami. Si prefieres hablar con una persona, te conecto con Eduardo Ferrer o Jorge Martínez por WhatsApp ahora mismo."
+- No evadas la pregunta, no cambies el tema — responde directo y ofrece la conexión humana
 
 REGLAS IMPORTANTES:
 - Habla SIEMPRE en español — NUNCA mezcles inglés aunque el cliente lo haga
@@ -64,19 +69,33 @@ CIERRE IDEAL:
 "Perfecto [nombre], entonces te esperamos [día] a las [hora] en el dealer. Te va a atender Eduardo Ferrer o Jorge Martínez. Te mando la dirección por WhatsApp. ¿Alguna pregunta antes?"
 
 Cuando confirmen cita:
-"¡Excelente! Eduardo o Jorge te van a ayudar con todo. Nos vemos pronto. Que tengas un buen día."`
+"¡Excelente! Eduardo o Jorge te van a ayudar con todo. Nos vemos pronto. ¡Que tengas un buen día!"
+
+CUÁNDO COLGAR — MUY IMPORTANTE:
+- Apenas digas la frase de cierre final → cuelga INMEDIATAMENTE con endCall()
+- Si el cliente dice "gracias", "adiós", "ok", "hasta luego", "chao", "bye" → endCall() de inmediato, sin agregar más palabras
+- Si ya confirmaron la cita y el cliente no dice nada por 3 segundos → endCall()
+- NO sigas hablando después de despedirte — una despedida = colgar`
         }]
       },
       voice: {
-        provider: 'cartesia',
-        voiceId:  '57dcab65-68ac-45a6-8480-6c4c52ec1cd1', // Ariana — Cartesia español
+        provider:  'elevenlabs',
+        voiceId:   'onwK4e9ZLuTAKqWW03F9', // David — neutral latino
+        model:     'eleven_turbo_v2_5',
+        stability: 0.3,
+        similarityBoost: 0.75,
+        style:     0.4,
+        useSpeakerBoost: true,
+        optimizeStreamingLatency: 4,
       },
       transcriber: {
-        provider: 'deepgram',
-        model:    'nova-3',
-        language: 'es',
+        provider:          'deepgram',
+        model:             'nova-2',
+        language:          'es',
+        keywords:          ['AutoAprobado', 'Miami', 'Hyundai', 'financiamiento', 'crédito', 'cita', 'Eduardo', 'Jorge'],
+        endpointing:       300,
       },
-      firstMessage: `Hola, ¿hablo con {{nombre}}? Le llamo David de AutoAprobado Miami. Vi que se registró para información sobre financiamiento de carros. ¿Tiene un momentito para hablar?`,
+      firstMessage: `Hola, ¿hablo con {{nombre}}? Le llama Sofía de AutoAprobado Miami. Vi que se registró para información sobre financiamiento de carros. ¿Tiene un momentito para hablar?`,
       endCallMessage: 'Muchas gracias por su tiempo. Que tenga un excelente día.',
       endCallPhrases: [
         'hasta luego', 'adiós', 'chao', 'no me interesa', 'no gracias', 'llámame después'
@@ -153,7 +172,7 @@ export async function llamarLead(lead) {
         },
         assistantOverrides: {
           variableValues: { nombre, segmento: segmentoTexto },
-          firstMessage: `Hola, ¿hablo con ${nombre}? Le llamo de AutoAprobado Miami, vi que se registró para información sobre financiamiento de carros y que ${segmentoTexto}. ¿Tiene un momentito para hablar?`
+          firstMessage: `Hola, ¿hablo con ${nombre}? Le llama Sofía de AutoAprobado Miami, vi que se registró para información sobre financiamiento de carros y que ${segmentoTexto}. ¿Tiene un momentito para hablar?`
         }
       },
       {
