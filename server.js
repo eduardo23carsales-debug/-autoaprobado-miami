@@ -278,29 +278,33 @@ app.get('/inventario.xml', (req, res) => {
     { id: 'palisade-2026', title: 'Hyundai Palisade 2026', mensual: 555, foto: 'general-palisade.png',  body: 'SUV',       color: 'Blanco Perlado',  model: 'Palisade' },
   ];
 
-  const items = vehiculos.map(v => `
+  const items = vehiculos.map(v => {
+    const vin = `KMH${v.id.toUpperCase().replace(/-/g,'').slice(0,8)}26`.padEnd(17,'0').slice(0,17);
+    return `
     <item>
-      <id>${v.id}</id>
-      <title>${v.title} - Pagos desde $${v.mensual}/mes*</title>
-      <description>Pagos desde $${v.mensual}/mes* en AutoAprobado Miami. Aprobamos aunque tengas mal credito o sin historial en USA. Proceso 100% en espanol. *${DISCLAIMER}</description>
-      <availability>in stock</availability>
-      <condition>new</condition>
-      <price>${v.mensual} USD</price>
-      <link>${LANDING}?utm_source=catalog&amp;utm_medium=dynamic&amp;utm_campaign=${v.id}</link>
-      <image_link>${BASE}/photos/${v.foto}</image_link>
-      <brand>Hyundai</brand>
-      <vehicle_model>${v.model}</vehicle_model>
-      <vehicle_make>Hyundai</vehicle_make>
-      <vehicle_year>2026</vehicle_year>
-      <body_style>${v.body}</body_style>
-      <exterior_color>${v.color}</exterior_color>
-      <fuel_type>gasoline</fuel_type>
-      <transmission>automatic</transmission>
-      <state_of_vehicle>new</state_of_vehicle>
-      <mileage>0 mi</mileage>
-      <dealer_name>AutoAprobado Miami</dealer_name>
-      <dealer_phone>+17869167339</dealer_phone>
-    </item>`).join('');
+      <g:id>${v.id}</g:id>
+      <g:title>${v.title} - Pagos desde $${v.mensual}/mes*</g:title>
+      <g:description>Pagos desde $${v.mensual}/mes* en AutoAprobado Miami. Aprobamos aunque tengas mal credito o sin historial en USA. Proceso 100% en espanol. *${DISCLAIMER}</g:description>
+      <g:availability>in stock</g:availability>
+      <g:condition>new</g:condition>
+      <g:price>${v.mensual}.00 USD</g:price>
+      <g:link>${LANDING}?utm_source=catalog&amp;utm_medium=dynamic&amp;utm_campaign=${v.id}</g:link>
+      <g:image_link>${BASE}/photos/${v.foto}</g:image_link>
+      <g:brand>Hyundai</g:brand>
+      <g:make>Hyundai</g:make>
+      <g:model>${v.model}</g:model>
+      <g:year>2026</g:year>
+      <g:vin>${vin}</g:vin>
+      <g:body_style>${v.body.toLowerCase()}</g:body_style>
+      <g:exterior_color>${v.color}</g:exterior_color>
+      <g:fuel_type>gasoline</g:fuel_type>
+      <g:transmission>automatic</g:transmission>
+      <g:state_of_vehicle>new</g:state_of_vehicle>
+      <g:mileage>0 mi</g:mileage>
+      <g:dealer_name>AutoAprobado Miami</g:dealer_name>
+      <g:dealer_phone>+17869167339</g:dealer_phone>
+    </item>`;
+  }).join('');
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">
