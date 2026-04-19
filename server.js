@@ -17,6 +17,7 @@ import { bot as tgBot, manejarMensaje, manejarCallback } from './bot-telegram.js
 import { ejecutarAnalista } from './agentes/analista.js';
 import { ejecutarSupervisor } from './agentes/supervisor.js';
 import { programarLlamada, procesarResultadoLlamada } from './agentes/llamador.js';
+import { registrarLead } from './agentes/leads-store.js';
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -191,7 +192,20 @@ app.post('/api/lead', leadLimiter, async (req, res) => {
       `${score.emoji} <b>Score: ${score.label}</b>${score.razones.length ? ` — ${score.razones.join(', ')}` : ''}\n` +
       `🕐 ${ts}`;
 
-    await bot.sendMessage(CHAT_ID, msg, { parse_mode: 'HTML' });
+    // Registrar lead para tracking de cierres
+    registrarLead({ nombre, telefono, segmento, score: score.label });
+
+    // Botones inline para seguimiento rápido
+    const telLimpio = telefono.replace(/\D/g, '');
+    const keyboard = {
+      inline_keyboard: [[
+        { text: '✅ Vendido',      callback_data: `cerrado:${telLimpio}` },
+        { text: '📵 No contestó',  callback_data: `no_contesto:${telLimpio}` },
+        { text: '💬 WhatsApp',     url: `https://wa.me/${telLimpio}` }
+      ]]
+    };
+
+    await bot.sendMessage(CHAT_ID, msg, { parse_mode: 'HTML', reply_markup: keyboard });
 
     // CAPI — enviar evento Lead a Meta server-side (no bloquea la respuesta)
     enviarEventoCAPI({

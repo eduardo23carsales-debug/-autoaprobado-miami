@@ -377,8 +377,9 @@ async function manejarMensaje(msg) {
     return;
   }
 
-  const partes = texto.toLowerCase().trim().split(/\s+/);
-  const cmd    = partes[0];
+  const partes = texto.trim().split(/\s+/);
+  const cmd    = partes[0].toLowerCase();
+  const args   = partes.slice(1);
 
   try {
     // /start o /ayuda o /menu
@@ -393,6 +394,42 @@ async function manejarMensaje(msg) {
     if (cmd === '/reporte' || cmd === 'reporte') {
       await bot.sendMessage(chatId, '⏳ Generando reporte...');
       await generarReporte();
+      return;
+    }
+
+    // /cerrado — marcar lead como vendido manualmente
+    if (cmd === '/cerrado') {
+      const telefono = args[0];
+      if (!telefono) {
+        await bot.sendMessage(chatId, '📱 Uso: /cerrado <teléfono>\nEjemplo: /cerrado 7861234567');
+        return;
+      }
+      const { marcarCerrado } = await import('./agentes/leads-store.js');
+      const lead = marcarCerrado(telefono);
+      if (lead) {
+        await bot.sendMessage(chatId, `✅ <b>¡Venta cerrada!</b> — ${lead.nombre}\n📱 ${lead.telefono}`, { parse_mode: 'HTML' });
+      } else {
+        await bot.sendMessage(chatId, `⚠️ No encontré un lead con ese teléfono.`);
+      }
+      return;
+    }
+
+    // /ventas — resumen de leads y cierres
+    if (cmd === '/ventas') {
+      const { obtenerResumen } = await import('./agentes/leads-store.js');
+      const r = obtenerResumen();
+      await bot.sendMessage(chatId,
+        `📊 <b>Resumen de Leads</b>\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `📥 Total leads: <b>${r.total}</b>\n` +
+        `📅 Hoy: <b>${r.hoy}</b>\n` +
+        `✅ Ventas cerradas: <b>${r.cerrados}</b>\n` +
+        `📵 No contestaron: <b>${r.noContesto}</b>\n` +
+        `🆕 Pendientes: <b>${r.nuevos}</b>\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `📈 Tasa de cierre: <b>${r.tasa}%</b>`,
+        { parse_mode: 'HTML' }
+      );
       return;
     }
 
@@ -603,6 +640,32 @@ async function manejarCallback(query) {
       await bot.answerCallbackQuery(queryId, { text: '❌ Plan ignorado' });
       limpiarPlan();
       global._planPendiente = null;
+      return;
+    }
+
+    // ── Cerrar lead — vendido ────────────────────────
+    if (data.startsWith('cerrado:')) {
+      const telefono = data.split(':')[1];
+      const { marcarCerrado } = await import('./agentes/leads-store.js');
+      const lead = marcarCerrado(telefono);
+      if (lead) {
+        await bot.answerCallbackQuery(queryId, { text: '✅ Lead marcado como vendido' });
+        await bot.sendMessage(chatId,
+          `✅ <b>¡Venta cerrada!</b> — ${lead.nombre}\n📱 ${lead.telefono}\n🎯 ${lead.segmento}`,
+          { parse_mode: 'HTML' }
+        );
+      } else {
+        await bot.answerCallbackQuery(queryId, { text: '⚠️ Lead no encontrado' });
+      }
+      return;
+    }
+
+    // ── Lead no contestó ────────────────────────────
+    if (data.startsWith('no_contesto:')) {
+      const telefono = data.split(':')[1];
+      const { marcarNoContesto } = await import('./agentes/leads-store.js');
+      const lead = marcarNoContesto(telefono);
+      await bot.answerCallbackQuery(queryId, { text: lead ? '📵 Marcado como no contestó' : '⚠️ Lead no encontrado' });
       return;
     }
 
