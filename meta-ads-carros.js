@@ -25,6 +25,9 @@ const PIXEL_ID     = process.env.META_PIXEL_ID?.trim();
 const OPENAI_KEY   = process.env.OPENAI_API_KEY?.trim();
 const LANDING_URL  = 'https://oferta.hyundaipromomiami.com';
 
+// Disclaimer financiero requerido por Meta para categoría FINANCIAL_PRODUCTS_SERVICES
+const DISCLAIMER = `*Pagos desde $299/mes. Sujeto a aprobación de crédito, plazo, inicial y tasa aplicable. Términos y condiciones en el dealer.`;
+
 const openai = new OpenAI({ apiKey: OPENAI_KEY });
 
 // ── Datos por segmento ───────────────────────────────
@@ -34,7 +37,7 @@ const SEGMENTOS = {
     hook:      '¿Te negaron el préstamo por mal crédito?',
     copies: [
       `😔 ¿Te han negado financiamiento por mal crédito?\n\nEn AutoAprobado Miami trabajamos CON tu situación, no contra ella.\n\n✅ Sin mínimo de score requerido\n✅ Aprobación en 24 horas\n✅ Carros 2024-2026 disponibles\n\nMiles de familias hispanas en Miami ya tienen su carro. Tú puedes ser el próximo. 👇`,
-      `⚠️ El banco te dijo NO. Nosotros decimos SÍ.\n\nEn AutoAprobado Miami especializamos en crédito difícil. No importa tu score, bancarrotas o deudas previas.\n\n🚗 Carros nuevos y usados\n💵 Inicial desde $500\n📱 Proceso 100% en español\n\nVe si calificas GRATIS 👇`,
+      `⚠️ ¿Otros dealers te dijeron que no? Nosotros encontramos opciones.\n\nEn AutoAprobado Miami nos especializamos en situaciones de crédito difícil. No importa tu score, bancarrotas o deudas previas.\n\n🚗 Carros nuevos y usados\n💵 Inicial desde $500\n📱 Proceso 100% en español\n\nVe si calificas GRATIS 👇`,
       `Tu crédito no define tu futuro 🚗\n\nHemos ayudado a cientos de personas en Miami a conseguir su carro aunque el banco los rechazó.\n\nNo necesitas crédito perfecto. Solo necesitas hablar con nosotros.\n\n¿Cuándo fue la última vez que manejaste tranquilo? Empieza hoy. 👇`
     ],
     imagenPrompt: `Documentary photograph, Canon 5D, 50mm lens, f/2.0. A single Hispanic man in his late 30s sitting at a desk inside a bright modern car dealership showroom in Miami. He is signing a document, looking down at the paper, slight smile. One salesperson's hand visible across the desk handing a pen. Real dealership background: glass walls, one or two cars on the showroom floor out of focus. Natural daylight from windows, no flash. Realistic skin tones, no dramatic shadows. Square 1:1 crop. NO TEXT, NO WORDS, NO LOGOS in the image.`
@@ -64,18 +67,18 @@ const SEGMENTOS = {
     hook:      '¿Listo para cambiar tu carro en Miami?',
     copies: [
       `🔄 ¿Tu carro ya no te da lo que necesitas?\n\nEn AutoAprobado Miami te ayudamos a hacer el cambio correcto.\n\n✅ Usamos tu carro actual como inicial\n✅ Más comodidad, más tecnología, menos problemas\n✅ Pagos que se adaptan a tu presupuesto\n\n¿Cuánto vale tu carro hoy? Descúbrelo gratis. 👇`,
-      `Tu carro actual puede ser tu inicial 🚗➡️🚗\n\nMuchos clientes en Miami hacen el upgrade sin gastar un peso de su bolsillo.\n\nUsamos el valor de tu carro actual como down payment del nuevo.\n\n✅ Modelos 2024-2026 disponibles\n✅ Carros Hyundai desde $310/mes\n✅ Proceso rápido y en español\n\nHablemos hoy. 👇`,
+      `Tu carro actual puede ser tu inicial 🚗➡️🚗\n\nMuchos clientes en Miami hacen el upgrade sin gastar un peso de su bolsillo.\n\nUsamos el valor de tu carro actual como down payment del nuevo.\n\n✅ Modelos 2024-2026 disponibles\n✅ Pagos desde $299/mes*\n✅ Proceso rápido y en español\n\nHablemos hoy. 👇\n\n${DISCLAIMER}`,
       `¿Cuánto llevas con el mismo carro? 🤔\n\nSi tu carro ya tiene muchos miles encima, muchas reparaciones o simplemente ya no va con tu vida actual — es momento de hablar.\n\nEn AutoAprobado Miami hacemos el proceso de cambio fácil, rápido y sin sorpresas.\n\nVe cuánto vale tu carro en 2 minutos. 👇`
     ],
     imagenPrompt: `Documentary photograph, Canon 5D, 50mm lens. Close-up of a single Hispanic man's hands, early 40s, holding two car keys — one old worn key on the left, one shiny new car key on the right. Real hands, real keys. Shallow depth of field, background slightly blurred showing a car dealership interior. Natural light. No people's faces visible, just the hands and keys. Realistic colors, no filters. Square 1:1. NO TEXT, NO WORDS, NO LOGOS.`
   },
   'oferta-especial': {
     nombre:    'Oferta Especial Hyundai — AutoAprobado Miami',
-    hook:      '🔥 Hyundai 2026 desde $310/mes en Miami',
+    hook:      '🔥 Hyundai 2026 — pagos desde $299/mes* en Miami',
     copies: [
-      `🔥 OFERTA ESPECIAL — Hyundai 2026 desde $310/mes\n\nDisponibles ahora en Miami:\n🚗 Hyundai Venue 2026 — desde $310/mes\n🚗 Hyundai Elantra 2026 — desde $350/mes\n🚗 Hyundai Tucson 2026 — desde $420/mes\n\n✅ Aprobamos aunque te hayan negado antes\n✅ Inicial accesible\n✅ Proceso 100% en español\n\nOferta por tiempo limitado. 👇`,
-      `¿Sabías que puedes manejar un Hyundai 2026 en Miami por menos de $400/mes? 🚗\n\nEn AutoAprobado Miami tenemos:\n• Venue 2026 — $310/mes\n• Elantra 2026 — $350/mes  \n• Tucson 2026 — $420/mes\n• Santa Fe 2026 — $480/mes\n\nSin importar tu historial crediticio.\n\nEl cupo es limitado. Reserva el tuyo hoy. 👇`,
-      `Maneja un carro NUEVO en 2026 sin arruinarte 💪\n\nHyundai Doral tiene los mejores precios de Miami y nosotros tenemos la aprobación más fácil.\n\nJuntos hacemos que sea posible para ti, sin importar tu situación de crédito.\n\n🔥 Precios desde $310/mes\n⚡ Respuesta en 24 horas\n\n¿Para cuál calificas tú? 👇`
+      `🔥 OFERTA ESPECIAL — Hyundai 2026 con pagos desde $299/mes*\n\nDisponibles ahora en Miami:\n🚗 Hyundai Venue 2026\n🚗 Hyundai Elantra 2026\n🚗 Hyundai Tucson 2026\n\n✅ Aprobamos aunque te hayan negado antes\n✅ Inicial accesible\n✅ Proceso 100% en español\n\nOferta por tiempo limitado. 👇\n\n${DISCLAIMER}`,
+      `¿Sabías que puedes manejar un Hyundai 2026 en Miami con pagos accesibles desde $299/mes*? 🚗\n\nEn AutoAprobado Miami tenemos Venue, Elantra, Tucson y Santa Fe 2026.\n\nSin importar tu historial crediticio.\n\nEl cupo es limitado. Reserva el tuyo hoy. 👇\n\n${DISCLAIMER}`,
+      `Maneja un carro NUEVO en 2026 sin arruinarte 💪\n\nHyundai Doral tiene los mejores precios de Miami y nosotros tenemos la aprobación más fácil.\n\nJuntos hacemos que sea posible para ti, sin importar tu situación de crédito.\n\n🔥 Pagos desde $299/mes*\n⚡ Respuesta en 24 horas\n\n¿Para cuál calificas tú? 👇\n\n${DISCLAIMER}`
     ],
     imagenPrompt: `Professional automotive photograph, Canon 5D, 35mm lens, f/8. A brand new white Hyundai Tucson SUV parked on clean asphalt outside a dealership in Miami on a sunny day. 3/4 front angle, eye level. Natural sunlight creating soft reflections on the hood and doors. Background: clear blue sky, one or two palm trees slightly blurred. No people. Realistic car proportions, accurate reflections, no CGI. Photo quality matching a real car dealership listing. Square 1:1. NO TEXT, NO WORDS, NO LOGOS, NO LICENSE PLATES.`
   }
