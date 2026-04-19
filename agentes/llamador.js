@@ -81,13 +81,13 @@ CUÁNDO COLGAR — MUY IMPORTANTE:
       },
       voice: {
         provider:  '11labs',
-        voiceId:   'onwK4e9ZLuTAKqWW03F9', // David — neutral latino
+        voiceId:   'jBpfuIE2acCO8z3wKNLl', // Belén — amable y suave
         model:     'eleven_turbo_v2_5',
-        stability: 0.3,
+        stability: 0.55,
         similarityBoost: 0.75,
-        style:     0.4,
+        style:     0.10,
         useSpeakerBoost: true,
-        optimizeStreamingLatency: 4,
+        optimizeStreamingLatency: 2,
       },
       transcriber: {
         provider:          'deepgram',
