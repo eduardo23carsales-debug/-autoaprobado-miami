@@ -216,10 +216,16 @@ app.post('/api/lead', leadLimiter, async (req, res) => {
       userAgent: req.headers['user-agent'] || ''
     });
 
-    // VAPI desactivado temporalmente — leads solo a Telegram
-    // if (process.env.VAPI_API_KEY && process.env.VAPI_PHONE_NUMBER_ID) {
-    //   programarLlamada({ nombre, telefono, segmento });
-    // }
+    // VAPI — llamar solo de 9 AM a 8 PM ET
+    if (process.env.VAPI_API_KEY && process.env.VAPI_PHONE_NUMBER_ID) {
+      const horaET = new Date().toLocaleString('en-US', { timeZone: 'America/New_York', hour: 'numeric', hour12: false });
+      const hora   = parseInt(horaET);
+      if (hora >= 9 && hora < 20) {
+        programarLlamada({ nombre, telefono, segmento });
+      } else {
+        console.log(`[VAPI] Fuera de horario (${hora}h ET) — solo Telegram`);
+      }
+    }
 
     // WhatsApp redirect URL
     const waNum = nextWhatsApp();
