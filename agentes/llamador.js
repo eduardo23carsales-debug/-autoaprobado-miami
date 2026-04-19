@@ -257,7 +257,7 @@ CUÁNDO COLGAR:
         }]
       },
       voice: {
-        provider:         'elevenlabs',
+        provider:         '11labs',
         voiceId:          'EXAVITQu4vr4xnSDxMaL', // Sarah — voz natural, cálida, profesional
         model:            'eleven_turbo_v2_5',
         stability:        0.45,
@@ -297,7 +297,6 @@ CUÁNDO COLGAR:
         },
         summaryPlan: {
           enabled: true,
-          prompt:  'Resumen en español de la decisión de Eduardo sobre el plan de campañas de hoy.'
         }
       }
     },
