@@ -302,22 +302,49 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
   console.log(`✅ Campaña creada: ${campana.id}`);
   await new Promise(r => setTimeout(r, 3000));
 
+  // Edad óptima por segmento — no desperdiciar en rango equivocado
+  const EDAD_POR_SEGMENTO = {
+    'sin-credito':     { min: 18, max: 40 }, // inmigrantes jóvenes, recién llegados
+    'upgrade':         { min: 30, max: 65 }, // gente establecida con carro actual
+    'mal-credito':     { min: 22, max: 55 },
+    'urgente':         { min: 22, max: 55 },
+    'oferta-especial': { min: 22, max: 60 },
+  };
+  const edad = EDAD_POR_SEGMENTO[segmento] || { min: 22, max: 55 };
+
+  // Audiencia de exclusión — no gastar en quien ya convirtió
+  // Excluye a personas que ya dispararon el evento Lead en el pixel
+  const exclusiones = PIXEL_ID ? [{
+    inclusions: { operator: 'or', rules: [{
+      event_sources: [{ id: PIXEL_ID, type: 'pixel' }],
+      retention_seconds: 5184000, // 60 días
+      filter: { operator: 'and', filters: [{ field: 'event', operator: 'eq', value: 'Lead' }] }
+    }]}
+  }] : [];
+
+  // Horario de ads — solo 7AM a 11PM ET (horas 7-23)
+  // Meta usa minutos desde medianoche en zona UTC — convertir ET a UTC (+4 o +5 según DST)
+  // Usamos franja amplia: 7AM-11PM = 420min a 1380min en zona del ad account
+  const horasActivas = [];
+  for (let dia = 0; dia <= 6; dia++) {
+    horasActivas.push({ start_minute: 420, end_minute: 1380, days: [dia] });
+  }
+
   // Targeting — Miami + hispanohablantes + móvil
-  // locales 27 = Spanish — filtra solo personas con idioma español en su cuenta
-  // device_platforms mobile — audiencia hispana Miami es 90%+ móvil, mejor CPL
   const targeting = {
-    age_min: 18,
-    age_max: 65,
+    age_min: edad.min,
+    age_max: edad.max,
     geo_locations: {
       custom_locations: [{
-        latitude: 25.7617,
-        longitude: -80.1918,
-        radius: 40,
+        latitude:      25.7617,
+        longitude:     -80.1918,
+        radius:        40,
         distance_unit: 'mile'
       }]
     },
     locales:          [27],
     device_platforms: ['mobile'],
+    ...(exclusiones.length ? { excluded_custom_audiences: exclusiones } : {})
   };
 
   // Si hay formulario → Lead Ads nativo. Si no → website con pixel
@@ -336,6 +363,15 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
     promoted_object: esLeadAd
       ? { page_id: PAGE_ID }
       : { pixel_id: PIXEL_ID, custom_event_type: 'LEAD' },
+    // Frecuencia máxima: 3 veces por semana — evita fatiga y dinero perdido
+    frequency_control_specs: [{
+      event: 'IMPRESSIONS',
+      interval_days: 7,
+      max_frequency: 3
+    }],
+    // Horario: solo 7AM-11PM — no gastar de madrugada
+    adset_schedule:   horasActivas,
+    pacing_type:      ['standard'],
     targeting: {
       ...targeting,
       publisher_platforms: ['facebook', 'instagram'],
@@ -468,6 +504,49 @@ async function preflight() {
     console.error('❌ META_ACCESS_TOKEN inválido o expirado');
     process.exit(1);
   }
+}
+
+// ── Crear audiencia Lookalike desde leads del pixel ──────────────────
+export async function crearLookalike() {
+  if (!PIXEL_ID) {
+    console.warn('[Lookalike] META_PIXEL_ID no configurado');
+    return null;
+  }
+
+  const fecha = new Date().toISOString().slice(0, 10);
+
+  // 1. Audiencia fuente: personas que dispararon evento Lead (tus convertidos)
+  const fuente = await metaPost(`/${AD_ACCOUNT}/customaudiences`, {
+    name: `AutoAprobado — Leads Convertidos — ${fecha}`,
+    subtype: 'WEBSITE',
+    retention_days: 180,
+    rule: JSON.stringify({
+      inclusions: { operator: 'or', rules: [{
+        event_sources: [{ id: PIXEL_ID, type: 'pixel' }],
+        retention_seconds: 15552000, // 180 días
+        filter: { operator: 'and', filters: [{ field: 'event', operator: 'eq', value: 'Lead' }] }
+      }]}
+    })
+  });
+  console.log(`[Lookalike] Audiencia fuente: ${fuente.id}`);
+  await new Promise(r => setTimeout(r, 3000));
+
+  // 2. Lookalike 1% — el 1% de Miami más parecido a tus leads
+  const lookalike = await metaPost(`/${AD_ACCOUNT}/customaudiences`, {
+    name: `AutoAprobado — Lookalike 1% Miami — ${fecha}`,
+    subtype: 'LOOKALIKE',
+    origin_audience_id: fuente.id,
+    lookalike_spec: JSON.stringify({
+      type:     'similarity',
+      ratio:    0.01,
+      country:  'US',
+      location: { geo_locations: { custom_locations: [{
+        latitude: 25.7617, longitude: -80.1918, radius: 40, distance_unit: 'mile'
+      }]}}
+    })
+  });
+  console.log(`[Lookalike] Audiencia lookalike: ${lookalike.id}`);
+  return { fuenteId: fuente.id, lookalikeId: lookalike.id };
 }
 
 // ── Campaña de retargeting — visitantes que no llenaron el formulario ──

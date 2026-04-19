@@ -361,7 +361,7 @@ const MENU_PRINCIPAL = {
   ]
 };
 
-const AYUDA = `📋 <b>Menú AutoAprobado Miami</b>\n\nEscribe /menu para ver los botones, o usa los comandos directos abajo.\n\n/nueva — crear campaña\n/retargeting [presupuesto] — campaña para visitantes que no convirtieron\n/pausa — pausar campaña\n/activa — activar campaña\n/presupuesto — cambiar presupuesto\n/reporte — métricas de hoy\n/mejor — mejor campaña\n/ventas — tasa de cierre y leads\n/analista — análisis IA\n/supervisor — revisar campañas`;
+const AYUDA = `📋 <b>Menú AutoAprobado Miami</b>\n\nEscribe /menu para ver los botones, o usa los comandos directos abajo.\n\n/nueva — crear campaña\n/retargeting [presupuesto] — campaña visitantes que no convirtieron\n/lookalike — audiencia lookalike del 1% más similar a tus leads\n/pausa — pausar campaña\n/activa — activar campaña\n/presupuesto — cambiar presupuesto\n/reporte — métricas de hoy\n/mejor — mejor campaña\n/ventas — tasa de cierre y leads\n/analista — análisis IA\n/supervisor — revisar campañas`;
 
 // ── Manejador principal de mensajes ──────────────────
 async function manejarMensaje(msg) {
@@ -430,6 +430,35 @@ async function manejarMensaje(msg) {
         `📈 Tasa de cierre: <b>${r.tasa}%</b>`,
         { parse_mode: 'HTML' }
       );
+      return;
+    }
+
+    // /lookalike — crear audiencia lookalike basada en leads convertidos
+    if (cmd === '/lookalike') {
+      await bot.sendMessage(chatId,
+        `🎯 Creando audiencia Lookalike 1%...\n\n` +
+        `Meta va a encontrar el 1% de Miami más parecido a tus leads convertidos.\n` +
+        `⚠️ Necesitas mínimo 100 leads en el pixel para que funcione bien.`,
+        { parse_mode: 'HTML' }
+      );
+      try {
+        const { crearLookalike } = await import('./meta-ads-carros.js');
+        const result = await crearLookalike();
+        if (!result) {
+          await bot.sendMessage(chatId, '❌ Falta META_PIXEL_ID configurado en Railway.');
+          return;
+        }
+        await bot.sendMessage(chatId,
+          `✅ <b>Lookalike lista!</b>\n\n` +
+          `👥 Audiencia fuente ID: <code>${result.fuenteId}</code>\n` +
+          `🎯 Lookalike 1% ID: <code>${result.lookalikeId}</code>\n\n` +
+          `Úsala en tu próxima campaña desde Meta Ads Manager → Audiencias.\n` +
+          `<b>Tip:</b> Con 100+ leads el lookalike empieza a ser muy efectivo.`,
+          { parse_mode: 'HTML' }
+        );
+      } catch (e) {
+        await bot.sendMessage(chatId, `❌ Error lookalike: <code>${e.message}</code>`, { parse_mode: 'HTML' });
+      }
       return;
     }
 
