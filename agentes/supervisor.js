@@ -16,7 +16,10 @@ export async function ejecutarSupervisor() {
 
   try {
     const campanas = await getCampanas(true); // solo activas
-    if (!campanas.length) return;
+    if (!campanas.length) {
+      await notificar('👁 <b>Supervisor:</b> No hay campañas activas en este momento.');
+      return;
+    }
 
     const acciones    = [];
     const consultas   = []; // decisiones que superan el límite
@@ -109,7 +112,10 @@ export async function ejecutarSupervisor() {
     }
 
     if (acciones.length === 0 && consultas.length === 0) {
-      console.log('[Supervisor] Todo en orden — sin acciones necesarias');
+      await notificar(
+        `👁 <b>Supervisor:</b> Todo en orden ✅\n` +
+        `${campanas.length} campaña(s) revisada(s) — sin acciones necesarias.`
+      );
     }
 
   } catch (err) {
