@@ -153,6 +153,8 @@ app.post('/api/lead', leadLimiter, async (req, res) => {
       return res.status(400).json({ ok: false, error: 'Nombre y teléfono requeridos' });
     }
 
+    const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
     const ts = new Date().toLocaleString('es-US', { timeZone: 'America/New_York' });
     const segmentoLabel = {
       'mal-credito':     '⚠️ Mal crédito',
@@ -165,21 +167,21 @@ app.post('/api/lead', leadLimiter, async (req, res) => {
     // Campos extra según segmento
     let extras = '';
     if (segmento === 'mal-credito') {
-      extras += negado      ? `\n❌ Le han negado antes: ${negado}`        : '';
-      extras += ingreso     ? `\n💼 Ingreso estable: ${ingreso}`           : '';
+      extras += negado      ? `\n❌ Le han negado antes: ${esc(negado)}`        : '';
+      extras += ingreso     ? `\n💼 Ingreso estable: ${esc(ingreso)}`           : '';
     }
     if (segmento === 'sin-credito') {
-      extras += ingreso     ? `\n💼 Tiene trabajo o negocio: ${ingreso}`   : '';
+      extras += ingreso     ? `\n💼 Tiene trabajo o negocio: ${esc(ingreso)}`   : '';
     }
     if (segmento === 'urgente') {
-      extras += cuando      ? `\n⏰ Necesita carro: ${cuando}`             : '';
+      extras += cuando      ? `\n⏰ Necesita carro: ${esc(cuando)}`             : '';
     }
     if (segmento === 'upgrade') {
-      extras += carro_actual ? `\n🚗 Carro actual: ${carro_actual}`        : '';
+      extras += carro_actual ? `\n🚗 Carro actual: ${esc(carro_actual)}`        : '';
     }
     if (segmento === 'oferta-especial') {
-      extras += carro_promo  ? `\n🔥 Carro de interés: ${carro_promo}`    : '';
-      extras += inicial      ? `\n💵 Inicial disponible: ${inicial}`       : '';
+      extras += carro_promo  ? `\n🔥 Carro de interés: ${esc(carro_promo)}`    : '';
+      extras += inicial      ? `\n💵 Inicial disponible: ${esc(inicial)}`       : '';
     }
 
     // Score del lead
@@ -189,8 +191,8 @@ app.post('/api/lead', leadLimiter, async (req, res) => {
     const msg =
       `🚗 <b>NUEVO LEAD — AutoAprobado Miami</b>\n` +
       `━━━━━━━━━━━━━━━━━━━━━━\n` +
-      `👤 <b>Nombre:</b> ${nombre}\n` +
-      `📱 <b>Teléfono:</b> ${telefono}\n` +
+      `👤 <b>Nombre:</b> ${esc(nombre)}\n` +
+      `📱 <b>Teléfono:</b> ${esc(telefono)}\n` +
       `🎯 <b>Situación:</b> ${segmentoLabel}` +
       extras + '\n' +
       `━━━━━━━━━━━━━━━━━━━━━━\n` +
