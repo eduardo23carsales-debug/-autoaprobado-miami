@@ -10,6 +10,7 @@ import TelegramBot from 'node-telegram-bot-api';
 import rateLimit from 'express-rate-limit';
 import axios from 'axios';
 import cron from 'node-cron';
+import crypto from 'crypto';
 import dotenv from 'dotenv';
 import { generarReporte } from './monitor-ads.js';
 import { bot as tgBot, manejarMensaje, manejarCallback } from './bot-telegram.js';
@@ -33,6 +34,48 @@ const WHATSAPP = [
 ];
 function nextWhatsApp() {
   return WHATSAPP[Math.floor(Date.now() / 1000) % 2];
+}
+
+// ── CAPI — enviar evento Lead a Meta Conversions API ─
+async function enviarEventoCAPI({ nombre, telefono, segmento, ip, userAgent }) {
+  try {
+    const pixelId = process.env.META_PIXEL_ID?.trim();
+    const token   = process.env.META_ACCESS_TOKEN?.trim();
+    if (!pixelId || !token) return;
+
+    const sha256 = v => crypto.createHash('sha256').update(v.toLowerCase().trim()).digest('hex');
+
+    // Normalizar teléfono para hashear
+    const telNorm = telefono.replace(/\D/g, '');
+
+    const payload = {
+      data: [{
+        event_name:       'Lead',
+        event_time:       Math.floor(Date.now() / 1000),
+        action_source:    'website',
+        event_source_url: 'https://oferta.hyundaipromomiami.com',
+        user_data: {
+          ph:         [sha256(telNorm)],
+          fn:         [sha256(nombre.split(' ')[0] || nombre)],
+          client_ip_address: ip,
+          client_user_agent: userAgent,
+        },
+        custom_data: {
+          lead_type: segmento || 'general',
+          currency:  'USD',
+        }
+      }]
+    };
+
+    await axios.post(
+      `https://graph.facebook.com/v25.0/${pixelId}/events`,
+      payload,
+      { params: { access_token: token }, timeout: 8000 }
+    );
+    console.log(`[CAPI] Evento Lead enviado — ${nombre}`);
+  } catch (err) {
+    console.warn(`[CAPI] Error (no crítico): ${err.response?.data?.error?.message || err.message}`);
+  }
 }
 
 // ── Rate limiting — máx 5 leads por IP por minuto ────
@@ -115,6 +158,15 @@ app.post('/api/lead', leadLimiter, async (req, res) => {
       `🕐 ${ts}`;
 
     await bot.sendMessage(CHAT_ID, msg, { parse_mode: 'HTML' });
+
+    // CAPI — enviar evento Lead a Meta server-side (no bloquea la respuesta)
+    enviarEventoCAPI({
+      nombre,
+      telefono,
+      segmento,
+      ip:        req.ip,
+      userAgent: req.headers['user-agent'] || ''
+    });
 
     // VAPI desactivado temporalmente — leads solo a Telegram
     // if (process.env.VAPI_API_KEY && process.env.VAPI_PHONE_NUMBER_ID) {
