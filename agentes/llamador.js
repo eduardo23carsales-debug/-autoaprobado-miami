@@ -242,6 +242,10 @@ ESTILO DE CONVERSACIÓN:
 - Si Eduardo dice "explícame más", das más detalle
 - Si dice "¿qué harías tú?", le dices exactamente lo que harías
 
+NÚMEROS — MUY IMPORTANTE:
+- Di SIEMPRE los números en palabras en español: "cinco leads", "tres campañas", "veinte por ciento", "dos dólares con cincuenta"
+- NUNCA uses dígitos al hablar: no "5 leads", no "3 campañas", no "20%"
+
 REGLAS IMPORTANTES:
 - Habla siempre en español
 - Nunca uses palabras técnicas sin explicarlas
@@ -257,14 +261,14 @@ CUÁNDO COLGAR:
         }]
       },
       voice: {
-        provider:         '11labs',
-        voiceId:          'EXAVITQu4vr4xnSDxMaL', // Sarah — voz natural, cálida, profesional
-        model:            'eleven_turbo_v2_5',
-        stability:        0.45,
-        similarityBoost:  0.80,
-        style:            0.30,
-        useSpeakerBoost:  true,
-        optimizeStreamingLatency: 3,
+        provider:                 '11labs',
+        voiceId:                  'jBpfuIE2acCO8z3wKNLl', // Belén — amable y suave
+        model:                    'eleven_turbo_v2_5',
+        stability:                0.55,
+        similarityBoost:          0.80,
+        style:                    0.10,
+        useSpeakerBoost:          true,
+        optimizeStreamingLatency: 2,
       },
       transcriber: {
         provider:   'deepgram',
