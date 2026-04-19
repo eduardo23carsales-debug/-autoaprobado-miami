@@ -6,6 +6,7 @@
 
 import { getCampanas, getMetricas, limpiarNombre, getSegmento,
          notificar, CHAT_ID, bot } from './utils.js';
+import { guardarPlan } from './plan-store.js';
 
 const PRESUPUESTO_MAXIMO_DIA = parseFloat(process.env.PRESUPUESTO_MAX_DIA || '30');
 
@@ -111,8 +112,9 @@ export async function ejecutarAnalista() {
       ]]
     };
 
-    // Si el plan es muy largo, guardarlo en memoria temporal
-    global._planPendiente = plan;
+    // Persistir plan en disco (sobrevive reinicios de Railway)
+    guardarPlan(plan);
+    global._planPendiente = plan; // compatibilidad hacia atrás
 
     const keyboardSimple = {
       inline_keyboard: [[

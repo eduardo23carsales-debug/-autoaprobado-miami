@@ -10,6 +10,7 @@ import fs           from 'fs';
 import path         from 'path';
 import { fileURLToPath } from 'url';
 import { generarReporte } from './monitor-ads.js';
+import { cargarPlan, marcarEjecutado, limpiarPlan } from './agentes/plan-store.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -584,14 +585,15 @@ async function manejarCallback(query) {
     // ── Aprobar plan del Analista ────────────────────
     if (data === 'aprobar_plan') {
       await bot.answerCallbackQuery(queryId, { text: '✅ Ejecutando plan...' });
-      const plan = global._planPendiente;
+      const plan = cargarPlan() || global._planPendiente;
       if (!plan) {
-        await bot.sendMessage(chatId, '⚠️ No hay plan pendiente (el bot se reinició). Ejecuta /analista para generar uno nuevo.');
+        await bot.sendMessage(chatId, '⚠️ No hay plan pendiente o ya expiró (24h). Ejecuta /analista para generar uno nuevo.');
         return;
       }
       await bot.sendMessage(chatId, '⚡ Ejecutando plan aprobado...');
       const { ejecutarPlan } = await import('./agentes/ejecutor.js');
       await ejecutarPlan(plan);
+      marcarEjecutado();
       global._planPendiente = null;
       return;
     }
@@ -599,6 +601,7 @@ async function manejarCallback(query) {
     // ── Ignorar plan del Analista ────────────────────
     if (data === 'ignorar_plan') {
       await bot.answerCallbackQuery(queryId, { text: '❌ Plan ignorado' });
+      limpiarPlan();
       global._planPendiente = null;
       return;
     }
