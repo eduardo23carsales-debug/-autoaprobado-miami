@@ -7,6 +7,7 @@
 import { getCampanas, getMetricas, limpiarNombre, getSegmento,
          notificar, CHAT_ID, bot } from './utils.js';
 import { guardarPlan } from './plan-store.js';
+import { obtenerResumen } from './leads-store.js';
 
 const PRESUPUESTO_MAXIMO_DIA = parseFloat(process.env.PRESUPUESTO_MAX_DIA || '30');
 
@@ -15,15 +16,26 @@ async function analizarConIA(datos) {
   const { default: Anthropic } = await import('@anthropic-ai/sdk');
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const msg = await anthropic.messages.create({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 800,
-    system: `Eres el analista de campañas de Meta Ads para AutoAprobado Miami, un dealer de carros en Miami que vende a personas con mal crédito.
-Recibes métricas de campañas y debes generar un plan de acción concreto.
+    model: 'claude-sonnet-4-6',
+    max_tokens: 1200,
+    system: `Eres el analista senior de campañas de Meta Ads para AutoAprobado Miami, un dealer de carros en Miami que ayuda a hispanos con mal crédito o sin historial crediticio.
+
+Tu trabajo es analizar métricas reales y tomar decisiones de negocio concretas — no solo optimizar CPL, sino maximizar ventas cerradas.
+
+Criterios de decisión:
+- CPL < $5 con leads = escalar (máximo 20% de aumento)
+- Gasto sin leads = pausar
+- Segmentos con mejor tasa de cierre histórica = priorizar
+- No crear campañas duplicadas del mismo segmento
+
 Responde SOLO con JSON válido, sin texto adicional.`,
     messages: [{
       role: 'user',
       content: `Métricas de los últimos 7 días:
 ${JSON.stringify(datos, null, 2)}
+
+Resumen de conversión real (leads → ventas):
+${JSON.stringify(obtenerResumen(), null, 2)}
 
 Presupuesto máximo disponible por día: $${PRESUPUESTO_MAXIMO_DIA}
 
