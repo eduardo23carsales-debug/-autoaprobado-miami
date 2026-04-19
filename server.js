@@ -40,42 +40,44 @@ function nextWhatsApp() {
 }
 
 // ── CAPI — enviar evento Lead a Meta Conversions API ─
-async function enviarEventoCAPI({ nombre, telefono, segmento, ip, userAgent }) {
+async function enviarEventoCAPI({ nombre, telefono, segmento, ip, userAgent, eventId = null, eventName = 'Lead', valor = null }) {
   try {
     const pixelId = process.env.META_PIXEL_ID?.trim();
     const token   = process.env.META_ACCESS_TOKEN?.trim();
     if (!pixelId || !token) return;
 
-    const sha256 = v => crypto.createHash('sha256').update(v.toLowerCase().trim()).digest('hex');
-
-    // Normalizar teléfono para hashear
+    const sha256  = v => crypto.createHash('sha256').update(v.toLowerCase().trim()).digest('hex');
     const telNorm = telefono.replace(/\D/g, '');
+    // event_id único para deduplicar con el pixel del browser — evita contar doble
+    const evId = eventId || `${eventName.toLowerCase()}_${telNorm}_${Date.now()}`;
 
-    const payload = {
-      data: [{
-        event_name:       'Lead',
-        event_time:       Math.floor(Date.now() / 1000),
-        action_source:    'website',
-        event_source_url: 'https://oferta.hyundaipromomiami.com',
-        user_data: {
-          ph:         [sha256(telNorm)],
-          fn:         [sha256(nombre.split(' ')[0] || nombre)],
-          client_ip_address: ip,
-          client_user_agent: userAgent,
-        },
-        custom_data: {
-          lead_type: segmento || 'general',
-          currency:  'USD',
-        }
-      }]
+    const eventoData = {
+      event_name:       eventName,
+      event_time:       Math.floor(Date.now() / 1000),
+      event_id:         evId,
+      action_source:    'website',
+      event_source_url: 'https://oferta.hyundaipromomiami.com',
+      user_data: {
+        ph:                [sha256(telNorm)],
+        fn:                [sha256(nombre.split(' ')[0] || nombre)],
+        ln:                nombre.includes(' ') ? [sha256(nombre.split(' ').slice(1).join(' '))] : undefined,
+        client_ip_address: ip,
+        client_user_agent: userAgent,
+      },
+      custom_data: {
+        lead_type: segmento || 'general',
+        currency:  'USD',
+        ...(valor ? { value: valor } : {})
+      }
     };
 
     await axios.post(
       `https://graph.facebook.com/v25.0/${pixelId}/events`,
-      payload,
+      { data: [eventoData] },
       { params: { access_token: token }, timeout: 8000 }
     );
-    console.log(`[CAPI] Evento Lead enviado — ${nombre}`);
+    console.log(`[CAPI] Evento ${eventName} enviado — ${nombre} (id: ${evId})`);
+    return evId;
   } catch (err) {
     console.warn(`[CAPI] Error (no crítico): ${err.response?.data?.error?.message || err.message}`);
   }
@@ -258,6 +260,44 @@ app.post('/api/lead', leadLimiter, async (req, res) => {
 // ── Health check ─────────────────────────────────────
 app.get('/api/ping', (req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
 
+// ── POST /api/venta — Registra venta cerrada y manda Purchase a Meta CAPI ──
+// Uso desde Telegram: /venta <telefono> [valor]
+// Esto enseña a Meta quién COMPRA carros, no solo quien llena formularios
+app.post('/api/venta', async (req, res) => {
+  try {
+    const { telefono, nombre = 'Cliente', valor = 15000, segmento = 'general' } = req.body;
+    if (!telefono) return res.status(400).json({ ok: false, error: 'Teléfono requerido' });
+
+    // Marcar como cerrado en leads-store
+    const lead = marcarCerrado(telefono);
+
+    // Enviar Purchase a Meta CAPI — entrena el algoritmo para buscar compradores reales
+    await enviarEventoCAPI({
+      nombre:    lead?.nombre || nombre,
+      telefono,
+      segmento:  lead?.segmento || segmento,
+      ip:        req.ip,
+      userAgent: req.headers['user-agent'] || '',
+      eventName: 'Purchase',
+      valor:     parseFloat(valor),
+    });
+
+    await bot.sendMessage(CHAT_ID,
+      `🎉 <b>¡VENTA CERRADA!</b>\n` +
+      `👤 ${lead?.nombre || nombre}\n` +
+      `📱 ${telefono}\n` +
+      `💵 Valor: $${valor}\n` +
+      `📊 <i>Evento Purchase enviado a Meta — el algoritmo aprende quién compra</i>`,
+      { parse_mode: 'HTML' }
+    );
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[Venta] Error:', err.message);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 // ════════════════════════════════════════════════════
 // Webhook de Meta Lead Ads — recibe leads en tiempo real
 // ════════════════════════════════════════════════════
@@ -303,19 +343,75 @@ app.post('/api/meta/webhook', async (req, res) => {
         const campana  = lead.campaign_name || '—';
         const adNombre = lead.ad_name || '—';
 
+        // Extraer campos de las nuevas preguntas de calificación
+        const tieneIngreso  = campos.tiene_ingreso      || '';
+        const cuandoNecesita = campos.cuando_necesita   || '';
+        const inicialDisp   = campos.inicial_disponible || '';
+        const tieneCarro    = campos.tiene_carro        || '';
+        const tiempoUsa     = campos.tiempo_en_usa      || '';
+
+        // Detectar segmento desde nombre de campaña
+        const segmento = campana.toLowerCase().includes('mal') ? 'mal-credito'
+          : campana.toLowerCase().includes('sin') ? 'sin-credito'
+          : campana.toLowerCase().includes('urgente') ? 'urgente'
+          : campana.toLowerCase().includes('upgrade') ? 'upgrade'
+          : campana.toLowerCase().includes('oferta') ? 'oferta-especial'
+          : 'mal-credito';
+
+        // Score del lead con las nuevas preguntas
+        const score = scoreLead({
+          segmento,
+          ingreso:  tieneIngreso,
+          cuando:   cuandoNecesita,
+          inicial:  inicialDisp,
+        });
+
+        const telLimpio = telefono.replace(/\D/g, '');
+        const extras = [
+          tieneIngreso   ? `💼 Ingreso: ${tieneIngreso}`       : '',
+          cuandoNecesita ? `⏰ Cuándo: ${cuandoNecesita}`      : '',
+          inicialDisp    ? `💵 Inicial: ${inicialDisp}`        : '',
+          tieneCarro     ? `🚗 Carro trade-in: ${tieneCarro}`  : '',
+          tiempoUsa      ? `🇺🇸 En USA: ${tiempoUsa}`          : '',
+          califica       ? `💬 ${califica}`                    : '',
+        ].filter(Boolean).join('\n');
+
         const msg =
           `🚗 <b>NUEVO LEAD — Facebook Lead Ads</b>\n` +
           `━━━━━━━━━━━━━━━━━━━━━━\n` +
           `👤 <b>Nombre:</b> ${nombre}\n` +
           `📱 <b>Teléfono:</b> ${telefono}\n` +
-          (califica ? `💬 <b>Calificación:</b> ${califica}\n` : '') +
+          (extras ? `${extras}\n` : '') +
           `━━━━━━━━━━━━━━━━━━━━━━\n` +
-          `📢 <b>Campaña:</b> ${campana}\n` +
-          `🎯 <b>Anuncio:</b> ${adNombre}\n` +
+          `${score.emoji} <b>Score: ${score.label}</b>${score.razones.length ? ` — ${score.razones.join(', ')}` : ''}\n` +
+          `📢 ${campana}\n` +
           `🕐 ${ts}`;
 
-        await bot.sendMessage(CHAT_ID, msg, { parse_mode: 'HTML' });
-        console.log(`[Lead Ads] Lead recibido: ${nombre} — ${telefono}`);
+        const keyboard = {
+          inline_keyboard: [[
+            { text: '✅ Vendido',     callback_data: `cerrado:${telLimpio}` },
+            { text: '📵 No contestó', callback_data: `no_contesto:${telLimpio}` },
+            { text: '💬 WhatsApp',    url: `https://wa.me/${telLimpio}` }
+          ]]
+        };
+
+        await bot.sendMessage(CHAT_ID, msg, { parse_mode: 'HTML', reply_markup: keyboard });
+
+        // Registrar en leads-store
+        registrarLead({ nombre, telefono, segmento, score: score.label });
+
+        // CAPI — deduplicar con event_id basado en leadgen_id
+        enviarEventoCAPI({ nombre, telefono, segmento, ip: '0.0.0.0', userAgent: 'Meta Lead Ads', eventId: `leadgen_${leadgen_id}` });
+
+        // VAPI — llamar de 9AM a 8PM ET
+        if (process.env.VAPI_API_KEY && process.env.VAPI_PHONE_NUMBER_ID && telefono !== '—') {
+          const horaET = new Date().toLocaleString('en-US', { timeZone: 'America/New_York', hour: 'numeric', hour12: false });
+          if (parseInt(horaET) >= 9 && parseInt(horaET) < 20) {
+            try { programarLlamada({ nombre, telefono, segmento }); } catch {}
+          }
+        }
+
+        console.log(`[Lead Ads] Lead recibido: ${nombre} — ${telefono} — Score: ${score.label}`);
       }
     }
   } catch (err) {

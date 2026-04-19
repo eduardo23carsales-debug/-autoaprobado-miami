@@ -361,7 +361,7 @@ const MENU_PRINCIPAL = {
   ]
 };
 
-const AYUDA = `📋 <b>Menú AutoAprobado Miami</b>\n\nEscribe /menu para ver los botones, o usa los comandos directos abajo.\n\n/nueva — crear campaña\n/retargeting [presupuesto] — campaña visitantes que no convirtieron\n/lookalike — audiencia lookalike del 1% más similar a tus leads\n/pausa — pausar campaña\n/activa — activar campaña\n/presupuesto — cambiar presupuesto\n/reporte — métricas de hoy\n/mejor — mejor campaña\n/ventas — tasa de cierre y leads\n/analista — análisis IA\n/supervisor — revisar campañas`;
+const AYUDA = `📋 <b>Menú AutoAprobado Miami</b>\n\nEscribe /menu para ver los botones, o usa los comandos directos abajo.\n\n/nueva — crear campaña\n/retargeting [presupuesto] — campaña visitantes que no convirtieron\n/lookalike — audiencia lookalike del 1% más similar a tus leads\n/pausa — pausar campaña\n/activa — activar campaña\n/presupuesto — cambiar presupuesto\n/reporte — métricas de hoy\n/mejor — mejor campaña\n/ventas — tasa de cierre y leads\n/venta &lt;tel&gt; [valor] — registra venta y entrena algoritmo Meta\n/analista — análisis IA\n/supervisor — revisar campañas`;
 
 // ── Manejador principal de mensajes ──────────────────
 async function manejarMensaje(msg) {
@@ -410,6 +410,30 @@ async function manejarMensaje(msg) {
         await bot.sendMessage(chatId, `✅ <b>¡Venta cerrada!</b> — ${lead.nombre}\n📱 ${lead.telefono}`, { parse_mode: 'HTML' });
       } else {
         await bot.sendMessage(chatId, `⚠️ No encontré un lead con ese teléfono.`);
+      }
+      return;
+    }
+
+    // /venta — registra venta + manda Purchase a Meta CAPI (entrena algoritmo)
+    // Uso: /venta 7861234567 [valor]
+    if (cmd === '/venta') {
+      const telefono = args[0];
+      const valor    = parseFloat(args[1]) || 15000;
+      if (!telefono) {
+        await bot.sendMessage(chatId,
+          `🎉 <b>Registrar venta cerrada</b>\n\nUso: /venta &lt;teléfono&gt; [valor]\n\nEjemplo: <code>/venta 7861234567 18000</code>\n\n<i>Esto manda evento Purchase a Meta — el algoritmo aprende quién compra y mejora la calidad de los próximos leads.</i>`,
+          { parse_mode: 'HTML' }
+        );
+        return;
+      }
+      try {
+        await axios.post(`http://localhost:${process.env.PORT || 3000}/api/venta`, { telefono, valor });
+        await bot.sendMessage(chatId,
+          `🎉 <b>¡Venta registrada!</b>\n📱 ${telefono}\n💵 $${valor}\n\n📊 <i>Purchase enviado a Meta — en 2-3 días el algoritmo mejora la calidad de leads</i>`,
+          { parse_mode: 'HTML' }
+        );
+      } catch (e) {
+        await bot.sendMessage(chatId, `⚠️ Error registrando venta: ${e.message}`);
       }
       return;
     }
