@@ -261,6 +261,61 @@ app.post('/api/lead', leadLimiter, async (req, res) => {
 // ── Health check ─────────────────────────────────────
 app.get('/api/ping', (req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
 
+// ── GET /inventario.xml — Feed de inventario para Meta Catalog ───────────
+// Meta descarga este feed automáticamente cada 24h
+app.get('/inventario.xml', (req, res) => {
+  const DISCLAIMER = 'Sujeto a aprobacion de credito, plazo, inicial y tasa aplicable. Terminos en el dealer.';
+  const BASE = 'https://oferta.hyundaipromomiami.com';
+  const LANDING = BASE;
+
+  const vehiculos = [
+    { id: 'elantra-2026',  title: 'Hyundai Elantra 2026',  mensual: 299, foto: 'general-elantra.png',   body: 'SEDAN',     color: 'Gris Metalico',   model: 'Elantra'  },
+    { id: 'venue-2026',    title: 'Hyundai Venue 2026',    mensual: 335, foto: 'general-venue.png',     body: 'CROSSOVER', color: 'Blanco Perlado',  model: 'Venue'    },
+    { id: 'kona-2026',     title: 'Hyundai Kona 2026',     mensual: 355, foto: 'general-kona.png',      body: 'CROSSOVER', color: 'Azul Electrico',  model: 'Kona'     },
+    { id: 'tucson-2026',   title: 'Hyundai Tucson 2026',   mensual: 359, foto: 'general-tucson.png',    body: 'SUV',       color: 'Blanco Perlado',  model: 'Tucson'   },
+    { id: 'sonata-2026',   title: 'Hyundai Sonata 2026',   mensual: 359, foto: 'general-sonata.png',    body: 'SEDAN',     color: 'Negro Onix',      model: 'Sonata'   },
+    { id: 'santa-fe-2026', title: 'Hyundai Santa Fe 2026', mensual: 475, foto: 'general-santa-fe.png',  body: 'SUV',       color: 'Rojo Veloz',      model: 'Santa Fe' },
+    { id: 'palisade-2026', title: 'Hyundai Palisade 2026', mensual: 555, foto: 'general-palisade.png',  body: 'SUV',       color: 'Blanco Perlado',  model: 'Palisade' },
+  ];
+
+  const items = vehiculos.map(v => `
+    <item>
+      <id>${v.id}</id>
+      <title>${v.title} - Pagos desde $${v.mensual}/mes*</title>
+      <description>Pagos desde $${v.mensual}/mes* en AutoAprobado Miami. Aprobamos aunque tengas mal credito o sin historial en USA. Proceso 100% en espanol. *${DISCLAIMER}</description>
+      <availability>in stock</availability>
+      <condition>new</condition>
+      <price>${v.mensual} USD</price>
+      <link>${LANDING}?utm_source=catalog&amp;utm_medium=dynamic&amp;utm_campaign=${v.id}</link>
+      <image_link>${BASE}/photos/${v.foto}</image_link>
+      <brand>Hyundai</brand>
+      <vehicle_model>${v.model}</vehicle_model>
+      <vehicle_make>Hyundai</vehicle_make>
+      <vehicle_year>2026</vehicle_year>
+      <body_style>${v.body}</body_style>
+      <exterior_color>${v.color}</exterior_color>
+      <fuel_type>gasoline</fuel_type>
+      <transmission>automatic</transmission>
+      <state_of_vehicle>new</state_of_vehicle>
+      <mileage>0 mi</mileage>
+      <dealer_name>AutoAprobado Miami</dealer_name>
+      <dealer_phone>+17869167339</dealer_phone>
+    </item>`).join('');
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">
+  <channel>
+    <title>AutoAprobado Miami — Inventario Hyundai 2026</title>
+    <link>${LANDING}</link>
+    <description>Inventario Hyundai 2026 con financiamiento para hispanos en Miami</description>
+    ${items}
+  </channel>
+</rss>`;
+
+  res.set('Content-Type', 'application/xml');
+  res.send(xml);
+});
+
 // ── POST /api/venta — Registra venta cerrada y manda Purchase a Meta CAPI ──
 // Uso desde Telegram: /venta <telefono> [valor]
 // Esto enseña a Meta quién COMPRA carros, no solo quien llena formularios
