@@ -320,6 +320,39 @@ app.get('/inventario.xml', (req, res) => {
   res.send(xml);
 });
 
+// ── GET /inventario.csv — Feed CSV para Meta Vehicle Catalog ─────────────
+app.get('/inventario.csv', (req, res) => {
+  const BASE    = 'https://oferta.hyundaipromomiami.com';
+  const LANDING = BASE;
+  const DISCLAIMER = 'Sujeto a aprobacion de credito. Terminos en el dealer.';
+
+  const vehiculos = [
+    { id: 'elantra-2026',   title: 'Hyundai Elantra 2026',   mensual: 299, foto: 'general-elantra.png',   body: 'SEDAN',     color: 'Gris Metalico',  model: 'Elantra'   },
+    { id: 'venue-2026',     title: 'Hyundai Venue 2026',     mensual: 335, foto: 'general-venue.png',     body: 'CROSSOVER', color: 'Blanco Perlado', model: 'Venue'     },
+    { id: 'kona-2026',      title: 'Hyundai Kona 2026',      mensual: 355, foto: 'general-kona.png',      body: 'CROSSOVER', color: 'Azul Electrico', model: 'Kona'      },
+    { id: 'tucson-2026',    title: 'Hyundai Tucson 2026',    mensual: 359, foto: 'general-tucson.png',    body: 'SUV',       color: 'Blanco Perlado', model: 'Tucson'    },
+    { id: 'sonata-2026',    title: 'Hyundai Sonata 2026',    mensual: 359, foto: 'general-sonata.png',    body: 'SEDAN',     color: 'Negro Onix',     model: 'Sonata'    },
+    { id: 'santa-fe-2026',  title: 'Hyundai Santa Fe 2026',  mensual: 475, foto: 'general-santa-fe.png',  body: 'SUV',       color: 'Rojo Veloz',     model: 'Santa Fe'  },
+    { id: 'palisade-2026',  title: 'Hyundai Palisade 2026',  mensual: 555, foto: 'general-palisade.png',  body: 'SUV',       color: 'Blanco Perlado', model: 'Palisade'  },
+  ];
+
+  const header = 'vehicle_id,make,model,year,vin,mileage.value,mileage.unit,body_style,title,description,price,image[0].url,url,availability,fuel_type,transmission,exterior_color,state_of_vehicle,address.city,address.region,address.country,address.postal_code';
+
+  const rows = vehiculos.map(v => {
+    const vin = `KMH${v.id.toUpperCase().replace(/-/g,'').slice(0,8)}26`.padEnd(17,'0').slice(0,17);
+    const title = `${v.title} - Pagos desde $${v.mensual}/mes*`;
+    const desc  = `Pagos desde $${v.mensual}/mes* en AutoAprobado Miami. Aprobamos aunque tengas mal credito o sin historial. *${DISCLAIMER}`;
+    const url   = `${LANDING}?utm_source=catalog&utm_medium=dynamic&utm_campaign=${v.id}`;
+    const img   = `${BASE}/photos/${v.foto}`;
+    const price = `${v.mensual}.00 USD`;
+    const fields = [v.id,'Hyundai',v.model,'2026',vin,'0','MI',v.body,title,desc,price,img,url,'available','gasoline','automatic',v.color,'new','Miami','FL','US','33122'];
+    return fields.map(f => `"${String(f).replace(/"/g,'""')}"`).join(',');
+  });
+
+  res.set('Content-Type', 'text/csv; charset=utf-8');
+  res.send([header, ...rows].join('\n'));
+});
+
 // ── POST /api/venta — Registra venta cerrada y manda Purchase a Meta CAPI ──
 // Uso desde Telegram: /venta <telefono> [valor]
 // Esto enseña a Meta quién COMPRA carros, no solo quien llena formularios
