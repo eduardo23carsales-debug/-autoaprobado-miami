@@ -1,5 +1,5 @@
 # PLAN — AutoAprobado Miami + Infraestructura Agencia
-> Archivo vivo. Actualizar cada sesión. Última actualización: 2026-04-18
+> Archivo vivo. Actualizar cada sesión. Última actualización: 2026-04-18 (sesión 2)
 
 ---
 
@@ -28,7 +28,7 @@ Eduardo solo supervisa — los agentes trabajan solos.
 
 ---
 
-## ESTADO ACTUAL — Completado al 2026-04-16
+## ESTADO ACTUAL — Completado al 2026-04-18
 
 ### ✅ Base del sistema
 - Landing page en producción — https://oferta.hyundaipromomiami.com
@@ -49,9 +49,36 @@ Eduardo solo supervisa — los agentes trabajan solos.
 - Script subir-fotos-videos.bat para nuevos assets
 
 ### ✅ 3 Agentes Autónomos
-- **Analista** — 8 AM ET diario, analiza 7 días con Claude Haiku, genera plan con botones ✅/❌
-- **Supervisor** — cada 4 horas, auto-pausa si gasta sin leads, auto-escala si CPL < $5
+- **Analista** — 8 AM ET diario, analiza 7 días con Claude **Sonnet** (upgrade desde Haiku), genera plan con botones ✅/❌. Recibe datos reales de cierres para optimizar por ventas, no solo CPL
+- **Supervisor** — cada 4 horas, auto-pausa si gasta sin leads, auto-escala máximo **20%** (antes 50%)
 - **Ejecutor** — ejecuta el plan aprobado por Eduardo
+- **Plan persistido en disco** — sobrevive reinicios de Railway, TTL 24h (agentes/plan-store.js)
+
+### ✅ Cumplimiento Meta Ads (2026-04-18)
+- Disclaimer financiero en todos los copies: `*Pagos desde $299/mes. Sujeto a aprobación de crédito...`
+- Eliminados precios específicos por modelo (riesgo de rechazo)
+- Copy "El banco dijo NO" reemplazado por lenguaje sin discriminación crediticia
+
+### ✅ CAPI — Conversions API (2026-04-18)
+- Evento `Lead` enviado server-side a Meta con teléfono y nombre hasheados (SHA256)
+- Incluye IP y user-agent para mejor match rate
+- Bypass de iOS 14 y adblockers — Meta optimiza con señal completa
+
+### ✅ Lead Scoring (2026-04-18)
+- Cada lead llega a Telegram con score: 🔥 Caliente / 🟡 Tibio / 🔵 Frío
+- Basado en respuestas del formulario (ingreso, urgencia, inicial disponible)
+
+### ✅ Loop de Conversión (2026-04-18)
+- `agentes/leads-store.js` — registra todos los leads con estado
+- Botones inline en cada lead: ✅ Vendido / 📵 No contestó / 💬 WhatsApp
+- Comando `/cerrado <tel>` para marcar venta manualmente
+- Comando `/ventas` — resumen: total leads, cerrados, tasa de cierre
+- Analista recibe tasa de cierre real para tomar mejores decisiones
+
+### ✅ VAPI Reactivado con Horario (2026-04-18)
+- Llama automáticamente de **9 AM a 8 PM ET**
+- Fuera de horario: solo Telegram, sin llamada
+- Asistente David — ElevenLabs Turbo v2.5, prompt con Eduardo Ferrer y Jorge Martínez
 
 ### ✅ Generador de proyectos
 - `crear-proyecto.js` — genera proyecto completo desde CLI
@@ -142,9 +169,12 @@ bot-telegram.js            ← Comandos + botones inline + menú
 meta-ads-carros.js         ← Creador de campañas Meta Ads
 monitor-ads.js             ← Reporte de métricas
 agentes/
-  ├── analista.js          ← 8 AM ET, Claude Haiku, plan JSON
+  ├── analista.js          ← 8 AM ET, Claude Sonnet, plan JSON
   ├── ejecutor.js          ← Ejecuta plan aprobado
-  ├── supervisor.js        ← Cada 4h, reglas automáticas
+  ├── supervisor.js        ← Cada 4h, reglas automáticas, ramp-up 20%
+  ├── llamador.js          ← VAPI agente David, horario 9AM-8PM ET
+  ├── plan-store.js        ← Persiste plan en disco con TTL 24h
+  ├── leads-store.js       ← Registra leads y cierres para loop de conversión
   └── utils.js             ← Helpers Meta API compartidos
 photos/                    ← 15 fotos reales Hyundai
 videos/                    ← Videos (vacío, listo para agregar)
@@ -174,3 +204,7 @@ INFRAESTRUCTURA.md         ← Visión completa multi-proyecto + roadmap
 | `LIMITE_ESCALAR_SOLO` | Máximo que Supervisor sube solo |
 | `LIMITE_GASTO_SIN_LEAD` | Pausa automática si gasta esto sin leads |
 | `RAILWAY_PUBLIC_DOMAIN` | Automático en Railway |
+| `VAPI_API_KEY` | Token VAPI |
+| `VAPI_PUBLIC_KEY` | Clave pública VAPI |
+| `VAPI_PHONE_NUMBER_ID` | ID del número VAPI |
+| `VAPI_ASSISTANT_ID` | `c3fef418-2ae3-456e-b0e6-c943701929fc` — asistente David |
