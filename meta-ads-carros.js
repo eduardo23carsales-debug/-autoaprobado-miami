@@ -330,17 +330,14 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
     horasActivas.push({ start_minute: 420, end_minute: 1380, days: [dia] });
   }
 
-  // Targeting — Miami + hispanohablantes + móvil
+  // Targeting — Miami DMA + hispanohablantes + móvil
+  // FINANCIAL_PRODUCTS_SERVICES no permite custom_locations con radio — usar DMA o ciudad
   const targeting = {
     age_min: edad.min,
     age_max: edad.max,
     geo_locations: {
-      custom_locations: [{
-        latitude:      25.7617,
-        longitude:     -80.1918,
-        radius:        40,
-        distance_unit: 'mile'
-      }]
+      geo_markets: [{ key: '528' }], // Miami-Ft. Lauderdale-Hollywood DMA
+      location_types: ['home', 'recent']
     },
     locales:          [27],
     device_platforms: ['mobile'],
@@ -355,11 +352,6 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
     billing_event: 'IMPRESSIONS',
     optimization_goal: esLeadAd ? 'LEAD_GENERATION' : 'OFFSITE_CONVERSIONS',
     destination_type:  esLeadAd ? 'ON_AD'           : 'WEBSITE',
-    bid_strategy: 'LOWEST_COST_WITHOUT_CAP',
-    attribution_spec: [
-      { event_type: 'CLICK_THROUGH', window_days: 7 },
-      { event_type: 'VIEW_THROUGH',  window_days: 1 }
-    ],
     promoted_object: esLeadAd
       ? { page_id: PAGE_ID }
       : { pixel_id: PIXEL_ID, custom_event_type: 'LEAD' },
@@ -619,7 +611,8 @@ export async function crearCampanaRetargeting(presupuestoDiario = 10) {
       age_min: 18,
       age_max: 65,
       geo_locations: {
-        custom_locations: [{ latitude: 25.7617, longitude: -80.1918, radius: 40, distance_unit: 'mile' }]
+        geo_markets: [{ key: '528' }],
+        location_types: ['home', 'recent']
       },
       locales: [27],
       device_platforms: ['mobile'],
