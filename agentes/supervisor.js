@@ -42,8 +42,9 @@ export async function ejecutarSupervisor() {
       }
 
       // ── Regla 2: Escalar si tiene leads con buen CPL ──
+      // Máximo 20% por ajuste — Meta reinicia la fase de aprendizaje con saltos bruscos
       if (m.leads > 0 && m.cpl !== null && m.cpl < 5) {
-        const presupuestoNuevo = presupuesto * 1.5; // subir 50%
+        const presupuestoNuevo = Math.round((presupuesto * 1.20) * 100) / 100;
         const aumento = presupuestoNuevo - presupuesto;
 
         if (aumento <= LIMITE_ESCALAR_SOLO) {
