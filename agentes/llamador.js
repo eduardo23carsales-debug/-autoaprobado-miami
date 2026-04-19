@@ -173,7 +173,16 @@ export async function llamarLead(lead) {
         },
         assistantOverrides: {
           variableValues: { nombre, segmento: segmentoTexto },
-          firstMessage: `Hola, ¿hablo con ${nombre}? Le llama Sofía de AutoAprobado Miami, vi que se registró para información sobre financiamiento de carros y que ${segmentoTexto}. ¿Tiene un momentito para hablar?`
+          firstMessage: `Hola, ¿hablo con ${nombre}? Le llama Sofía de AutoAprobado Miami, vi que se registró para información sobre financiamiento de carros y que ${segmentoTexto}. ¿Tiene un momentito para hablar?`,
+          voice: {
+            provider:  '11labs',
+            voiceId:   'jBpfuIE2acCO8z3wKNLl',
+            model:     'eleven_turbo_v2_5',
+            stability: 0.55,
+            similarityBoost: 0.75,
+            style:     0.10,
+            optimizeStreamingLatency: 2,
+          }
         }
       },
       {
@@ -190,7 +199,7 @@ export async function llamarLead(lead) {
       `📞 <b>Llamando a ${nombre}</b>\n` +
       `📱 ${telefono}\n` +
       `🎯 ${segmentoTexto}\n` +
-      `🤖 Agente Carlos en línea...`
+      `🤖 Sofía en línea...`
     );
 
     return call.id;

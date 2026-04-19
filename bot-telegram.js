@@ -768,6 +768,16 @@ async function manejarCallback(query) {
       return;
     }
 
+    // ── Rellamar lead ────────────────────────────────
+    if (data.startsWith('rellamar:')) {
+      const [, telefono, ...nombreParts] = data.split(':');
+      const nombre = nombreParts.join(':') || 'Lead';
+      await bot.answerCallbackQuery(queryId, { text: '📞 Llamando...' });
+      const { llamarLead } = await import('./agentes/llamador.js');
+      await llamarLead({ nombre, telefono, segmento: 'oferta-especial' });
+      return;
+    }
+
     await bot.answerCallbackQuery(queryId);
 
   } catch (err) {
