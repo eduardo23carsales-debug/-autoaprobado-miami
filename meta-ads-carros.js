@@ -422,7 +422,7 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
           description: '✅ Verificación gratis — sin compromiso',
           call_to_action: { type: cta, value: ctaValue }
         };
-        if (!esLeadAd) linkData.link = landingUTM;
+        linkData.link = landingUTM; // requerido por Meta API siempre, incluso en Lead Ads
         if (imageHash)  linkData.image_hash = imageHash;
         objectStorySpec = { page_id: PAGE_ID, link_data: linkData };
       }
