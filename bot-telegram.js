@@ -600,6 +600,20 @@ async function manejarMensaje(msg) {
       return;
     }
 
+    // /testvoz — llamada de prueba inmediata para verificar voz de Sofía
+    if (cmd === '/testvoz') {
+      await bot.sendMessage(chatId, '📞 Llamando ahora con Sofía (voz Belén)...');
+      try {
+        const { llamarLead } = await import('./agentes/llamador.js');
+        const tel = (process.env.WHATSAPP_EDUARDO || '17869167339').replace(/\D/g, '');
+        const telE164 = tel.startsWith('1') && tel.length === 11 ? `+${tel}` : `+1${tel}`;
+        await llamarLead({ nombre: 'Eduardo', telefono: telE164, segmento: 'oferta-especial' });
+      } catch (e) {
+        await bot.sendMessage(chatId, `❌ Error: <code>${e.message}</code>`, { parse_mode: 'HTML' });
+      }
+      return;
+    }
+
     // No reconocido — mostrar menú
     await bot.sendMessage(chatId, '🤖 <b>AutoAprobado Miami</b> — ¿Qué hacemos?', {
       parse_mode: 'HTML', reply_markup: MENU_PRINCIPAL
