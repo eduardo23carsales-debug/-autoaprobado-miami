@@ -29,11 +29,17 @@ const pendientes = new Map();
 
 // ── Helpers Meta API ─────────────────────────────────
 async function metaGet(endpoint, params = {}) {
-  const { data } = await axios.get(`${API}${endpoint}`, {
-    params: { ...params, access_token: TOKEN },
-    timeout: 15000
-  });
-  return data;
+  try {
+    const { data } = await axios.get(`${API}${endpoint}`, {
+      params: { ...params, access_token: TOKEN },
+      timeout: 15000
+    });
+    return data;
+  } catch (err) {
+    const meta = err.response?.data?.error;
+    const msg  = meta ? `Meta ${meta.code}: ${meta.message}` : err.message;
+    throw new Error(msg);
+  }
 }
 
 async function metaPost(endpoint, body) {
@@ -46,13 +52,11 @@ async function metaPost(endpoint, body) {
 
 // ── Obtener campañas AutoAprobado ────────────────────
 async function getCampanas(soloActivas = false) {
-  const filtering = [{ field: 'name', operator: 'CONTAIN', value: 'AutoAprobado' }];
   const data = await metaGet(`/${AD_ACCOUNT}/campaigns`, {
     fields: 'id,name,status,effective_status,daily_budget',
-    filtering: JSON.stringify(filtering),
     limit: 50
   });
-  const campanas = data.data || [];
+  const campanas = (data.data || []).filter(c => c.name.includes('AutoAprobado'));
   return soloActivas ? campanas.filter(c => c.effective_status === 'ACTIVE') : campanas;
 }
 
