@@ -6,6 +6,9 @@
 import { metaPost, getCampanas, limpiarNombre, notificar, AD_ACCOUNT } from './utils.js';
 import { crearCampanaSegmento } from '../meta-ads-carros.js';
 
+// Helper para escapar texto dinámico en mensajes HTML de Telegram
+const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
 // ── Ejecutar plan aprobado ───────────────────────────
 export async function ejecutarPlan(plan) {
   console.log('[Ejecutor] Ejecutando plan aprobado...');
@@ -17,10 +20,10 @@ export async function ejecutarPlan(plan) {
       for (const p of plan.pausar) {
         try {
           await metaPost(`/${p.id}`, { status: 'PAUSED' });
-          acciones.push(`⏸ Pausada: <b>${p.nombre}</b>`);
+          acciones.push(`⏸ Pausada: <b>${esc(p.nombre)}</b>`);
           console.log(`[Ejecutor] Pausada: ${p.nombre}`);
         } catch (e) {
-          acciones.push(`⚠️ No pude pausar ${p.nombre}: ${e.message}`);
+          acciones.push(`⚠️ No pude pausar ${esc(p.nombre)}: ${esc(e.message)}`);
         }
       }
     }
@@ -31,10 +34,10 @@ export async function ejecutarPlan(plan) {
         try {
           const centavos = Math.round(e.presupuesto_nuevo * 100);
           await metaPost(`/${e.id}`, { daily_budget: centavos });
-          acciones.push(`📈 Escalada: <b>${e.nombre}</b> → $${e.presupuesto_nuevo}/día`);
+          acciones.push(`📈 Escalada: <b>${esc(e.nombre)}</b> → $${e.presupuesto_nuevo}/día`);
           console.log(`[Ejecutor] Escalada: ${e.nombre} a $${e.presupuesto_nuevo}/día`);
         } catch (e2) {
-          acciones.push(`⚠️ No pude escalar ${e.nombre}: ${e2.message}`);
+          acciones.push(`⚠️ No pude escalar ${esc(e.nombre)}: ${esc(e2.message)}`);
         }
       }
     }
@@ -43,12 +46,12 @@ export async function ejecutarPlan(plan) {
     if (plan.crear?.length) {
       for (const c of plan.crear) {
         try {
-          acciones.push(`⏳ Creando campaña <b>${c.segmento}</b> $${c.presupuesto}/día...`);
+          acciones.push(`⏳ Creando campaña <b>${esc(c.segmento)}</b> $${c.presupuesto}/día...`);
           const result = await crearCampanaSegmento(c.segmento, c.presupuesto);
-          acciones.push(`🚀 Creada: <b>${c.segmento}</b> — ${result.ads.length} ads activos`);
+          acciones.push(`🚀 Creada: <b>${esc(c.segmento)}</b> — ${result.ads.length} ads activos`);
           console.log(`[Ejecutor] Creada: ${c.segmento}`);
         } catch (e) {
-          acciones.push(`⚠️ No pude crear ${c.segmento}: ${e.message}`);
+          acciones.push(`⚠️ No pude crear ${esc(c.segmento)}: ${esc(e.message)}`);
         }
       }
     }

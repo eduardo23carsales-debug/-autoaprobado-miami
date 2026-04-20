@@ -11,6 +11,9 @@ import { getCampanas, getMetricas, limpiarNombre, getSegmento,
 const LIMITE_ESCALAR_SOLO   = parseFloat(process.env.LIMITE_ESCALAR_SOLO   || '10'); // máx $/día que puede subir solo
 const LIMITE_GASTO_SIN_LEAD = parseFloat(process.env.LIMITE_GASTO_SIN_LEAD || '4');  // pausa si gasta esto sin leads
 
+// Helper para escapar texto dinámico en mensajes HTML de Telegram
+const escSup = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
 export async function ejecutarSupervisor() {
   console.log('[Supervisor] Revisando campañas...');
 
@@ -29,17 +32,18 @@ export async function ejecutarSupervisor() {
       const presupuesto = parseFloat(c.daily_budget || 0) / 100;
       const nombre     = limpiarNombre(c.name);
       const segmento   = getSegmento(c.name);
+      const nombreEsc  = escSup(nombre);
 
       // ── Regla 1: Pausa automática si gasta sin leads ──
       if (m.spend >= LIMITE_GASTO_SIN_LEAD && m.leads === 0) {
         try {
           await metaPost(`/${c.id}`, { status: 'PAUSED' });
           acciones.push(
-            `⏸ <b>Pausé ${nombre}</b> — gastó $${m.spend.toFixed(2)} sin leads.\n` +
+            `⏸ <b>Pausé ${nombreEsc}</b> — gastó $${m.spend.toFixed(2)} sin leads.\n` +
             `   👉 /activa ${segmento} para reactivar | /nueva ${segmento} 5 para nueva versión`
           );
         } catch (e) {
-          acciones.push(`⚠️ No pude pausar ${nombre}: ${e.message}`);
+          acciones.push(`⚠️ No pude pausar ${nombreEsc}: ${escSup(e.message)}`);
         }
         continue;
       }
@@ -55,16 +59,17 @@ export async function ejecutarSupervisor() {
           try {
             await metaPost(`/${c.id}`, { daily_budget: Math.round(presupuestoNuevo * 100) });
             acciones.push(
-              `📈 <b>Escalé ${nombre}</b> — ${m.leads} leads a $${m.cpl.toFixed(2)} c/u.\n` +
+              `📈 <b>Escalé ${nombreEsc}</b> — ${m.leads} leads a $${m.cpl.toFixed(2)} c/u.\n` +
               `   Presupuesto: $${presupuesto} → $${presupuestoNuevo.toFixed(2)}/día`
             );
           } catch (e) {
-            acciones.push(`⚠️ No pude escalar ${nombre}: ${e.message}`);
+            acciones.push(`⚠️ No pude escalar ${nombreEsc}: ${escSup(e.message)}`);
           }
         } else {
           // Supera el límite — consulta a Eduardo
           consultas.push({
             nombre,
+            nombreEsc,
             segmento,
             campana_id:        c.id,
             presupuesto_actual: presupuesto,
@@ -102,11 +107,11 @@ export async function ejecutarSupervisor() {
 
       await notificar(
         `🤔 <b>Supervisor necesita tu aprobación:</b>\n\n` +
-        `📊 <b>${c.nombre}</b>\n` +
+        `📊 <b>${escSup(c.nombre)}</b>\n` +
         `• Leads hoy: <b>${c.leads_hoy}</b>\n` +
         `• Costo por lead: <b>$${c.cpl.toFixed(2)}</b>\n` +
         `• Propuesta: $${c.presupuesto_actual}/día → <b>$${c.presupuesto_nuevo.toFixed(2)}/día</b>\n\n` +
-        `💬 <i>${c.resumen_voz}</i>`,
+        `💬 <i>${escSup(c.resumen_voz)}</i>`,
         { reply_markup: keyboard }
       );
     }

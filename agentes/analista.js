@@ -86,24 +86,27 @@ export async function ejecutarAnalista() {
     // Analizar con IA
     const plan = await analizarConIA(datos);
 
+    // Escapar texto dinámico para HTML de Telegram
+    const escPlan = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
     // Armar mensaje para Telegram
     const lineas = [];
     lineas.push(`🧠 <b>Plan del Analista — ${new Date().toLocaleDateString('es-US', { timeZone: 'America/New_York' })}</b>`);
     lineas.push(`━━━━━━━━━━━━━━━━━━━━━━`);
-    lineas.push(plan.resumen_telegram);
+    lineas.push(escPlan(plan.resumen_telegram));
     lineas.push(`━━━━━━━━━━━━━━━━━━━━━━`);
 
     if (plan.pausar?.length) {
       lineas.push(`\n⏸ <b>Pausar (${plan.pausar.length}):</b>`);
-      plan.pausar.forEach(p => lineas.push(`• ${p.nombre} — ${p.razon}`));
+      plan.pausar.forEach(p => lineas.push(`• ${escPlan(p.nombre)} — ${escPlan(p.razon)}`));
     }
     if (plan.escalar?.length) {
       lineas.push(`\n📈 <b>Escalar (${plan.escalar.length}):</b>`);
-      plan.escalar.forEach(e => lineas.push(`• ${e.nombre}: $${e.presupuesto_actual}→$${e.presupuesto_nuevo}/día — ${e.razon}`));
+      plan.escalar.forEach(e => lineas.push(`• ${escPlan(e.nombre)}: $${e.presupuesto_actual}→$${e.presupuesto_nuevo}/día — ${escPlan(e.razon)}`));
     }
     if (plan.crear?.length) {
       lineas.push(`\n🚀 <b>Crear nueva (${plan.crear.length}):</b>`);
-      plan.crear.forEach(c => lineas.push(`• ${c.segmento} $${c.presupuesto}/día — ${c.razon}`));
+      plan.crear.forEach(c => lineas.push(`• ${escPlan(c.segmento)} $${c.presupuesto}/día — ${escPlan(c.razon)}`));
     }
 
     // Calcular costo total del plan

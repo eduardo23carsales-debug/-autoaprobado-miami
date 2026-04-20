@@ -280,7 +280,7 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
   // 0. Crear formulario nativo de Lead Ads
   let formId = null;
   try {
-    formId = await crearFormulario(segmento, data.nombre);
+    formId = await crearFormulario(segmento);
   } catch (e) {
     console.warn(`[Form] No se pudo crear formulario — usando landing: ${e.message}`);
   }
@@ -387,16 +387,16 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
       max_frequency: 3
     }],
     // Horario: solo 7AM-11PM — no gastar de madrugada
-    adset_schedule:   horasActivas,
-    pacing_type:      ['standard'],
+    adset_schedule: horasActivas,
+    // Advantage+ Audience — Meta AI optimiza targeting más allá de las restricciones
+    // de FINANCIAL_PRODUCTS_SERVICES. El targeting manual se convierte en "sugerencia".
+    // Debe estar en el adset, NO dentro del objeto targeting.
+    targeting_automation: { advantage_audience: 1 },
     targeting: {
       ...targeting,
       publisher_platforms: ['facebook', 'instagram'],
       facebook_positions:  ['feed', 'marketplace'],
       instagram_positions: ['stream'],
-      // Advantage+ Audience — Meta AI optimiza targeting más allá de las restricciones
-      // de FINANCIAL_PRODUCTS_SERVICES. El targeting manual se convierte en "sugerencia".
-      targeting_automation: { advantage_audience: 1 },
     },
     status: 'ACTIVE'
   };
@@ -633,13 +633,12 @@ export async function crearCampanaRetargeting(presupuestoDiario = 10) {
     billing_event: 'IMPRESSIONS',
     optimization_goal: 'OFFSITE_CONVERSIONS',
     destination_type: 'WEBSITE',
-    bid_strategy: 'LOWEST_COST_WITHOUT_CAP',
     promoted_object: { pixel_id: PIXEL_ID, custom_event_type: 'LEAD' },
     targeting: {
       age_min: 18,
       age_max: 65,
       geo_locations: {
-        geo_markets: [{ key: '528' }],
+        regions: [{ key: '3847' }], // Florida — compatible con FINANCIAL_PRODUCTS_SERVICES
         location_types: ['home', 'recent']
       },
       locales: [27],

@@ -19,7 +19,7 @@ import { ejecutarSupervisor } from './agentes/supervisor.js';
 import { programarLlamada, procesarResultadoLlamada } from './agentes/llamador.js';
 import { cargarPlan, marcarEjecutado } from './agentes/plan-store.js';
 import { ejecutarPlan } from './agentes/ejecutor.js';
-import { registrarLead } from './agentes/leads-store.js';
+import { registrarLead, marcarCerrado } from './agentes/leads-store.js';
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -439,11 +439,15 @@ app.post('/api/meta/webhook', async (req, res) => {
         const adNombre = lead.ad_name || '—';
 
         // Extraer campos de las nuevas preguntas de calificación
-        const tieneIngreso  = campos.tiene_ingreso      || '';
-        const cuandoNecesita = campos.cuando_necesita   || '';
-        const inicialDisp   = campos.inicial_disponible || '';
-        const tieneCarro    = campos.tiene_carro        || '';
-        const tiempoUsa     = campos.tiempo_en_usa      || '';
+        const escLead = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const tieneIngreso   = escLead(campos.tiene_ingreso      || '');
+        const cuandoNecesita = escLead(campos.cuando_necesita    || '');
+        const inicialDisp    = escLead(campos.inicial_disponible || '');
+        const tieneCarro     = escLead(campos.tiene_carro        || '');
+        const tiempoUsa      = escLead(campos.tiempo_en_usa      || '');
+        const nombreEsc      = escLead(nombre);
+        const telefonoEsc    = escLead(telefono);
+        const campanaEsc     = escLead(campana);
 
         // Detectar segmento desde nombre de campaña
         const segmento = campana.toLowerCase().includes('mal') ? 'mal-credito'
@@ -461,25 +465,26 @@ app.post('/api/meta/webhook', async (req, res) => {
           inicial:  inicialDisp,
         });
 
-        const telLimpio = telefono.replace(/\D/g, '');
+        const telLimpio  = telefono.replace(/\D/g, '');
+        const calificaEsc = escLead(califica);
         const extras = [
           tieneIngreso   ? `💼 Ingreso: ${tieneIngreso}`       : '',
           cuandoNecesita ? `⏰ Cuándo: ${cuandoNecesita}`      : '',
           inicialDisp    ? `💵 Inicial: ${inicialDisp}`        : '',
           tieneCarro     ? `🚗 Carro trade-in: ${tieneCarro}`  : '',
           tiempoUsa      ? `🇺🇸 En USA: ${tiempoUsa}`          : '',
-          califica       ? `💬 ${califica}`                    : '',
+          calificaEsc    ? `💬 ${calificaEsc}`                 : '',
         ].filter(Boolean).join('\n');
 
         const msg =
           `🚗 <b>NUEVO LEAD — Facebook Lead Ads</b>\n` +
           `━━━━━━━━━━━━━━━━━━━━━━\n` +
-          `👤 <b>Nombre:</b> ${nombre}\n` +
-          `📱 <b>Teléfono:</b> ${telefono}\n` +
+          `👤 <b>Nombre:</b> ${nombreEsc}\n` +
+          `📱 <b>Teléfono:</b> ${telefonoEsc}\n` +
           (extras ? `${extras}\n` : '') +
           `━━━━━━━━━━━━━━━━━━━━━━\n` +
           `${score.emoji} <b>Score: ${score.label}</b>${score.razones.length ? ` — ${score.razones.join(', ')}` : ''}\n` +
-          `📢 ${campana}\n` +
+          `📢 ${campanaEsc}\n` +
           `🕐 ${ts}`;
 
         const keyboard = {
@@ -530,9 +535,10 @@ app.post('/api/vapi/webhook', async (req, res) => {
 
       // ── Briefing de Ana → detectar aprobación de Eduardo ──
       if (anaId && assistantId === anaId) {
+        const escVapi = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
         const planAprobado  = message.analysis?.structuredData?.planAprobado;
-        const notas         = message.analysis?.structuredData?.notasEduardo || '';
-        const resumen       = message.analysis?.summary || '';
+        const notas         = escVapi(message.analysis?.structuredData?.notasEduardo || '');
+        const resumen       = escVapi(message.analysis?.summary || '');
         const duracion      = message.durationSeconds ? `${Math.round(message.durationSeconds)}s` : '—';
 
         if (planAprobado === true) {
@@ -548,7 +554,7 @@ app.post('/api/vapi/webhook', async (req, res) => {
             );
             marcarEjecutado();
             ejecutarPlan(plan).catch(e =>
-              tgBot.sendMessage(CHAT_ID, `❌ Error ejecutando plan: <code>${e.message}</code>`, { parse_mode: 'HTML' })
+              tgBot.sendMessage(CHAT_ID, `❌ Error ejecutando plan: <code>${escVapi(e.message)}</code>`, { parse_mode: 'HTML' })
             );
           }
         } else if (planAprobado === false) {

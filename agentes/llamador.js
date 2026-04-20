@@ -129,6 +129,9 @@ async function getAssistantId() {
   return _assistantId;
 }
 
+// Helper para escapar texto dinámico en mensajes HTML de Telegram
+const escH = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
 // ── Llamar al lead ─────────────────────────────────────
 export async function llamarLead(lead) {
   const { nombre, telefono, segmento } = lead;
@@ -145,7 +148,7 @@ export async function llamarLead(lead) {
 
   if (tel.length < 12) {
     console.warn(`[VAPI] Teléfono inválido: ${telefono}`);
-    await notificar(`⚠️ <b>VAPI:</b> Teléfono inválido para ${nombre} — ${telefono}\nNo se pudo realizar la llamada.`);
+    await notificar(`⚠️ <b>VAPI:</b> Teléfono inválido para ${escH(nombre)} — ${escH(telefono)}\nNo se pudo realizar la llamada.`);
     return;
   }
 
@@ -196,9 +199,9 @@ export async function llamarLead(lead) {
 
     console.log(`[VAPI] Llamada iniciada: ${call.id}`);
     await notificar(
-      `📞 <b>Llamando a ${nombre}</b>\n` +
-      `📱 ${telefono}\n` +
-      `🎯 ${segmentoTexto}\n` +
+      `📞 <b>Llamando a ${escH(nombre)}</b>\n` +
+      `📱 ${escH(telefono)}\n` +
+      `🎯 ${escH(segmentoTexto)}\n` +
       `🤖 Sofía en línea...`
     );
 
@@ -207,7 +210,7 @@ export async function llamarLead(lead) {
   } catch (err) {
     const msg = err.response?.data?.message || err.message;
     console.error(`[VAPI] Error al llamar: ${msg}`);
-    await notificar(`⚠️ <b>VAPI Error:</b> No se pudo llamar a ${nombre}\n<code>${msg}</code>`);
+    await notificar(`⚠️ <b>VAPI Error:</b> No se pudo llamar a ${escH(nombre)}\n<code>${escH(msg)}</code>`);
   }
 }
 
@@ -337,7 +340,11 @@ export async function llamarBriefingMatutino(plan, resumen) {
     return;
   }
 
-  const telefonoEduardo = `+1${(process.env.WHATSAPP_EDUARDO || '17869167339').replace(/\D/g, '')}`;
+  // Normalizar a E.164: si el número ya incluye el código de país '1', no duplicarlo
+  const rawEduardo = (process.env.WHATSAPP_EDUARDO || '17869167339').replace(/\D/g, '');
+  const telefonoEduardo = rawEduardo.startsWith('1') && rawEduardo.length === 11
+    ? `+${rawEduardo}`
+    : `+1${rawEduardo}`;
 
   try {
     const anaId = await getAnaAssistantId();
@@ -413,15 +420,15 @@ export async function procesarResultadoLlamada(callData) {
     const scoreTexto = successEval != null ? `⭐ Score: ${successEval}/10` : '';
 
     let msg =
-      `${icono} <b>Resultado llamada — ${nombre}</b>\n` +
+      `${icono} <b>Resultado llamada — ${escH(nombre)}</b>\n` +
       `━━━━━━━━━━━━━━━━━━━━━━\n` +
-      `📱 ${telefono}\n` +
-      `⏱ Duración: ${duracion}\n` +
-      `📋 Estado: ${endedReason || status}\n` +
+      `📱 ${escH(telefono)}\n` +
+      `⏱ Duración: ${escH(duracion)}\n` +
+      `📋 Estado: ${escH(endedReason || status)}\n` +
       (citaIcono ? `${citaIcono}\n` : '') +
       (scoreTexto ? `${scoreTexto}\n` : '');
 
-    if (summary) msg += `\n💬 <b>Resumen:</b>\n${summary}`;
+    if (summary) msg += `\n💬 <b>Resumen:</b>\n${escH(summary)}`;
 
     // Botones de seguimiento
     const keyboard = {
