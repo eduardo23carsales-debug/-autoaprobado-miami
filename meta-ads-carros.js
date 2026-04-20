@@ -199,8 +199,7 @@ async function crearFormulario(segmento) {
   const form = await metaPost(`/${PAGE_ID}/leadgen_forms`, {
     name: `AutoAprobado Miami — ${segmento} — ${new Date().toISOString().slice(0,10)}`,
     locale: 'es_ES',
-    is_optimized_for_quality: true,        // Higher Intent — pantalla de revisión
-    block_display_for_non_targeted_viewer: true,
+    is_optimized_for_quality: true,
     context_card: {
       style:   'LIST_STYLE',
       title:   '¿Por qué AutoAprobado Miami?',
