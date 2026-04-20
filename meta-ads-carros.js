@@ -380,12 +380,6 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
     promoted_object: esLeadAd
       ? { page_id: PAGE_ID }
       : { pixel_id: PIXEL_ID, custom_event_type: 'LEAD' },
-    // Frecuencia máxima: 3 veces por semana — evita fatiga y dinero perdido
-    frequency_control_specs: [{
-      event: 'IMPRESSIONS',
-      interval_days: 7,
-      max_frequency: 3
-    }],
     // Horario: solo 7AM-11PM — no gastar de madrugada
     adset_schedule: horasActivas,
     // Advantage+ Audience — Meta AI optimiza targeting más allá de las restricciones
