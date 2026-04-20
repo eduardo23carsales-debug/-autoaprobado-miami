@@ -36,8 +36,8 @@ const SEGMENTOS = {
     nombre:    'Mal Crédito — AutoAprobado Miami',
     hook:      '¿Te negaron el préstamo por mal crédito?',
     copies: [
-      `😔 ¿Te negaron financiamiento por mal crédito?\n\nEn AutoAprobado Miami trabajamos CON tu situación, no contra ella.\n\n✅ Sin mínimo de score requerido\n✅ Respuesta en menos de 24 horas\n✅ Carros 2024-2026 disponibles\n\nMiles de familias hispanas en Miami ya manejan su carro nuevo. Tú puedes ser el próximo.\n\n👉 Llena el formulario en 30 segundos y te llamamos hoy.`,
-      `⚠️ ¿Otros dealers te dijeron que NO?\n\nNosotros decimos: cuéntanos tu situación.\n\nEn AutoAprobado Miami nos especializamos en crédito difícil. No importa tu score, bancarrotas anteriores o deudas.\n\n🚗 Carros nuevos y usados\n💵 Inicial desde $500\n📱 Proceso 100% en español\n\n👉 Verifica si calificas GRATIS — sin afectar tu crédito. Tarda 30 segundos.`,
+      `😔 ¿Te negaron financiamiento por mal crédito?\n\nEn AutoAprobado Miami trabajamos CON tu situación, no contra ella.\n\n✅ Trabajamos con scores bajos\n✅ Respuesta en menos de 24 horas\n✅ Carros 2024-2026 disponibles\n\nMiles de familias hispanas en Miami ya manejan su carro nuevo. Tú puedes ser el próximo.\n\n👉 Llena el formulario en 30 segundos y te llamamos hoy.`,
+      `⚠️ ¿Otros dealers te dijeron que NO?\n\nNosotros decimos: cuéntanos tu situación.\n\nEn AutoAprobado Miami nos especializamos en crédito difícil. Trabajamos con scores bajos, bancarrotas anteriores y situaciones complicadas.\n\n🚗 Carros nuevos y usados\n💵 Inicial desde $500*\n📱 Proceso 100% en español\n\n👉 Verifica si calificas GRATIS — sin afectar tu crédito. Tarda 30 segundos.\n\n*Inicial sujeta a aprobación de crédito, modelo y condiciones del dealer.`,
       `Tu crédito no define tu futuro 🚗\n\nHemos ayudado a cientos de familias en Miami a conseguir su carro aunque el banco los rechazó.\n\nNo necesitas crédito perfecto. Solo necesitas al dealer correcto.\n\n¿Cuándo fue la última vez que manejaste sin preocupaciones?\n\n👉 Empieza ahora — es gratis verificar y no te compromete a nada.`
     ],
     imagenPrompt: `Documentary photograph, Canon 5D, 50mm lens, f/2.0. A single Hispanic man in his late 30s sitting at a desk inside a bright modern car dealership showroom in Miami. He is signing a document, looking down at the paper, slight smile. One salesperson's hand visible across the desk handing a pen. Real dealership background: glass walls, one or two cars on the showroom floor out of focus. Natural daylight from windows, no flash. Realistic skin tones, no dramatic shadows. Square 1:1 crop. NO TEXT, NO WORDS, NO LOGOS in the image.`
@@ -46,7 +46,7 @@ const SEGMENTOS = {
     nombre:    'Sin Historial — AutoAprobado Miami',
     hook:      '¿No tienes historial crediticio en USA?',
     copies: [
-      `🆕 ¿Recién llegaste a USA o nunca tuviste crédito?\n\nNo necesitas historial crediticio para tener tu carro en Miami.\n\n✅ Aprobamos con ITIN o SSN\n✅ Si tienes trabajo o negocio propio, calificas\n✅ Proceso 100% en español\n\nTu carro propio es también tu primer paso para construir crédito en USA.\n\n👉 Verifica si calificas en 30 segundos — completamente gratis.`,
+      `🆕 ¿Recién llegaste a USA o nunca tuviste crédito?\n\nNo necesitas historial crediticio para tener tu carro en Miami.\n\n✅ Trabajamos con ITIN o SSN\n✅ Si tienes trabajo o negocio propio, podemos ayudarte\n✅ Proceso 100% en español\n\nTu carro propio es también tu primer paso para construir crédito en USA.\n\n👉 Verifica si calificas en 30 segundos — completamente gratis.`,
       `Llegaste a USA con ganas de crecer 💪\n\nEmpezar desde cero es difícil. Por eso en AutoAprobado Miami no te pedimos historial crediticio.\n\nSolo necesitas:\n🚗 Trabajo estable o negocio propio\n💵 Inicial accesible\n📱 Ganas de manejar tu propio carro\n\nYa ayudamos a cientos de inmigrantes hispanos en Miami a conseguir su primer carro.\n\n👉 ¿Cuándo empezamos? Llena el formulario ahora — es gratis.`,
       `Sin crédito en USA no significa sin carro 🚗\n\nCientos de nuestros clientes compraron su primer carro sin un solo punto de historial crediticio.\n\nEl secreto: encontrar el dealer que sabe cómo trabajar con tu situación.\n\nEn AutoAprobado Miami lo hacemos todos los días.\n\n👉 Tarda 2 minutos verificar si calificas. Sin costo, sin compromiso.`
     ],
@@ -56,9 +56,9 @@ const SEGMENTOS = {
     nombre:    'Urgente — AutoAprobado Miami',
     hook:      '¿Necesitas un carro YA en Miami?',
     copies: [
-      `🚨 ¿Perdiste tu carro o necesitas uno URGENTE?\n\nEn AutoAprobado Miami podemos tenerte manejando en 24-48 horas.\n\n⚡ Aprobación express el mismo día\n🚗 Inventario disponible para entrega inmediata\n📱 Proceso sin vueltas, 100% en español\n\nNo pierdas más trabajo ni oportunidades por falta de transporte. Cada día cuenta.\n\n👉 Llena el formulario ahora — te llamamos en menos de 1 hora.`,
-      `⏰ Cada día sin carro en Miami te cuesta dinero real.\n\nSin carro es casi imposible trabajar, llevar a los niños al colegio o manejar tu negocio en esta ciudad.\n\nEn AutoAprobado Miami entendemos la urgencia:\n✅ Respuesta en menos de 24 horas\n✅ Entrega inmediata del vehículo\n✅ Aprobamos aunque te hayan negado antes\n\n👉 Actúa ahora — llena el formulario en 30 segundos.`,
-      `Si estás leyendo esto, necesitas un carro HOY 🚗⚡\n\nNo te vamos a hacer esperar semanas. Llamamos a nuestros bancos y encontramos quien te apruebe — sin importar tu situación de crédito.\n\nMiles de personas en Miami ya manejan gracias a nosotros.\n\nTú eres el siguiente. Pero hay que actuar rápido — el inventario es limitado.\n\n👉 Reserva tu lugar ahora. Es gratis y tarda 30 segundos.`
+      `🚨 ¿Perdiste tu carro o necesitas uno URGENTE?\n\nEn AutoAprobado Miami podemos tenerte manejando en 24-48 horas.\n\n⚡ Proceso express con respuesta el mismo día\n🚗 Inventario disponible para entrega inmediata\n📱 Proceso sin vueltas, 100% en español\n\nNo pierdas más trabajo ni oportunidades por falta de transporte. Cada día cuenta.\n\n👉 Llena el formulario ahora — te llamamos en menos de 1 hora.`,
+      `⏰ Cada día sin carro en Miami te cuesta dinero real.\n\nSin carro es casi imposible trabajar, llevar a los niños al colegio o manejar tu negocio en esta ciudad.\n\nEn AutoAprobado Miami entendemos la urgencia:\n✅ Respuesta en menos de 24 horas\n✅ Entrega inmediata del vehículo\n✅ Trabajamos con tu situación aunque te hayan negado antes\n\n👉 Actúa ahora — llena el formulario en 30 segundos.`,
+      `Si estás leyendo esto, necesitas un carro HOY 🚗⚡\n\nNo te vamos a hacer esperar semanas. Llamamos a nuestros bancos y trabajamos con tu situación de crédito para encontrar opciones reales.\n\nMiles de personas en Miami ya manejan gracias a nosotros.\n\nTú eres el siguiente. Pero hay que actuar rápido — el inventario es limitado.\n\n👉 Reserva tu lugar ahora. Es gratis y tarda 30 segundos.`
     ],
     imagenPrompt: `Documentary photograph, Canon 5D, 35mm lens, f/2.8. A single Hispanic woman in her 30s sitting in the driver's seat of a car, hands on the steering wheel, looking forward through the windshield with a calm confident expression. Shot from outside the car through the driver's window, slightly low angle. Miami street visible through the windshield — palm trees, buildings. Natural daylight. Realistic interior: car dashboard, steering wheel, seatbelt on. No exaggerated expression, real moment. Square 1:1. NO TEXT, NO WORDS, NO LOGOS.`
   },
@@ -76,9 +76,9 @@ const SEGMENTOS = {
     nombre:    'Oferta Especial Hyundai — AutoAprobado Miami',
     hook:      '🔥 Hyundai 2026 — pagos desde $299/mes* en Miami',
     copies: [
-      `🔥 OFERTA ESPECIAL — Hyundai 2026 con pagos desde $299/mes*\n\nDisponibles AHORA en Miami:\n🚗 Hyundai Venue 2026\n🚗 Hyundai Elantra 2026\n🚗 Hyundai Tucson 2026\n\n✅ Aprobamos aunque te hayan negado antes\n✅ Inicial accesible desde $500\n✅ Proceso 100% en español\n\nOferta por tiempo limitado — los carros se van rápido.\n\n👉 Llena el formulario en 30 segundos y reserva el tuyo hoy.\n\n${DISCLAIMER}`,
-      `¿Sabías que puedes manejar un Hyundai 2026 NUEVO en Miami desde $299/mes*? 🚗\n\nTenemos Venue, Elantra, Tucson y Santa Fe 2026 — y aprobamos sin importar tu historial crediticio.\n\nYa ayudamos a cientos de familias hispanas en Miami a manejar carro nuevo.\n\n⚠️ El inventario es limitado y esta oferta no dura para siempre.\n\n👉 Reserva el tuyo ahora — verifica si calificas en 2 minutos, gratis.\n\n${DISCLAIMER}`,
-      `Maneja un Hyundai NUEVO en 2026 sin arruinar tu presupuesto 💪\n\nLos mejores precios de Miami + la aprobación más fácil de la ciudad = tu carro nuevo esta semana.\n\nNo importa tu crédito. No importa si te negaron antes.\n\n🔥 Pagos desde $299/mes*\n⚡ Respuesta en menos de 24 horas\n🚗 Inventario disponible para entrega inmediata\n\n¿Para cuál Hyundai calificas tú?\n\n👉 Descúbrelo gratis en 2 minutos.\n\n${DISCLAIMER}`
+      `🔥 OFERTA ESPECIAL — Hyundai 2026 con pagos desde $299/mes*\n\nDisponibles AHORA en Miami:\n🚗 Hyundai Venue 2026\n🚗 Hyundai Elantra 2026\n🚗 Hyundai Tucson 2026\n\n✅ Trabajamos con tu situación aunque te hayan negado antes\n✅ Inicial accesible desde $500\n✅ Proceso 100% en español\n\nOferta por tiempo limitado — los carros se van rápido.\n\n👉 Llena el formulario en 30 segundos y reserva el tuyo hoy.\n\n${DISCLAIMER}`,
+      `¿Sabías que puedes manejar un Hyundai 2026 NUEVO en Miami desde $299/mes*? 🚗\n\nTenemos Venue, Elantra, Tucson y Santa Fe 2026 — y trabajamos con tu historial crediticio, sea cual sea.\n\nYa ayudamos a cientos de familias hispanas en Miami a manejar carro nuevo.\n\n⚠️ El inventario es limitado y esta oferta no dura para siempre.\n\n👉 Reserva el tuyo ahora — verifica si calificas en 2 minutos, gratis.\n\n${DISCLAIMER}`,
+      `Maneja un Hyundai NUEVO en 2026 sin arruinar tu presupuesto 💪\n\nLos mejores precios de Miami + el proceso de aprobación más accesible de la ciudad = tu carro nuevo esta semana.\n\nTrabajamos con todo tipo de historial crediticio, incluso si te negaron antes.\n\n🔥 Pagos desde $299/mes*\n⚡ Respuesta en menos de 24 horas\n🚗 Inventario disponible para entrega inmediata\n\n¿Para cuál Hyundai calificas tú?\n\n👉 Descúbrelo gratis en 2 minutos.\n\n${DISCLAIMER}`
     ],
     imagenPrompt: `Professional automotive photograph, Canon 5D, 35mm lens, f/8. A brand new white Hyundai Tucson SUV parked on clean asphalt outside a dealership in Miami on a sunny day. 3/4 front angle, eye level. Natural sunlight creating soft reflections on the hood and doors. Background: clear blue sky, one or two palm trees slightly blurred. No people. Realistic car proportions, accurate reflections, no CGI. Photo quality matching a real car dealership listing. Square 1:1. NO TEXT, NO WORDS, NO LOGOS, NO LICENSE PLATES.`
   }
@@ -158,11 +158,11 @@ async function subirFotoLocal(filePath) {
 
 // ── Pantalla de intro por segmento (Higher Intent context card) ───────
 const CONTEXT_CONTENT = {
-  'mal-credito':     ['✅ Trabajamos con crédito dañado o bajo score', '✅ Sin mínimo de credit score requerido', '✅ Aprobamos aunque otros dealers te dijeron NO', '✅ Respuesta en menos de 24 horas — 100% en español'],
-  'sin-credito':     ['✅ Aprobamos sin historial crediticio en USA', '✅ Aceptamos ITIN o SSN', '✅ Solo necesitas trabajo o negocio propio', '✅ Tu primer carro = tu primer crédito en USA'],
-  'urgente':         ['⚡ Aprobación express el mismo día', '✅ Inventario disponible para entrega inmediata', '✅ Sin importar tu historial de crédito', '✅ Te llamamos en menos de 1 hora'],
-  'upgrade':         ['🔄 Usamos tu carro actual como parte del pago inicial', '✅ Modelos 2024-2026 disponibles', '✅ Pagos desde $299/mes*', '✅ Proceso sin complicaciones, respuesta el mismo día'],
-  'oferta-especial': ['🔥 Hyundai 2026 desde $299/mes*', '✅ Venue, Elantra, Tucson, Santa Fe disponibles', '✅ Aprobamos aunque te hayan negado antes', '✅ Entrega inmediata, proceso 100% en español'],
+  'mal-credito':     ['✅ Trabajamos con crédito dañado o bajo score', '✅ Proceso accesible aunque tu score sea bajo', '✅ Trabajamos con tu situación aunque otros dealers te dijeron NO', '✅ Respuesta en menos de 24 horas — 100% en español'],
+  'sin-credito':     ['✅ Trabajamos con personas sin historial crediticio en USA', '✅ Aceptamos ITIN o SSN', '✅ Solo necesitas trabajo o negocio propio', '✅ Tu primer carro = tu primer crédito en USA'],
+  'urgente':         ['⚡ Proceso express con respuesta el mismo día', '✅ Inventario disponible para entrega inmediata', '✅ Trabajamos con tu historial de crédito, sea cual sea', '✅ Te llamamos en menos de 1 hora'],
+  'upgrade':         ['🔄 Usamos tu carro actual como parte del pago inicial', '✅ Modelos 2024-2026 disponibles', '✅ Pagos desde $299/mes* (sujeto a aprobación de crédito)', '✅ Proceso sin complicaciones, respuesta el mismo día'],
+  'oferta-especial': ['🔥 Hyundai 2026 desde $299/mes* (sujeto a aprobación)', '✅ Venue, Elantra, Tucson, Santa Fe disponibles', '✅ Trabajamos con tu situación aunque te hayan negado antes', '✅ Entrega inmediata, proceso 100% en español'],
 };
 
 // ── Preguntas de calificación — 2 preguntas por segmento (más filtro, mejor calidad) ───
@@ -644,7 +644,7 @@ export async function crearCampanaRetargeting(presupuestoDiario = 10) {
       const linkData = {
         message: copies[i],
         name: '¿Todavía buscas financiamiento para tu carro?',
-        description: '✅ Aprobamos aunque te hayan negado antes — 100% en español',
+        description: '✅ Trabajamos con tu situación aunque te hayan negado antes — 100% en español',
         link: landingUTM,
         call_to_action: { type: 'APPLY_NOW', value: { link: landingUTM } }
       };
