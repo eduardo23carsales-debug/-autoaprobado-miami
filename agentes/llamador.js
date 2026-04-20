@@ -16,9 +16,10 @@ const WHATSAPP_PRINCIPAL = process.env.WHATSAPP_PRINCIPAL || process.env.WHATSAP
 const SOFIA_CONFIG = {
   name: 'Sofía — AutoAprobado Miami',
   model: {
-    provider:    'openai',
-    model:       'gpt-4o-mini',
-    temperature: 0.7,
+    provider:             'openai',
+    model:                'gpt-4o-mini',
+    temperature:          0.7,
+    endCallFunctionEnabled: true,
     messages: [{
       role:    'system',
       content: `Eres Sofía, asesora de AutoAprobado Miami. Llamas a personas que pidieron información sobre financiamiento de carros.
@@ -73,11 +74,11 @@ CUÁNDO COLGAR:
     provider:                 '11labs',
     voiceId:                  'KDG2CWzkFgcZz4Vqbu8m', // Belén — amable y suave
     model:                    'eleven_turbo_v2_5',
-    stability:                0.45,  // menos robótico, más expresivo
+    stability:                0.40,  // más expresivo y dinámico
     similarityBoost:          0.80,
-    style:                    0.35,  // más emoción natural
+    style:                    0.50,  // energía de ventas — cálida pero activa
     useSpeakerBoost:          true,
-    optimizeStreamingLatency: 3,     // máxima velocidad de respuesta
+    optimizeStreamingLatency: 3,
   },
   transcriber: {
     provider:    'deepgram',
@@ -87,7 +88,7 @@ CUÁNDO COLGAR:
     endpointing: 200, // detecta fin de frase más rápido — menos silencios incómodos
   },
   startSpeakingPlan: {
-    waitSeconds: 0.6, // pausa natural antes de responder
+    waitSeconds: 0.3, // respuesta rápida — ritmo de ventas
     transcriptionEndpointingPlan: {
       onPunctuationSeconds:   0.2,
       onNoPunctuationSeconds: 1.2,
