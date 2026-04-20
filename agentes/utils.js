@@ -16,11 +16,17 @@ export const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: fa
 
 // ── Meta API helpers ─────────────────────────────────
 export async function metaGet(endpoint, params = {}) {
-  const { data } = await axios.get(`${API}${endpoint}`, {
-    params: { ...params, access_token: TOKEN },
-    timeout: 15000
-  });
-  return data;
+  try {
+    const { data } = await axios.get(`${API}${endpoint}`, {
+      params: { ...params, access_token: TOKEN },
+      timeout: 15000
+    });
+    return data;
+  } catch (err) {
+    const meta = err.response?.data?.error;
+    const msg  = meta ? `Meta ${meta.code}: ${meta.message}` : err.message;
+    throw new Error(msg);
+  }
 }
 
 export async function metaPost(endpoint, body) {
@@ -35,10 +41,9 @@ export async function metaPost(endpoint, body) {
 export async function getCampanas(soloActivas = false) {
   const data = await metaGet(`/${AD_ACCOUNT}/campaigns`, {
     fields: 'id,name,status,effective_status,daily_budget',
-    filtering: JSON.stringify([{ field: 'name', operator: 'CONTAIN', value: 'AutoAprobado' }]),
     limit: 50
   });
-  const campanas = data.data || [];
+  const campanas = (data.data || []).filter(c => c.name.includes('AutoAprobado'));
   return soloActivas ? campanas.filter(c => c.effective_status === 'ACTIVE') : campanas;
 }
 
