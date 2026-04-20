@@ -362,8 +362,7 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
     age_min: edad.min,
     age_max: edad.max,
     geo_locations: {
-      geo_markets: [{ key: '528' }], // Miami-Ft. Lauderdale-Hollywood DMA
-      location_types: ['home', 'recent']
+      regions: [{ key: '3847' }], // Florida — compatible con FINANCIAL_PRODUCTS_SERVICES
     },
     locales:          [27],
     device_platforms: ['mobile'],
