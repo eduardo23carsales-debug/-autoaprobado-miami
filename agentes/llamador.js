@@ -15,11 +15,11 @@ const WHATSAPP_PRINCIPAL = process.env.WHATSAPP_PRINCIPAL || process.env.WHATSAP
 // Config inline Sofía — se pasa directo en cada llamada, sin crear asistente en VAPI
 const SOFIA_CONFIG = {
   name: 'Sofía — AutoAprobado Miami',
+  endCallFunctionEnabled: true,
   model: {
-    provider:             'openai',
-    model:                'gpt-4o-mini',
-    temperature:          0.7,
-    endCallFunctionEnabled: true,
+    provider:    'openai',
+    model:       'gpt-4o-mini',
+    temperature: 0.7,
     messages: [{
       role:    'system',
       content: `Eres Sofía, asesora de AutoAprobado Miami. Llamas a personas que pidieron información sobre financiamiento de carros.
