@@ -57,31 +57,31 @@ Reglas:
     provider:                 '11labs',
     voiceId:                  'KDG2CWzkFgcZz4Vqbu8m', // Belén
     model:                    'eleven_turbo_v2_5',
-    stability:                0.42,
-    similarityBoost:          0.85,
-    style:                    0.60,
+    stability:                0.38, // suficiente variación para sonar humana sin ser inestable
+    similarityBoost:          0.88, // fidelidad alta a la voz original de Belén
+    style:                    0.55, // emoción de ventas — cálida y segura, no sobreactuada
     useSpeakerBoost:          true,
-    optimizeStreamingLatency: 3,
+    optimizeStreamingLatency: 2,    // balance calidad/velocidad — 3 sacrifica calidad de audio
   },
   transcriber: {
     provider:    'deepgram',
     model:       'nova-2',
     language:    'es',
     keywords:    ['AutoAprobado', 'Miami', 'Hyundai', 'financiamiento', 'crédito', 'cita', 'sí', 'no'],
-    endpointing: 150,
+    endpointing: 180, // 150 es demasiado agresivo — corta antes de que terminen de hablar
   },
   startSpeakingPlan: {
-    waitSeconds: 0.4,
+    waitSeconds: 0.5, // pausa humana natural antes de responder — no parece bot
     transcriptionEndpointingPlan: {
-      onPunctuationSeconds:   0.1,
-      onNoPunctuationSeconds: 0.8,
-      onNumberSeconds:        0.3,
+      onPunctuationSeconds:   0.15,
+      onNoPunctuationSeconds: 1.0,
+      onNumberSeconds:        0.4,
     }
   },
   stopSpeakingPlan: {
-    numWords:       2,
-    voiceSeconds:   0.2,
-    backoffSeconds: 1.0,
+    numWords:       3,
+    voiceSeconds:   0.25,
+    backoffSeconds: 1.2,
   },
   endCallMessage:       '',
   endCallPhrases:       ['hasta luego', 'adiós', 'chao', 'no me interesa', 'no gracias', 'bye', 'no quiero'],
