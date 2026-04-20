@@ -199,11 +199,11 @@ async function crearFormulario(segmento) {
   const form = await metaPost(`/${PAGE_ID}/leadgen_forms`, {
     name: `AutoAprobado Miami — ${segmento} — ${Date.now()}`,
     questions: [
-      { type: 'FULL_NAME'  },
-      { type: 'PHONE'      },
-      { type: 'EMAIL'      },
+      { type: 'FULL_NAME' },
+      { type: 'PHONE'     },
     ],
-    privacy_policy: { url: LANDING_URL },
+    privacy_policy:      { url: LANDING_URL },
+    follow_up_action_url: LANDING_URL,
   });
   console.log(`[Form] Formulario Higher Intent creado: ${form.id}`);
   return form.id;
