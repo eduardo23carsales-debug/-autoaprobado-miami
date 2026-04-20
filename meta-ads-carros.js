@@ -335,7 +335,7 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
     'urgente':         { min: 22, max: 55 },
     'oferta-especial': { min: 22, max: 60 },
   };
-  const edad = EDAD_POR_SEGMENTO[segmento] || { min: 22, max: 55 };
+  const edad = { min: 18, max: 65 }; // FINANCIAL_PRODUCTS_SERVICES requiere 18-65+ obligatorio
 
   // Exclusión de audiencia desactivada — excluded_custom_audiences requiere ID de audiencia
   // existente en Meta, no reglas inline. Activar después de crear la audiencia en Meta.
