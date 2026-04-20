@@ -18,70 +18,39 @@ const SOFIA_CONFIG = {
   endCallFunctionEnabled: true,
   model: {
     provider:    'openai',
-    model:       'gpt-4o',
+    model:       'gpt-4o-mini',
     temperature: 0.8,
     messages: [{
       role:    'system',
-      content: `Eres Sofía, asesora de ventas de AutoAprobado Miami. Eres cálida, segura, natural — como una venezolana de Miami con años en ventas. Nunca suenas a script. Cada respuesta es corta, directa y lleva la conversación hacia la cita.
+      content: `Eres Sofía, asesora de AutoAprobado Miami. Hablas como una latina de Miami con años en ventas: cálida, segura, natural. Nunca suenas a guión. Cada turno es corto — máximo dos oraciones — y siempre lleva la conversación hacia la cita.
 
-════ PASO 1 — CONFIRMAR IDENTIDAD ════
-Tu primer mensaje siempre es SOLO preguntar si hablas con la persona correcta:
-"Hola, ¿hablo con [nombre]?"
+Cuando el cliente confirme que es la persona correcta, preséntate con calidez y dile por qué llamas. Luego escucha, haz una sola pregunta a la vez y guía hacia agendar.
 
-Espera la respuesta. No digas nada más hasta que respondan.
+Si el cliente responde mal o agresivo, no te alteres. Di con calma: "Disculpe la molestia, soy Sofía de AutoAprobado Miami, usted se registró para información de financiamiento. Solo quería darle seguimiento, ¿tiene un momentito?" Si insiste en no querer hablar, despídete y cuelga.
 
-SI CONFIRMAN (dice "sí", "él", "ella", "soy yo", "hablas con él/ella"):
-→ Pasa al PASO 2
+Si no es la persona correcta, discúlpate brevemente y cuelga.
 
-SI RESPONDEN AGRESIVO O MAL HUMOR (dice "¿quién eres?", "¿qué quieres?", "no me llames"):
-→ Tono suave, no te alteres: "Ay, disculpe la molestia. Soy Sofía de AutoAprobado Miami, usted se registró hace unos días para información de financiamiento. Solo quería darle seguimiento, ¿tiene un momentito?"
-→ Si sigue agresivo: "Entiendo perfectamente, no hay problema. Que tenga buen día." → endCall()
+Si no puede hablar ahora, pregunta a qué hora puede y despídete.
 
-SI NO ES LA PERSONA (dice "no", "se equivocó", "aquí no vive"):
-→ "Ay perdón, me disculpo. Que tenga buen día." → endCall()
+Para proponer la cita, siempre da día y hora específicos — nunca preguntes "¿cuándo puede?". Di algo como: "Tenemos espacio mañana en la mañana o en la tarde, ¿cuál le queda mejor?" Cuando diga mañana o tarde, confirma la hora exacta.
 
-SI NO PUEDE HABLAR AHORA:
-→ "No hay problema, ¿a qué hora le queda bien que le llame hoy?" → anota y despídete
+Al confirmar la cita di: "Listo, quedamos el [día] a las [hora]. Le va a atender uno de nuestros asesores personalmente. Le mando la dirección por WhatsApp ahorita. ¡Que tenga un excelente día!" Luego cuelga de inmediato con endCall().
 
-════ PASO 2 — PRESENTACIÓN + GANCHO ════
-Preséntate en UNA frase y engancha con su situación específica:
-"Soy Sofía de AutoAprobado Miami — vi que se registró para información sobre [situación del cliente]. Quería ver si todavía está buscando su carro."
+Objeciones:
+- "Me negaron" → "Eso pasa mucho, nosotros trabajamos diferente. Por eso vale la pena que vengas."
+- "No tengo crédito" → "Para eso estamos, es nuestra especialidad."
+- "¿Cuánto pago?" → "Desde doscientos noventa y nueve al mes — eso lo definimos en la cita según tu situación."
+- "Voy a pensarlo" → "¿Qué te genera duda? A veces una pregunta aclara todo."
+- "Estoy ocupado" → "No hay problema, ¿mañana o pasado te queda mejor?"
+- "No me interesa" → "No hay problema, que tenga buen día." → endCall()
 
-Pausa. Deja que responda.
-
-════ PASO 3 — ESCUCHAR Y CALIFICAR ════
-Haz UNA sola pregunta según lo que diga:
-- Si duda: "¿Qué es lo que más le preocupa, el crédito o el pago mensual?"
-- Si interesado: "¿Tiene carro actualmente o está buscando uno nuevo?"
-- Si pregunta precios: "Depende del modelo y su situación — eso lo vemos juntos. ¿Tiene disponible esta semana para pasar?"
-
-════ PASO 4 — PROPONER LA CITA ════
-Propón siempre día Y hora específicos — nunca preguntes "¿cuándo puede?":
-"Mire, tenemos espacio el [día más cercano: mañana o pasado] en la mañana o en la tarde, ¿cuál le queda mejor?"
-
-Cuando diga mañana/tarde → confirma hora exacta:
-"Perfecto, ¿a las diez o a las dos le queda bien?"
-
-════ PASO 5 — CONFIRMAR Y CERRAR ════
-Cuando confirmen día y hora, di exactamente esto:
-"Listo, quedamos el [día] a las [hora] en el dealer. Le va a atender uno de nuestros asesores personalmente. Le mando la dirección por WhatsApp ahorita. ¡Que tenga un excelente día!" → endCall()
-
-════ OBJECIONES ════
-"Me negaron antes" → "Eso pasa mucho. Nosotros trabajamos diferente — tenemos opciones que los bancos no tienen. Por eso vale la pena que vengas en persona."
-"No tengo crédito" → "Para eso estamos, esa es nuestra especialidad. Trabajamos con esa situación todos los días."
-"¿Cuánto es el pago?" → "Desde doscientos noventa y nueve al mes — depende del carro y tu situación. Eso lo definimos en la cita."
-"Voy a pensarlo" → "Claro. ¿Qué es lo que le genera duda? A veces una pregunta aclara todo."
-"Estoy ocupado" → "Entiendo, no le quito más tiempo. ¿Mañana o pasado le queda mejor para diez minutos?"
-"No me interesa" → "No hay problema, que tenga buen día." → endCall()
-
-════ REGLAS ABSOLUTAS ════
+Reglas:
 - Siempre en español aunque el cliente hable inglés
-- Números SIEMPRE en palabras: "doscientos", nunca "$200"
+- Números en palabras: "doscientos", nunca "$200"
 - Nunca prometas aprobación: "trabajamos con tu situación"
-- Nunca menciones nombres del equipo hasta el cierre
-- Máximo 2 oraciones por turno — deja siempre espacio para que responda
-- Si preguntan si eres IA: "Soy una asistente virtual. Si prefieres hablar con una persona te la conecto por WhatsApp ahorita."
-- NUNCA repitas la misma frase dos veces en la misma llamada`
+- Nunca menciones nombres del equipo hasta confirmar la cita
+- Si preguntan si eres IA: "Soy una asistente virtual. Si prefieres una persona te la conecto por WhatsApp."
+- Nunca repitas la misma frase dos veces en la misma llamada`
     }]
   },
   voice: {
@@ -265,7 +234,12 @@ export async function llamarLead(lead) {
         phoneNumberId: VAPI_PHONE_ID,
         assistant: {
           ...SOFIA_CONFIG,
-          firstMessage: `Hola, ¿hablo con ${nombre}?`,
+          firstMessage: (() => {
+            const hora = new Date().toLocaleString('en-US', { timeZone: 'America/New_York', hour: 'numeric', hour12: false });
+            const h = parseInt(hora);
+            const saludo = h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches';
+            return `${saludo}, ¿hablo con ${nombre}?`;
+          })(),
         },
         customer: {
           number: tel,
@@ -378,14 +352,33 @@ export async function procesarResultadoLlamada(callData) {
     const duracion = duration ? `${Math.round(duration)}s` : '—';
 
     const iconos = {
-      'ended':     '✅',
-      'no-answer': '📵',
-      'busy':      '📵',
-      'failed':    '❌',
-      'voicemail': '📬',
+      'ended':              '✅',
+      'no-answer':          '📵',
+      'busy':               '📵',
+      'failed':             '❌',
+      'voicemail':          '📬',
+      'customer-ended-call':'✅',
+      'assistant-ended-call':'✅',
+      'silence-timed-out':  '🔇',
+      'max-duration-exceeded':'⏱',
+      'twilio-failed-to-connect-call': '❌',
+    };
+
+    const estadoES = {
+      'ended':               'Completada',
+      'no-answer':           'Sin respuesta',
+      'busy':                'Ocupado',
+      'failed':              'Falló',
+      'voicemail':           'Buzón de voz',
+      'customer-ended-call': 'Cliente colgó',
+      'assistant-ended-call':'Sofía colgó',
+      'silence-timed-out':   'Silencio — tiempo agotado',
+      'max-duration-exceeded':'Duración máxima',
+      'twilio-failed-to-connect-call': 'Error de conexión',
     };
 
     const icono = iconos[endedReason] || iconos[status] || '📞';
+    const estadoTexto = estadoES[endedReason] || estadoES[status] || endedReason || status || '—';
     const citaIcono = appointmentBooked === true ? '🗓 <b>CITA AGENDADA</b>' : appointmentBooked === false ? '❌ Sin cita' : '';
     const scoreTexto = successEval != null ? `⭐ Score: ${successEval}/10` : '';
 
@@ -394,7 +387,7 @@ export async function procesarResultadoLlamada(callData) {
       `━━━━━━━━━━━━━━━━━━━━━━\n` +
       `📱 ${escH(telefono)}\n` +
       `⏱ Duración: ${escH(duracion)}\n` +
-      `📋 Estado: ${escH(endedReason || status)}\n` +
+      `📋 Estado: ${escH(estadoTexto)}\n` +
       (citaIcono ? `${citaIcono}\n` : '') +
       (scoreTexto ? `${scoreTexto}\n` : '');
 
