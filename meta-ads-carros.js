@@ -199,24 +199,17 @@ async function crearFormulario(segmento) {
   const form = await metaPost(`/${PAGE_ID}/leadgen_forms`, {
     name: `AutoAprobado Miami — ${segmento} — ${new Date().toISOString().slice(0,10)}`,
     locale: 'es_ES',
-    is_optimized_for_quality: true,
-    context_card: {
-      style:   'LIST_STYLE',
-      title:   '¿Por qué AutoAprobado Miami?',
-      content: contexto,
-      button_text: 'Verificar si califico',
-    },
     questions: [
       { type: 'FULL_NAME',  key: 'full_name'    },
       { type: 'PHONE',      key: 'phone_number' },
       ...preguntas
     ],
-    privacy_policy: { url: `${LANDING_URL}/#privacidad` },
+    privacy_policy: { url: `${LANDING_URL}/privacidad` },
     thank_you_page: {
-      title:       '¡Solicitud recibida! 🚗',
-      body:        'Eduardo o Jorge te llamarán en menos de 24 horas. ¡Prepárate para tu carro nuevo!',
+      title:       '¡Solicitud recibida!',
+      body:        'Eduardo o Jorge te llamarán en menos de 24 horas.',
       button_type: 'VIEW_WEBSITE',
-      button_text: 'Ver nuestros carros disponibles',
+      button_text: 'Ver nuestros carros',
       website_url: LANDING_URL,
     },
   });
