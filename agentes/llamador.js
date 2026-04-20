@@ -71,7 +71,7 @@ CUÁNDO COLGAR — MUY IMPORTANTE:
   },
   voice: {
     provider:                 '11labs',
-    voiceId:                  'jBpfuIE2acCO8z3wKNLl', // Belén
+    voiceId:                  'KDG2CWzkFgcZz4Vqbu8m', // Belén
     model:                    'eleven_turbo_v2_5',
     stability:                0.55,
     similarityBoost:          0.75,
@@ -142,7 +142,7 @@ CUÁNDO COLGAR:
   },
   voice: {
     provider:                 '11labs',
-    voiceId:                  'jBpfuIE2acCO8z3wKNLl', // Belén
+    voiceId:                  'KDG2CWzkFgcZz4Vqbu8m', // Belén
     model:                    'eleven_turbo_v2_5',
     stability:                0.55,
     similarityBoost:          0.80,
