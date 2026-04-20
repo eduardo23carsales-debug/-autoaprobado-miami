@@ -104,6 +104,9 @@ CUÁNDO COLGAR:
   maxDurationSeconds:    240,
   silenceTimeoutSeconds: 25,
   backgroundSound:       'off',
+  backgroundSpeechDenoisingPlan: {
+    smartDenoisingPlan: { enabled: true }
+  },
   serverUrl: process.env.RAILWAY_PUBLIC_DOMAIN
     ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}/api/vapi/webhook`
     : null,
