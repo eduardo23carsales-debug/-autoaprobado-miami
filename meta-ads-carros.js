@@ -345,15 +345,9 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
   };
   const edad = EDAD_POR_SEGMENTO[segmento] || { min: 22, max: 55 };
 
-  // Audiencia de exclusión — no gastar en quien ya convirtió
-  // Excluye a personas que ya dispararon el evento Lead en el pixel
-  const exclusiones = PIXEL_ID ? [{
-    inclusions: { operator: 'or', rules: [{
-      event_sources: [{ id: PIXEL_ID, type: 'pixel' }],
-      retention_seconds: 5184000, // 60 días
-      filter: { operator: 'and', filters: [{ field: 'event', operator: 'eq', value: 'Lead' }] }
-    }]}
-  }] : [];
+  // Exclusión de audiencia desactivada — excluded_custom_audiences requiere ID de audiencia
+  // existente en Meta, no reglas inline. Activar después de crear la audiencia en Meta.
+  const exclusiones = [];
 
   // Horario de ads — solo 7AM a 11PM ET (horas 7-23)
   // Meta usa minutos desde medianoche en zona UTC — convertir ET a UTC (+4 o +5 según DST)
