@@ -12,25 +12,15 @@ const VAPI_API_KEY       = process.env.VAPI_API_KEY;
 const VAPI_PHONE_ID      = process.env.VAPI_PHONE_NUMBER_ID;
 const WHATSAPP_PRINCIPAL = process.env.WHATSAPP_PRINCIPAL || process.env.WHATSAPP_EDUARDO || '17869167339';
 
-// ID del asistente Sofía (leads) — se crea una vez y se reutiliza
-let _assistantId    = process.env.VAPI_ASSISTANT_ID     || null;
-// ID del asistente Ana (briefing matutino) — se guarda en VAPI_ANA_ASSISTANT_ID
-let _anaAssistantId = process.env.VAPI_ANA_ASSISTANT_ID || null;
-
-// ── Crear asistente VAPI (solo la primera vez) ────────
-async function crearAsistente() {
-  console.log('[VAPI] Creando asistente de ventas...');
-
-  const { data } = await axios.post(
-    'https://api.vapi.ai/assistant',
-    {
-      name: 'Vendedor AutoAprobado Miami',
-      model: {
-        provider: 'openai',
-        model:    'gpt-4o-mini',
-        messages: [{
-          role:    'system',
-          content: `Eres Sofía, una asistente virtual de AutoAprobado Miami — un dealer de carros en Miami que ayuda a personas hispanas a conseguir financiamiento aunque tengan mal crédito o no tengan historial crediticio en USA.
+// Config inline Sofía — se pasa directo en cada llamada, sin crear asistente en VAPI
+const SOFIA_CONFIG = {
+  name: 'Sofía — AutoAprobado Miami',
+  model: {
+    provider: 'openai',
+    model:    'gpt-4o-mini',
+    messages: [{
+      role:    'system',
+      content: `Eres Sofía, una asistente virtual de AutoAprobado Miami — un dealer de carros en Miami que ayuda a personas hispanas a conseguir financiamiento aunque tengan mal crédito o no tengan historial crediticio en USA.
 
 Tu trabajo es llamar al cliente, presentarte brevemente, confirmar que recibieron la información y agendar una cita con uno de nuestros asesores.
 
@@ -77,167 +67,45 @@ CUÁNDO COLGAR — MUY IMPORTANTE:
 - Si el cliente dice "gracias", "adiós", "ok", "hasta luego", "chao", "bye" → endCall() de inmediato, sin agregar más palabras
 - Si ya confirmaron la cita y el cliente no dice nada por 3 segundos → endCall()
 - NO sigas hablando después de despedirte — una despedida = colgar`
-        }]
-      },
-      voice: {
-        provider:  '11labs',
-        voiceId:   'jBpfuIE2acCO8z3wKNLl', // Belén — amable y suave
-        model:     'eleven_turbo_v2_5',
-        stability: 0.55,
-        similarityBoost: 0.75,
-        style:     0.10,
-        useSpeakerBoost: true,
-        optimizeStreamingLatency: 2,
-      },
-      transcriber: {
-        provider:          'deepgram',
-        model:             'nova-2',
-        language:          'es',
-        keywords:          ['AutoAprobado', 'Miami', 'Hyundai', 'financiamiento', 'crédito', 'cita', 'Eduardo', 'Jorge'],
-        endpointing:       300,
-      },
-      firstMessage: `Hola, ¿hablo con {{nombre}}? Le llama Sofía de AutoAprobado Miami. Vi que se registró para información sobre financiamiento de carros. ¿Tiene un momentito para hablar?`,
-      endCallMessage: 'Muchas gracias por su tiempo. Que tenga un excelente día.',
-      endCallPhrases: [
-        'hasta luego', 'adiós', 'chao', 'no me interesa', 'no gracias', 'llámame después'
-      ],
-      maxDurationSeconds:    240,
-      silenceTimeoutSeconds: 20,
-      backgroundSound:       'off',
-      serverUrl: process.env.RAILWAY_PUBLIC_DOMAIN
-        ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}/api/vapi/webhook`
-        : null,
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${VAPI_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      timeout: 15000
-    }
-  );
-
-  console.log(`[VAPI] Asistente creado: ${data.id}`);
-  console.log(`[VAPI] ⚠️  Agrega a Railway: VAPI_ASSISTANT_ID=${data.id}`);
-  return data.id;
-}
-
-// ── Obtener o crear asistente ─────────────────────────
-async function getAssistantId() {
-  if (_assistantId) return _assistantId;
-  _assistantId = await crearAsistente();
-  return _assistantId;
-}
-
-// Helper para escapar texto dinámico en mensajes HTML de Telegram
-const escH = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-
-// ── Llamar al lead ─────────────────────────────────────
-export async function llamarLead(lead) {
-  const { nombre, telefono, segmento } = lead;
-
-  if (!VAPI_API_KEY || !VAPI_PHONE_ID) {
-    console.warn('[VAPI] Variables no configuradas — saltando llamada');
-    return;
-  }
-
-  // Formatear teléfono — asegurar formato E.164 (+1XXXXXXXXXX)
-  let tel = telefono.replace(/\D/g, '');
-  if (tel.length === 10) tel = `1${tel}`;
-  if (!tel.startsWith('+')) tel = `+${tel}`;
-
-  if (tel.length < 12) {
-    console.warn(`[VAPI] Teléfono inválido: ${telefono}`);
-    await notificar(`⚠️ <b>VAPI:</b> Teléfono inválido para ${escH(nombre)} — ${escH(telefono)}\nNo se pudo realizar la llamada.`);
-    return;
-  }
-
-  try {
-    const assistantId = await getAssistantId();
-
-    const segmentoTexto = {
-      'mal-credito':     'tiene mal crédito y quiere financiamiento',
-      'sin-credito':     'no tiene historial crediticio en USA',
-      'urgente':         'necesita un carro urgentemente',
-      'upgrade':         'quiere cambiar su carro actual',
-      'oferta-especial': 'está interesado en la oferta especial de Hyundai 2026',
-    }[segmento] || 'se registró para información de financiamiento';
-
-    console.log(`[VAPI] Llamando a ${nombre} (${tel})...`);
-
-    const { data: call } = await axios.post(
-      'https://api.vapi.ai/call',
-      {
-        phoneNumberId: VAPI_PHONE_ID,
-        assistantId,
-        customer: {
-          number: tel,
-          name:   nombre
-        },
-        assistantOverrides: {
-          variableValues: { nombre, segmento: segmentoTexto },
-          firstMessage: `Hola, ¿hablo con ${nombre}? Le llama Sofía de AutoAprobado Miami, vi que se registró para información sobre financiamiento de carros y que ${segmentoTexto}. ¿Tiene un momentito para hablar?`,
-          voice: {
-            provider:  '11labs',
-            voiceId:   'jBpfuIE2acCO8z3wKNLl',
-            model:     'eleven_turbo_v2_5',
-            stability: 0.55,
-            similarityBoost: 0.75,
-            style:     0.10,
-            optimizeStreamingLatency: 2,
-          }
-        }
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${VAPI_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        timeout: 15000
-      }
-    );
-
-    console.log(`[VAPI] Llamada iniciada: ${call.id}`);
-    await notificar(
-      `📞 <b>Llamando a ${escH(nombre)}</b>\n` +
-      `📱 ${escH(telefono)}\n` +
-      `🎯 ${escH(segmentoTexto)}\n` +
-      `🤖 Sofía en línea...`
-    );
-
-    return call.id;
-
-  } catch (err) {
-    const msg = err.response?.data?.message || err.message;
-    console.error(`[VAPI] Error al llamar: ${msg}`);
-    await notificar(`⚠️ <b>VAPI Error:</b> No se pudo llamar a ${escH(nombre)}\n<code>${escH(msg)}</code>`);
-  }
-}
-
-// ════════════════════════════════════════════════════
-// ANA — Asistente Personal de Eduardo
-// Llama cada mañana con el briefing del negocio
-// Tono: profesional, cálida, como una socia de confianza
-// ════════════════════════════════════════════════════
-
-async function crearAsistenteAna() {
-  console.log('[Ana] Creando asistente de briefing...');
-
-  const serverUrl = process.env.RAILWAY_PUBLIC_DOMAIN
+    }]
+  },
+  voice: {
+    provider:                 '11labs',
+    voiceId:                  'jBpfuIE2acCO8z3wKNLl', // Belén
+    model:                    'eleven_turbo_v2_5',
+    stability:                0.55,
+    similarityBoost:          0.75,
+    style:                    0.10,
+    useSpeakerBoost:          true,
+    optimizeStreamingLatency: 2,
+  },
+  transcriber: {
+    provider:    'deepgram',
+    model:       'nova-2',
+    language:    'es',
+    keywords:    ['AutoAprobado', 'Miami', 'Hyundai', 'financiamiento', 'crédito', 'cita', 'Eduardo', 'Jorge'],
+    endpointing: 300,
+  },
+  endCallMessage:       'Muchas gracias por su tiempo. Que tenga un excelente día.',
+  endCallPhrases:       ['hasta luego', 'adiós', 'chao', 'no me interesa', 'no gracias', 'llámame después'],
+  maxDurationSeconds:    240,
+  silenceTimeoutSeconds: 20,
+  backgroundSound:       'off',
+  serverUrl: process.env.RAILWAY_PUBLIC_DOMAIN
     ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}/api/vapi/webhook`
-    : null;
+    : null,
+};
 
-  const { data } = await axios.post(
-    'https://api.vapi.ai/assistant',
-    {
-      name: 'Ana — Asistente AutoAprobado Miami',
-      model: {
-        provider:  'anthropic',
-        model:     'claude-sonnet-4-6',
-        maxTokens: 1000,
-        messages: [{
-          role:    'system',
-          content: `Eres Ana, la asistente personal de Eduardo Ferrer en AutoAprobado Miami.
+// Config inline Ana — se pasa directo en cada llamada, sin crear asistente en VAPI
+const ANA_CONFIG = {
+  name: 'Ana — Asistente AutoAprobado Miami',
+  model: {
+    provider:  'anthropic',
+    model:     'claude-sonnet-4-6',
+    maxTokens: 1000,
+    messages: [{
+      role:    'system',
+      content: `Eres Ana, la asistente personal de Eduardo Ferrer en AutoAprobado Miami.
 
 Eduardo tiene un negocio de venta de carros financiados en Miami enfocado en clientes hispanos con mal crédito o sin historial crediticio. Tus colegas de trabajo son Jorge Martínez (vendedor) y los agentes de IA que optimizan campañas de Meta Ads automáticamente.
 
@@ -270,68 +138,130 @@ CUÁNDO COLGAR:
 - Después de que Eduardo aprueba o rechaza el plan → endCall() inmediatamente
 - Si Eduardo dice "listo", "ok gracias", "ya", "perfecto" después del briefing → endCall()
 - Si hay silencio por 5 segundos después del cierre → endCall()`
-        }]
-      },
-      voice: {
-        provider:                 '11labs',
-        voiceId:                  'jBpfuIE2acCO8z3wKNLl', // Belén — amable y suave
-        model:                    'eleven_turbo_v2_5',
-        stability:                0.55,
-        similarityBoost:          0.80,
-        style:                    0.10,
-        useSpeakerBoost:          true,
-        optimizeStreamingLatency: 2,
-      },
-      transcriber: {
-        provider:   'deepgram',
-        model:      'nova-2',
-        language:   'es',
-        keywords:   ['Eduardo', 'AutoAprobado', 'Miami', 'campaña', 'leads', 'presupuesto', 'apruebo', 'aprobado'],
-        endpointing: 400,
-      },
-      endCallMessage:  'Perfecto Eduardo. Que tengas un excelente día.',
-      endCallPhrases:  ['adiós', 'hasta luego', 'chao', 'bye', 'listo gracias'],
-      maxDurationSeconds:    360,
-      silenceTimeoutSeconds: 25,
-      serverUrl,
-      analysisPlan: {
-        structuredDataPlan: {
-          enabled: true,
-          schema: {
-            type: 'object',
-            properties: {
-              planAprobado: {
-                type: 'boolean',
-                description: 'true si Eduardo aprobó el plan de campañas, false si lo rechazó o pidió cambios'
-              },
-              notasEduardo: {
-                type: 'string',
-                description: 'Comentarios o cambios que Eduardo pidió durante la llamada'
-              }
-            }
+    }]
+  },
+  voice: {
+    provider:                 '11labs',
+    voiceId:                  'jBpfuIE2acCO8z3wKNLl', // Belén
+    model:                    'eleven_turbo_v2_5',
+    stability:                0.55,
+    similarityBoost:          0.80,
+    style:                    0.10,
+    useSpeakerBoost:          true,
+    optimizeStreamingLatency: 2,
+  },
+  transcriber: {
+    provider:    'deepgram',
+    model:       'nova-2',
+    language:    'es',
+    keywords:    ['Eduardo', 'AutoAprobado', 'Miami', 'campaña', 'leads', 'presupuesto', 'apruebo', 'aprobado'],
+    endpointing: 400,
+  },
+  endCallMessage:       'Perfecto Eduardo. Que tengas un excelente día.',
+  endCallPhrases:       ['adiós', 'hasta luego', 'chao', 'bye', 'listo gracias'],
+  maxDurationSeconds:    360,
+  silenceTimeoutSeconds: 25,
+  serverUrl: process.env.RAILWAY_PUBLIC_DOMAIN
+    ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}/api/vapi/webhook`
+    : null,
+  analysisPlan: {
+    structuredDataPlan: {
+      enabled: true,
+      schema: {
+        type: 'object',
+        properties: {
+          planAprobado: {
+            type: 'boolean',
+            description: 'true si Eduardo aprobó el plan de campañas, false si lo rechazó o pidió cambios'
+          },
+          notasEduardo: {
+            type: 'string',
+            description: 'Comentarios o cambios que Eduardo pidió durante la llamada'
           }
-        },
-        summaryPlan: {
-          enabled: true,
         }
       }
     },
-    {
-      headers: { Authorization: `Bearer ${VAPI_API_KEY}`, 'Content-Type': 'application/json' },
-      timeout: 15000
-    }
-  );
+    summaryPlan: { enabled: true }
+  }
+};
 
-  console.log(`[Ana] Asistente creado: ${data.id}`);
-  console.log(`[Ana] ⚠️  Agrega a Railway: VAPI_ANA_ASSISTANT_ID=${data.id}`);
-  return data.id;
+// Helper para escapar texto dinámico en mensajes HTML de Telegram
+const escH = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+// ── Llamar al lead ─────────────────────────────────────
+export async function llamarLead(lead) {
+  const { nombre, telefono, segmento } = lead;
+
+  if (!VAPI_API_KEY || !VAPI_PHONE_ID) {
+    console.warn('[VAPI] Variables no configuradas — saltando llamada');
+    return;
+  }
+
+  // Formatear teléfono — asegurar formato E.164 (+1XXXXXXXXXX)
+  let tel = telefono.replace(/\D/g, '');
+  if (tel.length === 10) tel = `1${tel}`;
+  if (!tel.startsWith('+')) tel = `+${tel}`;
+
+  if (tel.length < 12) {
+    console.warn(`[VAPI] Teléfono inválido: ${telefono}`);
+    await notificar(`⚠️ <b>VAPI:</b> Teléfono inválido para ${escH(nombre)} — ${escH(telefono)}\nNo se pudo realizar la llamada.`);
+    return;
+  }
+
+  try {
+    const segmentoTexto = {
+      'mal-credito':     'tiene mal crédito y quiere financiamiento',
+      'sin-credito':     'no tiene historial crediticio en USA',
+      'urgente':         'necesita un carro urgentemente',
+      'upgrade':         'quiere cambiar su carro actual',
+      'oferta-especial': 'está interesado en la oferta especial de Hyundai 2026',
+    }[segmento] || 'se registró para información de financiamiento';
+
+    console.log(`[VAPI] Llamando a ${nombre} (${tel})...`);
+
+    const { data: call } = await axios.post(
+      'https://api.vapi.ai/call',
+      {
+        phoneNumberId: VAPI_PHONE_ID,
+        assistant: {
+          ...SOFIA_CONFIG,
+          firstMessage: `Hola, ¿hablo con ${nombre}? Le llama Sofía de AutoAprobado Miami, vi que se registró para información sobre financiamiento de carros y que ${segmentoTexto}. ¿Tiene un momentito para hablar?`,
+        },
+        customer: {
+          number: tel,
+          name:   nombre
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${VAPI_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        timeout: 15000
+      }
+    );
+
+    console.log(`[VAPI] Llamada iniciada: ${call.id}`);
+    await notificar(
+      `📞 <b>Llamando a ${escH(nombre)}</b>\n` +
+      `📱 ${escH(telefono)}\n` +
+      `🎯 ${escH(segmentoTexto)}\n` +
+      `🤖 Sofía en línea...`
+    );
+
+    return call.id;
+
+  } catch (err) {
+    const msg = err.response?.data?.message || err.message;
+    console.error(`[VAPI] Error al llamar: ${msg}`);
+    await notificar(`⚠️ <b>VAPI Error:</b> No se pudo llamar a ${escH(nombre)}\n<code>${escH(msg)}</code>`);
+  }
 }
 
-async function getAnaAssistantId() {
-  if (_anaAssistantId) return _anaAssistantId;
-  _anaAssistantId = await crearAsistenteAna();
-  return _anaAssistantId;
-}
+// ════════════════════════════════════════════════════
+// ANA — Asistente Personal de Eduardo
+// Llama cada mañana con el briefing del negocio
+// ════════════════════════════════════════════════════
 
 // ── Briefing matutino — Ana llama a Eduardo con el plan del día ────────
 export async function llamarBriefingMatutino(plan, resumen) {
@@ -347,8 +277,6 @@ export async function llamarBriefingMatutino(plan, resumen) {
     : `+1${rawEduardo}`;
 
   try {
-    const anaId = await getAnaAssistantId();
-
     // Construir el briefing con datos reales
     const pausar  = plan.pausar?.length  ? `Pausar ${plan.pausar.length} campaña(s): ${plan.pausar.map(p => p.nombre).join(', ')}.` : '';
     const escalar = plan.escalar?.length ? `Escalar ${plan.escalar.length} campaña(s).` : '';
@@ -363,20 +291,11 @@ export async function llamarBriefingMatutino(plan, resumen) {
       'https://api.vapi.ai/call',
       {
         phoneNumberId: VAPI_PHONE_ID,
-        assistantId:   anaId,
-        customer: { number: telefonoEduardo, name: 'Eduardo Ferrer' },
-        assistantOverrides: {
+        assistant: {
+          ...ANA_CONFIG,
           firstMessage,
-          voice: {
-            provider:                 '11labs',
-            voiceId:                  'jBpfuIE2acCO8z3wKNLl', // Belén
-            model:                    'eleven_turbo_v2_5',
-            stability:                0.55,
-            similarityBoost:          0.80,
-            style:                    0.10,
-            optimizeStreamingLatency: 2,
-          }
-        }
+        },
+        customer: { number: telefonoEduardo, name: 'Eduardo Ferrer' },
       },
       {
         headers: { Authorization: `Bearer ${VAPI_API_KEY}`, 'Content-Type': 'application/json' },
