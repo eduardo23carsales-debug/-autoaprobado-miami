@@ -122,6 +122,15 @@ Cuando confirmen día y hora, di exactamente esto:
   backgroundSpeechDenoisingPlan: {
     smartDenoisingPlan: { enabled: true }
   },
+  analysisPlan: {
+    summaryPlan: {
+      enabled: true,
+      messages: [{
+        role: 'system',
+        content: 'Eres un asistente que resume llamadas de ventas en español. Resume brevemente: qué dijo el cliente, si mostró interés, si agendó cita, y cualquier dato importante. Máximo 3 líneas. Siempre en español.'
+      }]
+    }
+  },
   serverUrl: process.env.RAILWAY_PUBLIC_DOMAIN
     ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}/api/vapi/webhook`
     : null,
