@@ -197,21 +197,13 @@ async function crearFormulario(segmento) {
   const contexto  = CONTEXT_CONTENT[segmento] || ['✅ Proceso rápido y 100% en español', '✅ Respuesta en menos de 24 horas'];
 
   const form = await metaPost(`/${PAGE_ID}/leadgen_forms`, {
-    name: `AutoAprobado Miami — ${segmento} — ${new Date().toISOString().slice(0,10)}`,
-    locale: 'es_ES',
+    name: `AutoAprobado Miami — ${segmento} — ${Date.now()}`,
     questions: [
-      { type: 'FULL_NAME',  key: 'full_name'    },
-      { type: 'PHONE',      key: 'phone_number' },
-      ...preguntas
+      { type: 'FULL_NAME'  },
+      { type: 'PHONE'      },
+      { type: 'EMAIL'      },
     ],
-    privacy_policy: { url: `${LANDING_URL}/privacidad` },
-    thank_you_page: {
-      title:       '¡Solicitud recibida!',
-      body:        'Eduardo o Jorge te llamarán en menos de 24 horas.',
-      button_type: 'VIEW_WEBSITE',
-      button_text: 'Ver nuestros carros',
-      website_url: LANDING_URL,
-    },
+    privacy_policy: { url: LANDING_URL },
   });
   console.log(`[Form] Formulario Higher Intent creado: ${form.id}`);
   return form.id;
@@ -342,12 +334,6 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
   const exclusiones = [];
 
   // Horario de ads — solo 7AM a 11PM ET (horas 7-23)
-  // Meta usa minutos desde medianoche en zona UTC — convertir ET a UTC (+4 o +5 según DST)
-  // Usamos franja amplia: 7AM-11PM = 420min a 1380min en zona del ad account
-  const horasActivas = [];
-  for (let dia = 0; dia <= 6; dia++) {
-    horasActivas.push({ start_minute: 420, end_minute: 1380, days: [dia] });
-  }
 
   // Targeting — Miami DMA + hispanohablantes + móvil
   // FINANCIAL_PRODUCTS_SERVICES no permite custom_locations con radio — usar DMA o ciudad
@@ -374,7 +360,6 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
       ? { page_id: PAGE_ID }
       : { pixel_id: PIXEL_ID, custom_event_type: 'LEAD' },
     // Horario: solo 7AM-11PM — no gastar de madrugada
-    adset_schedule: horasActivas,
     // Advantage+ Audience — Meta AI optimiza targeting más allá de las restricciones
     // de FINANCIAL_PRODUCTS_SERVICES. El targeting manual se convierte en "sugerencia".
     // Debe estar en el adset, NO dentro del objeto targeting.
