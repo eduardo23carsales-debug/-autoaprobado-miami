@@ -365,7 +365,18 @@ export async function llamarBriefingMatutino(plan, resumen) {
         phoneNumberId: VAPI_PHONE_ID,
         assistantId:   anaId,
         customer: { number: telefonoEduardo, name: 'Eduardo Ferrer' },
-        assistantOverrides: { firstMessage }
+        assistantOverrides: {
+          firstMessage,
+          voice: {
+            provider:                 '11labs',
+            voiceId:                  'jBpfuIE2acCO8z3wKNLl', // Belén
+            model:                    'eleven_turbo_v2_5',
+            stability:                0.55,
+            similarityBoost:          0.80,
+            style:                    0.10,
+            optimizeStreamingLatency: 2,
+          }
+        }
       },
       {
         headers: { Authorization: `Bearer ${VAPI_API_KEY}`, 'Content-Type': 'application/json' },
