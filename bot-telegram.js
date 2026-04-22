@@ -384,6 +384,7 @@ async function manejarMensaje(msg) {
   const partes = texto.trim().split(/\s+/);
   const cmd    = partes[0].toLowerCase().replace(/@\w+$/, ''); // strip @botname suffix in groups
   const args   = partes.slice(1);
+  console.log(`[Bot] cmd="${cmd}" chatId=${chatId}`);
 
   try {
     // /start o /ayuda o /menu
