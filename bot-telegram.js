@@ -16,7 +16,7 @@ dotenv.config();
 
 const __dirname  = path.dirname(fileURLToPath(import.meta.url));
 const API        = 'https://graph.facebook.com/v25.0';
-const TOKEN      = process.env.META_ACCESS_TOKEN?.trim();
+const getToken   = () => process.env.META_ACCESS_TOKEN?.trim();
 const AD_ACCOUNT = process.env.META_AD_ACCOUNT_ID?.trim();
 const PAGE_ID    = process.env.META_PAGE_ID?.trim();
 const CHAT_ID    = String(process.env.TELEGRAM_CHAT_ID);
@@ -31,7 +31,7 @@ const pendientes = new Map();
 async function metaGet(endpoint, params = {}) {
   try {
     const { data } = await axios.get(`${API}${endpoint}`, {
-      params: { ...params, access_token: TOKEN },
+      params: { ...params, access_token: getToken() },
       timeout: 15000
     });
     return data;
@@ -43,7 +43,7 @@ async function metaGet(endpoint, params = {}) {
 }
 
 async function metaPost(endpoint, body) {
-  const { data } = await axios.post(`${API}${endpoint}?access_token=${TOKEN}`, body, {
+  const { data } = await axios.post(`${API}${endpoint}?access_token=${getToken()}`, body, {
     timeout: 15000,
     headers: { 'Content-Type': 'application/json' }
   });
@@ -99,7 +99,7 @@ async function subirVideo(videoPath) {
   const form = new FormData();
   form.append('source', fs.createReadStream(videoPath));
   const { data } = await axios.post(
-    `${API}/${AD_ACCOUNT}/advideos?access_token=${TOKEN}`,
+    `${API}/${AD_ACCOUNT}/advideos?access_token=${getToken()}`,
     form,
     { headers: form.getHeaders(), timeout: 120000 }
   );

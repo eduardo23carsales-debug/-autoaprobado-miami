@@ -8,9 +8,11 @@ import dotenv      from 'dotenv';
 dotenv.config();
 
 export const API        = 'https://graph.facebook.com/v25.0';
-export const TOKEN      = process.env.META_ACCESS_TOKEN?.trim();
 export const AD_ACCOUNT = process.env.META_AD_ACCOUNT_ID?.trim();
 export const CHAT_ID    = process.env.TELEGRAM_CHAT_ID;
+
+// Leer token en cada llamada — Railway puede rotar el valor sin restart
+export const getToken = () => process.env.META_ACCESS_TOKEN?.trim();
 
 export const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: false });
 
@@ -18,7 +20,7 @@ export const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: fa
 export async function metaGet(endpoint, params = {}) {
   try {
     const { data } = await axios.get(`${API}${endpoint}`, {
-      params: { ...params, access_token: TOKEN },
+      params: { ...params, access_token: getToken() },
       timeout: 15000
     });
     return data;
@@ -30,7 +32,7 @@ export async function metaGet(endpoint, params = {}) {
 }
 
 export async function metaPost(endpoint, body) {
-  const { data } = await axios.post(`${API}${endpoint}?access_token=${TOKEN}`, body, {
+  const { data } = await axios.post(`${API}${endpoint}?access_token=${getToken()}`, body, {
     timeout: 15000,
     headers: { 'Content-Type': 'application/json' }
   });

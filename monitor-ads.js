@@ -11,7 +11,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const API        = 'https://graph.facebook.com/v25.0';
-const TOKEN      = process.env.META_ACCESS_TOKEN?.trim();
+const getToken = () => process.env.META_ACCESS_TOKEN?.trim();
 const AD_ACCOUNT = process.env.META_AD_ACCOUNT_ID?.trim() || 'act_2128062444705705';
 const bot        = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: false });
 const CHAT_ID    = process.env.TELEGRAM_CHAT_ID;
@@ -29,14 +29,14 @@ const ACCOUNT_STATUS = {
 
 async function metaGet(endpoint, params = {}) {
   const { data } = await axios.get(`${API}${endpoint}`, {
-    params: { ...params, access_token: TOKEN },
+    params: { ...params, access_token: getToken() },
     timeout: 15000
   });
   return data;
 }
 
 async function metaPost(endpoint, params) {
-  const url = `${API}${endpoint}?access_token=${TOKEN}`;
+  const url = `${API}${endpoint}?access_token=${getToken()}`;
   const { data } = await axios.post(url, params, {
     timeout: 15000,
     headers: { 'Content-Type': 'application/json' }

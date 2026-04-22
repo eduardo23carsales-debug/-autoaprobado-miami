@@ -18,7 +18,7 @@ const __dirname  = path.dirname(fileURLToPath(import.meta.url));
 const PHOTOS_DIR = path.join(__dirname, 'photos');
 
 const API          = 'https://graph.facebook.com/v25.0';
-const TOKEN        = process.env.META_ACCESS_TOKEN?.trim();
+const getToken = () => process.env.META_ACCESS_TOKEN?.trim();
 const AD_ACCOUNT   = process.env.META_AD_ACCOUNT_ID?.trim();
 const PAGE_ID      = process.env.META_PAGE_ID?.trim();
 const PIXEL_ID     = process.env.META_PIXEL_ID?.trim();
@@ -87,7 +87,7 @@ const SEGMENTOS = {
 // ── Helper Meta API ──────────────────────────────────
 async function metaPost(endpoint, params) {
   try {
-    const url = `${API}${endpoint}?access_token=${TOKEN}`;
+    const url = `${API}${endpoint}?access_token=${getToken()}`;
     const { data } = await axios.post(url, params, {
       timeout: 15000,
       headers: { 'Content-Type': 'application/json' }
@@ -145,7 +145,7 @@ async function subirFotoLocal(filePath) {
   const { default: FormData } = await import('form-data');
   const form = new FormData();
   form.append('filename', fs.createReadStream(filePath));
-  const url = `${API}/${AD_ACCOUNT}/adimages?access_token=${TOKEN}`;
+  const url = `${API}/${AD_ACCOUNT}/adimages?access_token=${getToken()}`;
   const { data } = await axios.post(url, form, {
     headers: form.getHeaders(),
     timeout: 30000
@@ -233,7 +233,7 @@ async function subirVideoLocal(videoPath) {
   const form = new FormData();
   form.append('source', fs.createReadStream(videoPath));
   const { data } = await axios.post(
-    `${API}/${AD_ACCOUNT}/advideos?access_token=${TOKEN}`,
+    `${API}/${AD_ACCOUNT}/advideos?access_token=${getToken()}`,
     form,
     { headers: form.getHeaders(), timeout: 120000 }
   );
@@ -444,7 +444,7 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
       try {
         await new Promise(r => setTimeout(r, 2000));
         const prev = await axios.get(`${API}/${ad.id}/previews`, {
-          params: { ad_format: 'MOBILE_FEED_STANDARD', access_token: TOKEN },
+          params: { ad_format: 'MOBILE_FEED_STANDARD', access_token: getToken() },
           timeout: 10000
         });
         const iframe = prev.data?.data?.[0]?.body || '';
@@ -477,7 +477,7 @@ async function crearCampanaSegmento(segmento, presupuestoDiario = 20, videoPathP
 // ── Verificar credenciales antes de lanzar ───────────
 async function preflight() {
   const faltantes = [];
-  if (!TOKEN)      faltantes.push('META_ACCESS_TOKEN');
+  if (!getToken())      faltantes.push('META_ACCESS_TOKEN');
   if (!AD_ACCOUNT) faltantes.push('META_AD_ACCOUNT_ID');
   if (!PAGE_ID)    faltantes.push('META_PAGE_ID');
 
@@ -488,7 +488,7 @@ async function preflight() {
 
   try {
     const { data } = await axios.get(`${API}/me`, {
-      params: { fields: 'id,name', access_token: TOKEN },
+      params: { fields: 'id,name', access_token: getToken() },
       timeout: 10000
     });
     console.log(`✅ Token válido — cuenta: ${data.name}`);
