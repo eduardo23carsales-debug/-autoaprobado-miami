@@ -616,6 +616,29 @@ app.post('/telegram/webhook', (req, res) => {
   }
 });
 
+// ── Chequeo de token Meta — medianoche ET ────────────
+cron.schedule('0 0 * * *', async () => {
+  try {
+    const { validarToken } = await import('./agentes/utils.js');
+    const res = await validarToken();
+    if (!res.ok) {
+      await bot.sendMessage(CHAT_ID,
+        `🔑 <b>Token Meta expirado o inválido</b>\n\n` +
+        `<b>Error:</b> ${res.error}\n\n` +
+        `<b>Para renovar (2 min):</b>\n` +
+        `1. business.facebook.com/settings\n` +
+        `2. Usuarios → Usuarios del sistema → tu usuario\n` +
+        `3. Generar nuevo token → ads_management, ads_read, leads_retrieval\n` +
+        `4. Railway → Variables → META_ACCESS_TOKEN → pegar → Save\n\n` +
+        `Luego manda <code>/token</code> para confirmar.`,
+        { parse_mode: 'HTML' }
+      );
+    }
+  } catch (e) {
+    console.error('[Token Check]', e.message);
+  }
+}, { timezone: 'America/New_York' });
+
 // ── Agente Analista — 8 AM ET diario ─────────────────
 cron.schedule('0 8 * * *', () => {
   console.log('[Cron] Ejecutando Analista...');
@@ -632,6 +655,29 @@ cron.schedule('0 */4 * * *', () => {
 app.listen(PORT, async () => {
   console.log(`✅ AutoAprobado Miami corriendo en http://localhost:${PORT}`);
   console.log(`📊 Monitor de campañas activo — reporte diario a las 8 AM ET`);
+
+  // Validar token Meta al arrancar
+  try {
+    const { validarToken } = await import('./agentes/utils.js');
+    const res = await validarToken();
+    if (res.ok) {
+      console.log(`✅ Token Meta OK — cuenta: ${res.nombre}`);
+    } else {
+      console.error(`❌ Token Meta inválido: ${res.error}`);
+      await bot.sendMessage(CHAT_ID,
+        `🔑 <b>Token Meta inválido al arrancar</b>\n\n` +
+        `<b>Error:</b> ${res.error}\n\n` +
+        `<b>Para renovar:</b>\n` +
+        `1. business.facebook.com/settings → Usuarios del sistema\n` +
+        `2. Generar nuevo token → ads_management, ads_read, leads_retrieval\n` +
+        `3. Railway → META_ACCESS_TOKEN → pegar → Save\n\n` +
+        `Manda <code>/token</code> para confirmar cuando lo actualices.`,
+        { parse_mode: 'HTML' }
+      ).catch(() => {});
+    }
+  } catch (e) {
+    console.error('[Startup] Error validando token:', e.message);
+  }
 
   // Registrar webhook de Telegram
   const domain = process.env.RAILWAY_PUBLIC_DOMAIN;

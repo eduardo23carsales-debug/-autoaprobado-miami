@@ -16,6 +16,22 @@ export const getToken = () => process.env.META_ACCESS_TOKEN?.trim();
 
 export const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: false });
 
+// ── Validar token Meta ────────────────────────────────
+export async function validarToken() {
+  const token = getToken();
+  if (!token) return { ok: false, error: 'META_ACCESS_TOKEN no configurado en Railway' };
+  try {
+    const { data } = await axios.get(`${API}/me`, {
+      params: { fields: 'id,name', access_token: token },
+      timeout: 8000
+    });
+    return { ok: true, nombre: data.name, id: data.id };
+  } catch (err) {
+    const meta = err.response?.data?.error;
+    return { ok: false, error: meta ? `${meta.message}` : err.message, code: meta?.code };
+  }
+}
+
 // ── Meta API helpers ─────────────────────────────────
 export async function metaGet(endpoint, params = {}) {
   try {

@@ -604,6 +604,35 @@ async function manejarMensaje(msg) {
       return;
     }
 
+    // /token — verifica estado del token Meta en Railway
+    if (cmd === '/token') {
+      await bot.sendMessage(chatId, '🔍 Verificando token Meta...');
+      try {
+        const { validarToken } = await import('./agentes/utils.js');
+        const res = await validarToken();
+        if (res.ok) {
+          await bot.sendMessage(chatId,
+            `✅ <b>Token Meta OK</b>\n👤 Cuenta: <b>${res.nombre}</b>\n🆔 ID: <code>${res.id}</code>`,
+            { parse_mode: 'HTML' }
+          );
+        } else {
+          await bot.sendMessage(chatId,
+            `❌ <b>Token Meta INVÁLIDO</b>\n\n` +
+            `<b>Error:</b> ${res.error}\n\n` +
+            `<b>Para renovar:</b>\n` +
+            `1. Entra a business.facebook.com/settings\n` +
+            `2. Usuarios → Usuarios del sistema → tu usuario\n` +
+            `3. Generar nuevo token → permisos: ads_management, ads_read, leads_retrieval\n` +
+            `4. Pégalo en Railway → META_ACCESS_TOKEN`,
+            { parse_mode: 'HTML' }
+          );
+        }
+      } catch (e) {
+        await bot.sendMessage(chatId, `❌ Error: <code>${e.message}</code>`, { parse_mode: 'HTML' });
+      }
+      return;
+    }
+
     // /testvoz — llamada de prueba inmediata para verificar voz de Sofía
     if (cmd === '/testvoz') {
       await bot.sendMessage(chatId, '📞 Llamando ahora con Sofía (voz Belén)...');
