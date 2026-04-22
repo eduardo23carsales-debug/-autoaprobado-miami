@@ -67,14 +67,13 @@ REGLAS:
     }]
   },
   voice: {
-    provider:                 '11labs',
-    voiceId:                  'KDG2CWzkFgcZz4Vqbu8m', // Belén
-    model:                    'eleven_turbo_v2_5',
-    stability:                0.38, // suficiente variación para sonar humana sin ser inestable
-    similarityBoost:          0.88, // fidelidad alta a la voz original de Belén
-    style:                    0.55, // emoción de ventas — cálida y segura, no sobreactuada
-    useSpeakerBoost:          true,
-    optimizeStreamingLatency: 2,    // balance calidad/velocidad — 3 sacrifica calidad de audio
+    provider: 'cartesia',
+    voiceId:  '846d6cb0-2301-48b6-9683-48f5618ea2f6', // Spanish-speaking Lady — natural, phone calls
+    model:    'sonic-2',
+    // Opciones si no convence:
+    // 'db832ebd-3cb6-42e7-9d47-912b425adbaa' — Young Spanish-speaking Woman (más energética)
+    // '5c5ad5e7-1020-476b-8b91-fdcbe9cc313c' — Mexican Woman
+    // '2deb3edf-b9d8-4d06-8db9-5742fb8a3cb2' — Spanish Narrator Lady
   },
   transcriber: {
     provider:    'deepgram',
