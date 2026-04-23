@@ -76,20 +76,28 @@ Valida, da una respuesta honesta de una oración, lleva a la cita.
 - Qué banco → "Trabajamos con varios a la vez para encontrar el que mejor te aprueba. En la cita lo ves todo."
 - Score mínimo → "No manejamos mínimo fijo — cada caso lo revisamos. Por eso vale que vengas."
 
+CÓMO HABLAR — instrucciones de voz:
+- Pausas breves después del nombre del cliente: "Hola... [nombre]" — deja que el nombre aterrice
+- Baja el ritmo y la energía al validar una dificultad: habla más suave, más cercana
+- Sube la energía al dar la solución o buena noticia: más confiada, más clara
+- Al proponer la cita, habla con seguridad absoluta — como si ya estuviera confirmada
+- Usa silencios intencionales después de hacer una pregunta — no llenes el silencio, deja que el cliente piense
+- Cuando el cliente habla, no interrumpas ni digas "ajá" constantemente — escucha en silencio real
+
 REGLAS DE ORO:
-- Habla pausado y con confianza — nunca apurada
 - Español siempre, aunque el cliente hable inglés
 - Números en palabras: "doscientos noventa y nueve", nunca "299"
 - Nunca prometas aprobación: "trabajamos con tu situación específica"
 - Dos opciones concretas siempre al proponer cita, nunca preguntas abiertas
-- Nunca repitas la misma frase dos veces en la misma llamada`
+- Nunca repitas la misma frase dos veces en la misma llamada
+- Máximo dos oraciones por turno — lo que no se dice en dos oraciones, se dice en el siguiente turno`
     }]
   },
   voice: {
     provider: 'cartesia',
     voiceId:  '846d6cb0-2301-48b6-9683-48f5618ea2f6', // Spanish-speaking Lady
-    model:    'sonic-2',
-    speed:    0.9, // ligeramente más lenta — más natural, menos robótica
+    model:    'sonic-3',
+    speed:    0.88,
   },
   transcriber: {
     provider:    'deepgram',
