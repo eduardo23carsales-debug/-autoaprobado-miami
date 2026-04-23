@@ -128,6 +128,26 @@ REGLAS DE ORO:
     smartDenoisingPlan: { enabled: true }
   },
   analysisPlan: {
+    structuredDataPlan: {
+      enabled: true,
+      schema: {
+        type: 'object',
+        properties: {
+          citaAgendada: {
+            type: 'boolean',
+            description: 'true si el cliente confirmó una cita, false si no'
+          },
+          diaCita: {
+            type: 'string',
+            description: 'Día de la cita mencionado en la conversación, por ejemplo "martes", "mañana", "miércoles"'
+          },
+          horaCita: {
+            type: 'string',
+            description: 'Hora de la cita mencionada, por ejemplo "10 de la mañana", "2 de la tarde"'
+          }
+        }
+      }
+    },
     summaryPlan: {
       enabled: true,
       messages: [{
@@ -376,21 +396,22 @@ export function programarLlamada(lead) {
 // ── Procesar resultado de llamada (desde webhook) ─────
 export async function procesarResultadoLlamada(callData) {
   try {
-    const { id, status, endedReason, duration, transcript, summary, appointmentBooked, successEval, customer } = callData;
+    const { status, endedReason, duration, summary, successEval, customer, analysis } = callData;
 
     const nombre   = customer?.name || 'Lead';
     const telefono = customer?.number || '—';
     const duracion = duration ? `${Math.round(duration)}s` : '—';
+    const telLimpio = telefono.replace(/\D/g, '');
 
     const iconos = {
-      'ended':              '✅',
-      'no-answer':          '📵',
-      'busy':               '📵',
-      'failed':             '❌',
-      'voicemail':          '📬',
-      'customer-ended-call':'✅',
+      'ended':               '✅',
+      'no-answer':           '📵',
+      'busy':                '📵',
+      'failed':              '❌',
+      'voicemail':           '📬',
+      'customer-ended-call': '✅',
       'assistant-ended-call':'✅',
-      'silence-timed-out':  '🔇',
+      'silence-timed-out':   '🔇',
       'max-duration-exceeded':'⏱',
       'twilio-failed-to-connect-call': '❌',
     };
@@ -408,32 +429,49 @@ export async function procesarResultadoLlamada(callData) {
       'twilio-failed-to-connect-call': 'Error de conexión',
     };
 
-    const icono = iconos[endedReason] || iconos[status] || '📞';
-    const estadoTexto = estadoES[endedReason] || estadoES[status] || endedReason || status || '—';
-    const citaIcono = appointmentBooked === true ? '🗓 <b>CITA AGENDADA</b>' : appointmentBooked === false ? '❌ Sin cita' : '';
-    const scoreTexto = successEval != null ? `⭐ Score: ${successEval}/10` : '';
+    // Datos de cita extraídos por el structuredDataPlan
+    const estructurado  = analysis?.structuredData || {};
+    const citaAgendada  = estructurado.citaAgendada === true;
+    const diaCita       = estructurado.diaCita  || '';
+    const horaCita      = estructurado.horaCita || '';
+    const detalleCita   = [diaCita, horaCita].filter(Boolean).join(' a las ');
+
+    const icono      = iconos[endedReason] || iconos[status] || '📞';
+    const estadoText = estadoES[endedReason] || estadoES[status] || endedReason || status || '—';
+    const scoreText  = successEval != null ? `⭐ Score: ${successEval}/10` : '';
 
     let msg =
       `${icono} <b>Resultado llamada — ${escH(nombre)}</b>\n` +
       `━━━━━━━━━━━━━━━━━━━━━━\n` +
       `📱 ${escH(telefono)}\n` +
       `⏱ Duración: ${escH(duracion)}\n` +
-      `📋 Estado: ${escH(estadoTexto)}\n` +
-      (citaIcono ? `${citaIcono}\n` : '') +
-      (scoreTexto ? `${scoreTexto}\n` : '');
+      `📋 Estado: ${escH(estadoText)}\n` +
+      (citaAgendada ? `🗓 <b>CITA AGENDADA${detalleCita ? ` — ${escH(detalleCita)}` : ''}</b>\n` : '❌ Sin cita\n') +
+      (scoreText ? `${scoreText}\n` : '');
 
     if (summary) msg += `\n💬 <b>Resumen:</b>\n${escH(summary)}`;
 
-    // Botones de seguimiento
-    const keyboard = {
-      inline_keyboard: [[
-        { text: '📱 WhatsApp', url: `https://wa.me/${telefono.replace(/\D/g,'')}` },
-        { text: '🔄 Rellamar', callback_data: `rellamar:${telefono}:${nombre}` }
-      ]]
-    };
+    // Botones siempre disponibles
+    const botonesBase = [
+      { text: '🔄 Rellamar', callback_data: `rellamar:${telefono}:${nombre}` }
+    ];
 
-    await notificar(msg, { reply_markup: keyboard });
-    console.log(`[VAPI] Resultado procesado: ${nombre} — ${endedReason || status}`);
+    // Si hay cita: botón para enviar confirmación por WhatsApp con un tap
+    if (citaAgendada && telLimpio) {
+      const textoWA = encodeURIComponent(
+        `Hola ${nombre} 👋 Le escribe el equipo de AutoAprobado Miami.\n\n` +
+        `✅ Su cita está confirmada${detalleCita ? ` para el ${detalleCita}` : ''}.\n\n` +
+        `📍 Le enviamos la dirección en un momento.\n` +
+        `Si necesita cambiar el horario, escríbanos aquí.\n\n` +
+        `¡Hasta pronto! 🚗`
+      );
+      botonesBase.unshift({ text: '✅ Confirmar cita por WhatsApp', url: `https://wa.me/${telLimpio}?text=${textoWA}` });
+    } else if (telLimpio) {
+      botonesBase.unshift({ text: '📱 WhatsApp', url: `https://wa.me/${telLimpio}` });
+    }
+
+    await notificar(msg, { reply_markup: { inline_keyboard: [botonesBase] } });
+    console.log(`[VAPI] Resultado procesado: ${nombre} — ${endedReason || status}${citaAgendada ? ' — CITA ✅' : ''}`);
 
   } catch (err) {
     console.error('[VAPI] Error procesando resultado:', err.message);
