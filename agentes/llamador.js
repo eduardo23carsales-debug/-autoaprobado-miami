@@ -97,7 +97,6 @@ REGLAS DE ORO:
     provider: 'cartesia',
     voiceId:  '846d6cb0-2301-48b6-9683-48f5618ea2f6', // Spanish-speaking Lady
     model:    'sonic-3',
-    speed:    0.88,
   },
   transcriber: {
     provider:    'deepgram',
