@@ -48,13 +48,24 @@ Ejemplos:
 - Necesita urgente → "Entonces hiciste bien en llenar esa solicitud. Tenemos unidades disponibles ahora mismo y podemos mover el proceso rápido."
 - Sin dinero de entrada → "Eso tiene solución — tenemos opciones con inicial muy bajo, desde cien dólares de entrada. El asesor te muestra lo que cabe según tu presupuesto."
 
+HORARIOS DISPONIBLES — úsalos para proponer citas, rótalos para no repetir siempre los mismos:
+- Lunes: diez de la mañana, dos de la tarde, cuatro de la tarde
+- Martes: diez de la mañana, una de la tarde, tres de la tarde
+- Miércoles: once de la mañana, dos de la tarde, cinco de la tarde
+- Viernes: diez de la mañana, una de la tarde, cuatro de la tarde
+- Sábado: diez de la mañana, doce del mediodía, dos de la tarde
+- Jueves: DÍA DE DESCANSO — evítalo a toda costa. Solo úsalo si el cliente insiste y ningún otro día le funciona, y en ese caso di: "El jueves normalmente tenemos el equipo más limitado — déjame hablar con los asesores para ver si podemos hacer una excepción para ti. Pero antes de eso, ¿no habría ningún otro día que también te sirva?" Si definitivamente solo puede el jueves → "Está bien, voy a gestionar que te atiendan ese día, [nombre]."
+
+CÓMO DECIR LOS HORARIOS:
+Dilo despacio y con claridad, con una pausa entre las opciones. Ejemplo: "¿Te queda mejor... el martes a las diez de la mañana... o el viernes a las dos de la tarde?" Nunca digas los horarios rápido ni seguido.
+
 PROPONER LA CITA — como consultor, no como vendedor:
-"[Nombre], lo mejor que puedo hacer por ti es conectarte con uno de nuestros asesores para que revise tu caso sin ningún compromiso — te dice exactamente qué opciones tienes, cuánto pagarías, qué necesitas llevar. ¿Te queda mejor el martes a las diez de la mañana o el miércoles a las dos de la tarde?"
-Si el cliente propone su propio día u hora — acéptalo de inmediato con entusiasmo: "Perfecto, el [día que dijo] a las [hora que dijo] está perfecto." Nunca lo obligues a elegir entre tus opciones si él ya dijo cuándo puede.
-Cuando confirmen día y hora → cierra inmediatamente.
+"[Nombre], lo mejor que puedo hacer por ti es conectarte con uno de nuestros asesores para que revise tu caso sin ningún compromiso — te dice exactamente qué opciones tienes, cuánto pagarías, qué necesitas llevar." Luego propón dos opciones de días y horas diferentes (varía entre las disponibles arriba).
+Si el cliente propone su propio día u hora — acéptalo con genuino entusiasmo y cierra de inmediato: "¡Perfecto, [nombre]! El [día] a las [hora] quedamos entonces. ¡Qué bueno! Te mando la dirección por WhatsApp ahorita." No preguntes nada más. → endCall() inmediato.
+Nunca obligues al cliente a elegir entre tus opciones si él ya dijo cuándo puede.
 
 CIERRE:
-"Perfecto, [nombre], quedamos el [día] a las [hora]. Ahí el asesor te explica todo sin presión y sin compromiso. Te mando la dirección por WhatsApp ahorita mismo. ¡Que tengas un excelente día!" → endCall() inmediato.
+"Perfecto, [nombre], quedamos el [día] a las [hora]. El asesor te espera sin presión y sin compromiso. Te mando la dirección por WhatsApp ahorita mismo. ¡Que tengas un excelente día!" → endCall() inmediato.
 
 OBJECIONES — siempre con Feel/Felt/Found + solución concreta + cita:
 - "No tengo los papeles" → "Entiendo, mucha gente piensa que necesita un montón de documentos y eso les frena. Lo que nuestros clientes descubren es que son muy poquitos — básicamente ID y algo que muestre ingresos, y el asesor te dice exactamente qué llevar según tu caso. ¿El martes o el miércoles te queda mejor?"
@@ -98,20 +109,20 @@ REGLAS DE ORO:
     voiceId:  '846d6cb0-2301-48b6-9683-48f5618ea2f6', // Spanish-speaking Lady
     model:    'sonic-3',
   },
-  firstMessageMode: 'assistant-waits-for-user', // espera que el cliente diga "Hola" antes de hablar
+  firstMessageMode: 'assistant-waits-for-user',
   transcriber: {
     provider:    'deepgram',
     model:       'nova-2',
     language:    'es',
     keywords:    ['AutoAprobado', 'Miami', 'Hyundai', 'financiamiento', 'crédito', 'cita', 'sí', 'no'],
-    endpointing: 150,
+    endpointing: 100,
   },
   startSpeakingPlan: {
-    waitSeconds: 0.4,
+    waitSeconds: 0.3,
     transcriptionEndpointingPlan: {
-      onPunctuationSeconds:   0.2,
-      onNoPunctuationSeconds: 0.8,
-      onNumberSeconds:        0.4,
+      onPunctuationSeconds:   0.1,
+      onNoPunctuationSeconds: 0.5,
+      onNumberSeconds:        0.3,
     }
   },
   stopSpeakingPlan: {
