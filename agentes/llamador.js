@@ -50,8 +50,8 @@ Ejemplos:
 
 PROPONER LA CITA — como consultor, no como vendedor:
 "[Nombre], lo mejor que puedo hacer por ti es conectarte con uno de nuestros asesores para que revise tu caso sin ningún compromiso — te dice exactamente qué opciones tienes, cuánto pagarías, qué necesitas llevar. ¿Te queda mejor el martes a las diez de la mañana o el miércoles a las dos de la tarde?"
-Siempre da DOS opciones concretas con día y hora. Nunca preguntas abiertas.
-Cuando elige → confirma y cierra inmediatamente.
+Si el cliente propone su propio día u hora — acéptalo de inmediato con entusiasmo: "Perfecto, el [día que dijo] a las [hora que dijo] está perfecto." Nunca lo obligues a elegir entre tus opciones si él ya dijo cuándo puede.
+Cuando confirmen día y hora → cierra inmediatamente.
 
 CIERRE:
 "Perfecto, [nombre], quedamos el [día] a las [hora]. Ahí el asesor te explica todo sin presión y sin compromiso. Te mando la dirección por WhatsApp ahorita mismo. ¡Que tengas un excelente día!" → endCall() inmediato.
@@ -59,7 +59,7 @@ CIERRE:
 OBJECIONES — siempre con Feel/Felt/Found + solución concreta + cita:
 - "No tengo los papeles" → "Entiendo, mucha gente piensa que necesita un montón de documentos y eso les frena. Lo que nuestros clientes descubren es que son muy poquitos — básicamente ID y algo que muestre ingresos, y el asesor te dice exactamente qué llevar según tu caso. ¿El martes o el miércoles te queda mejor?"
 - "No tengo dinero para el inicial" → "Eso lo escucho seguido, [nombre], y tiene solución. Tenemos carros desde cien dólares de inicial — el asesor trabaja contigo según lo que tienes disponible. Vale la pena verlo en persona. ¿Mañana en la mañana o en la tarde?"
-- "No tengo tiempo, trabajo mucho" → "Entiendo perfectamente, todos andamos corriendo. Por eso tenemos horarios flexibles — mañana, tarde, y también los sábados. ¿Cuál día de esta semana te funciona, aunque sea una horita?"
+- "No tengo tiempo, trabajo mucho" → "Entiendo perfectamente, todos andamos corriendo. Por eso tenemos horarios flexibles — mañana, tarde, y también los sábados. ¿Cuándo te quedaría bien a ti, aunque sea una horita?" Si el cliente propone un día y hora, acéptalo de inmediato.
 - "Me negaron en todos lados" → Feel/Felt/Found completo + "¿Por qué no vienes sin compromiso y dejamos que el asesor revise tu caso? No cuesta nada y puede que te sorprenda. ¿Qué día esta semana?"
 - "No tengo crédito" → "Eso no es problema aquí, [nombre] — es nuestra especialidad. Trabajamos con personas que están empezando, sin historial, y les ayudamos a construir crédito mientras manejan. ¿Mañana o pasado te queda mejor?"
 - "¿Cuánto voy a pagar al mes?" → "Desde doscientos noventa y nueve al mes, [nombre], pero el número real depende de tu situación — por eso el asesor te hace el cálculo exacto en persona. ¿El martes o el miércoles te funciona?"
@@ -98,19 +98,20 @@ REGLAS DE ORO:
     voiceId:  '846d6cb0-2301-48b6-9683-48f5618ea2f6', // Spanish-speaking Lady
     model:    'sonic-3',
   },
+  firstMessageMode: 'assistant-waits-for-user', // espera que el cliente diga "Hola" antes de hablar
   transcriber: {
     provider:    'deepgram',
     model:       'nova-2',
     language:    'es',
     keywords:    ['AutoAprobado', 'Miami', 'Hyundai', 'financiamiento', 'crédito', 'cita', 'sí', 'no'],
-    endpointing: 250, // más tiempo para que el cliente termine de hablar
+    endpointing: 150,
   },
   startSpeakingPlan: {
-    waitSeconds: 0.7, // pausa natural entre que el cliente habla y Sofía responde
+    waitSeconds: 0.4,
     transcriptionEndpointingPlan: {
-      onPunctuationSeconds:   0.3,
-      onNoPunctuationSeconds: 1.2,
-      onNumberSeconds:        0.5,
+      onPunctuationSeconds:   0.2,
+      onNoPunctuationSeconds: 0.8,
+      onNumberSeconds:        0.4,
     }
   },
   stopSpeakingPlan: {
@@ -289,7 +290,7 @@ export async function llamarLead(lead) {
         phoneNumberId: VAPI_PHONE_ID,
         assistant: {
           ...SOFIA_CONFIG,
-          firstMessage: `¿Hola, ${nombre}?`,
+          firstMessage: `¡Hola! ¿Hablo con ${nombre}?`,
         },
         customer: {
           number: tel,
