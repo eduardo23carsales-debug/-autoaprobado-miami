@@ -651,6 +651,24 @@ cron.schedule('0 */4 * * *', () => {
   ejecutarSupervisor().catch(e => console.error('[Cron] Supervisor error:', e.message));
 }, { timezone: 'America/New_York' });
 
+// ── Self-ping cada 30 min — detectar caídas ──────────
+cron.schedule('*/30 * * * *', async () => {
+  try {
+    const res = await axios.get(`https://oferta.hyundaipromomiami.com/health`, { timeout: 10000 });
+    if (res.status !== 200) throw new Error(`Status ${res.status}`);
+    console.log('[HealthCheck] OK');
+  } catch (err) {
+    console.error('[HealthCheck] Fallo:', err.message);
+    bot.sendMessage(CHAT_ID,
+      `🚨 <b>AutoAprobado Miami — SERVIDOR CAÍDO</b>\n\n` +
+      `❌ No responde en <code>hyundaipromomiami.com</code>\n` +
+      `🕐 ${new Date().toLocaleString('es-US', { timeZone: 'America/New_York' })}\n\n` +
+      `Railway reiniciará automáticamente. Si persiste, revisa el deploy.`,
+      { parse_mode: 'HTML' }
+    ).catch(() => {});
+  }
+});
+
 // ── Iniciar servidor ─────────────────────────────────
 app.listen(PORT, async () => {
   console.log(`✅ AutoAprobado Miami corriendo en http://localhost:${PORT}`);
