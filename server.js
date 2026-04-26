@@ -651,21 +651,28 @@ cron.schedule('0 */4 * * *', () => {
   ejecutarSupervisor().catch(e => console.error('[Cron] Supervisor error:', e.message));
 }, { timezone: 'America/New_York' });
 
-// ── Self-ping cada 30 min — detectar caídas ──────────
+// ── Self-ping cada 30 min — auto-reinicio si se congela ──
+let healthFails = 0;
 cron.schedule('*/30 * * * *', async () => {
   try {
     const res = await axios.get(`https://oferta.hyundaipromomiami.com/health`, { timeout: 10000 });
     if (res.status !== 200) throw new Error(`Status ${res.status}`);
+    healthFails = 0;
     console.log('[HealthCheck] OK');
   } catch (err) {
-    console.error('[HealthCheck] Fallo:', err.message);
+    healthFails++;
+    console.error(`[HealthCheck] Fallo #${healthFails}:`, err.message);
     bot.sendMessage(CHAT_ID,
-      `🚨 <b>AutoAprobado Miami — SERVIDOR CAÍDO</b>\n\n` +
-      `❌ No responde en <code>hyundaipromomiami.com</code>\n` +
-      `🕐 ${new Date().toLocaleString('es-US', { timeZone: 'America/New_York' })}\n\n` +
-      `Railway reiniciará automáticamente. Si persiste, revisa el deploy.`,
+      `🚨 <b>AutoAprobado Miami — SERVIDOR NO RESPONDE</b>\n\n` +
+      `❌ Fallo #${healthFails} en <code>hyundaipromomiami.com</code>\n` +
+      `🕐 ${new Date().toLocaleString('es-US', { timeZone: 'America/New_York' })}\n` +
+      (healthFails >= 2 ? `🔄 Reiniciando proceso ahora...` : `⏳ Reintentando en 30 min...`),
       { parse_mode: 'HTML' }
     ).catch(() => {});
+    if (healthFails >= 2) {
+      console.error('[HealthCheck] 2 fallos consecutivos — forzando reinicio');
+      process.exit(1);
+    }
   }
 });
 
