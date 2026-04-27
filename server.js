@@ -655,7 +655,7 @@ cron.schedule('0 */4 * * *', () => {
 let healthFails = 0;
 cron.schedule('*/30 * * * *', async () => {
   try {
-    const res = await axios.get(`https://oferta.hyundaipromomiami.com/health`, { timeout: 10000 });
+    const res = await axios.get(`https://oferta.hyundaipromomiami.com/api/ping`, { timeout: 10000 });
     if (res.status !== 200) throw new Error(`Status ${res.status}`);
     healthFails = 0;
     console.log('[HealthCheck] OK');
