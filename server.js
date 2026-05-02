@@ -503,14 +503,6 @@ app.post('/api/meta/webhook', async (req, res) => {
         // CAPI — deduplicar con event_id basado en leadgen_id
         enviarEventoCAPI({ nombre, telefono, segmento, ip: '0.0.0.0', userAgent: 'Meta Lead Ads', eventId: `leadgen_${leadgen_id}` });
 
-        // VAPI — llamar de 9AM a 8PM ET
-        if (process.env.VAPI_API_KEY && process.env.VAPI_PHONE_NUMBER_ID && telefono !== '—') {
-          const horaET = new Date().toLocaleString('en-US', { timeZone: 'America/New_York', hour: 'numeric', hour12: false });
-          if (parseInt(horaET) >= 9 && parseInt(horaET) < 20) {
-            try { programarLlamada({ nombre, telefono, segmento }); } catch {}
-          }
-        }
-
         console.log(`[Lead Ads] Lead recibido: ${nombre} — ${telefono} — Score: ${score.label}`);
       }
     }
@@ -655,7 +647,7 @@ cron.schedule('0 */4 * * *', () => {
 let healthFails = 0;
 cron.schedule('*/30 * * * *', async () => {
   try {
-    const res = await axios.get(`https://oferta.hyundaipromomiami.com/api/ping`, { timeout: 10000 });
+    const res = await axios.get(`https://oferta.hyundaipromomiami.com/api/ping`, { timeout: 15000 });
     if (res.status !== 200) throw new Error(`Status ${res.status}`);
     healthFails = 0;
     console.log('[HealthCheck] OK');
@@ -666,11 +658,11 @@ cron.schedule('*/30 * * * *', async () => {
       `🚨 <b>AutoAprobado Miami — SERVIDOR NO RESPONDE</b>\n\n` +
       `❌ Fallo #${healthFails} en <code>hyundaipromomiami.com</code>\n` +
       `🕐 ${new Date().toLocaleString('es-US', { timeZone: 'America/New_York' })}\n` +
-      (healthFails >= 2 ? `🔄 Reiniciando proceso ahora...` : `⏳ Reintentando en 30 min...`),
+      (healthFails >= 3 ? `🔄 Reiniciando proceso ahora...` : `⏳ Reintentando en 30 min...`),
       { parse_mode: 'HTML' }
     ).catch(() => {});
-    if (healthFails >= 2) {
-      console.error('[HealthCheck] 2 fallos consecutivos — forzando reinicio');
+    if (healthFails >= 3) {
+      console.error('[HealthCheck] 3 fallos consecutivos — forzando reinicio');
       process.exit(1);
     }
   }
